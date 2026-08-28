@@ -18,21 +18,6 @@ STATUS_MAP = {
 
 
 def extract_rows(response: dict) -> list[dict]:
-    """
-    mySim devuelve:
-
-    {
-        "msg": "Ok",
-        "status": 200,
-        "data": {
-            "data": [...]
-        }
-    }
-    """
-
-    if not response:
-        return []
-
     data = response.get("data")
 
     if isinstance(data, dict):
@@ -41,37 +26,24 @@ def extract_rows(response: dict) -> list[dict]:
         if isinstance(rows, list):
             return rows
 
-    if isinstance(data, list):
-        return data
-
     return []
 
 
-def parse_mysim_datetime(value: str | None) -> datetime | None:
-    if not value:
-        return None
+def get_task_id_from_schedule_code(
+    schedule_code: str | None,
+) -> str:
+    if not schedule_code:
+        return "UNKNOWN"
 
-    try:
-        return datetime.fromisoformat(value)
-    except ValueError:
-        logger.warning(
-            "Invalid mySim datetime: %r",
-            value,
-        )
-        return None
+    parts = schedule_code.split("-")
+
+    if len(parts) < 4:
+        return schedule_code
+
+    return "-".join(parts[2:])
 
 
 def get_device_from_task_id(task_id: str) -> str:
-    """
-    Ejemplos:
-
-    FTD-00297       -> FTD
-    A400M-000797    -> A400M
-    295_2-000706    -> 295_2
-    MRTT-00392      -> MRTT
-    IPT-00363       -> IPT
-    """
-
     match = re.match(r"^(.*)-\d+$", task_id)
 
     if match:
@@ -96,122 +68,89 @@ async def get_upcoming_tasks(
     start_date = start.strftime("%Y-%m-%d")
     end_date = end.strftime("%Y-%m-%d")
 
+    #
+    # ESTA ES LA CONSULTA QUE YA HEMOS
+    # COMPROBADO QUE FUNCIONA EN mySim
+    #
     query = (
-        "t.entity='MaintenanceSchedule' "
-        "AND t.idCol=34 "
-        "AND t.enabled=1 "
-        "AND t.status<>201 "
-        f"AND t.plannedDate>='{start_date}' "
-        f"AND t.plannedDate<'{end_date}' "
-        "ORDER BY t.plannedDate ASC"
+        f"t.plannedDate>='{start_date}' "
+        f"AND t.plannedDate<'{end_date}'"
     )
 
     logger.info(
-        "Fetching scheduled tasks: %s",
+        "scheduledTasks query: %s",
         query,
     )
 
-    scheduled_response = await mysim_client.get(
+    response = await mysim_client.get(
         entity="scheduledTasks",
         extra_query=query,
     )
 
-    scheduled_tasks = extract_rows(
-        scheduled_response
-    )
-
-    if not scheduled_tasks:
-        return []
-
-    #
-    # IDs internos de maintenanceTask
-    #
-
-    task_ids = sorted({
-        row["task"]
-        for row in scheduled_tasks
-        if row.get("task") is not None
-    })
-
-    if not task_ids:
-        return []
-
-    ids_csv = ",".join(
-        str(task_id)
-        for task_id in task_ids
-    )
-
-    task_query = (
-        f"t.id IN ({ids_csv}) "
-        "ORDER BY t.id ASC"
-    )
+    rows = extract_rows(response)
 
     logger.info(
-        "Fetching maintenance tasks: %s",
-        task_query,
+        "scheduledTasks returned %d rows",
+        len(rows),
     )
-
-    maintenance_response = await mysim_client.get(
-        entity="maintenanceTask",
-        extra_query=task_query,
-    )
-
-    maintenance_tasks = extract_rows(
-        maintenance_response
-    )
-
-    maintenance_by_id = {
-        row["id"]: row
-        for row in maintenance_tasks
-        if row.get("id") is not None
-    }
 
     result: list[Task] = []
 
-    for scheduled in scheduled_tasks:
+    for row in rows:
 
-        internal_task_id = scheduled.get(
-            "task"
-        )
+        #
+        # La consulta funcional también devuelve
+        # MaintenanceSchedule 35 (ITC).
+        #
+        # Nosotros queremos las del schedule 34
+        # que estábamos viendo en el dashboard.
+        #
+        if row.get("entity") != "MaintenanceSchedule":
+            continue
 
-        maintenance = maintenance_by_id.get(
-            internal_task_id
-        )
+        if row.get("idCol") != 34:
+            continue
 
-        if not maintenance:
+        if not row.get("enabled", False):
+            continue
+
+        #
+        # No mostrar las ya terminadas.
+        #
+        status_id = row.get("status")
+
+        if status_id == 201:
+            continue
+
+        planned_value = row.get("plannedDate")
+
+        if not planned_value:
+            continue
+
+        try:
+            planned_date = datetime.fromisoformat(
+                planned_value
+            )
+        except ValueError:
             logger.warning(
-                "maintenanceTask not found for id=%s",
-                internal_task_id,
+                "Invalid plannedDate for task %s: %r",
+                row.get("id"),
+                planned_value,
             )
             continue
 
-        task_id = maintenance.get("taskId")
-        description = maintenance.get("task")
-
-        if not task_id:
-            logger.warning(
-                "maintenanceTask %s has no taskId",
-                internal_task_id,
-            )
-            continue
-
-        planned_date = parse_mysim_datetime(
-            scheduled.get("plannedDate")
+        task_id = get_task_id_from_schedule_code(
+            row.get("scheduleTaskCod")
         )
-
-        if planned_date is None:
-            continue
-
-        status_id = scheduled.get("status")
 
         result.append(
             Task(
-                id=scheduled["id"],
+                id=row["id"],
                 task_id=task_id,
                 device=get_device_from_task_id(
                     task_id
                 ),
-                description=description or "",
+                description="",
                 planned_date=planned_date,
                 status_id=status_id,
                 status=STATUS_MAP.get(

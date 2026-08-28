@@ -34,13 +34,7 @@ export function Dashboard() {
   useEffect(() => {
     async function loadData() {
       try {
-        const [
-          expiring,
-          overdue,
-          drs,
-          actions,
-          upcomingTasks,
-        ] = await Promise.all([
+        const results = await Promise.allSettled([
           getExpiringJobs(7),
           getOverdueJobs(),
           getOpenDrs(),
@@ -48,19 +42,84 @@ export function Dashboard() {
           getUpcomingTasks(7),
         ])
 
-        console.log("Expiring jobs:", expiring.length)
-        console.log("Overdue jobs:", overdue.length)
-        console.log("Open DRs:", drs.length)
-        console.log("Open Actions:", actions.length)
-        console.log("Upcoming Tasks:", upcomingTasks.length)
+        const [
+          expiringResult,
+          overdueResult,
+          drsResult,
+          actionsResult,
+          tasksResult,
+        ] = results
 
-        setExpiringJobs(expiring)
-        setOverdueJobs(overdue)
-        setOpenDrs(drs)
-        setOpenActions(actions)
-        setTasks(upcomingTasks)
-      } catch (error) {
-        console.error("Dashboard load error:", error)
+        if (expiringResult.status === "fulfilled") {
+          console.log(
+            "Expiring jobs:",
+            expiringResult.value.length
+          )
+
+          setExpiringJobs(expiringResult.value)
+        } else {
+          console.error(
+            "Expiring jobs error:",
+            expiringResult.reason
+          )
+        }
+
+        if (overdueResult.status === "fulfilled") {
+          console.log(
+            "Overdue jobs:",
+            overdueResult.value.length
+          )
+
+          setOverdueJobs(overdueResult.value)
+        } else {
+          console.error(
+            "Overdue jobs error:",
+            overdueResult.reason
+          )
+        }
+
+        if (drsResult.status === "fulfilled") {
+          console.log(
+            "Open DRs:",
+            drsResult.value.length
+          )
+
+          setOpenDrs(drsResult.value)
+        } else {
+          console.error(
+            "DRs error:",
+            drsResult.reason
+          )
+        }
+
+        if (actionsResult.status === "fulfilled") {
+          console.log(
+            "Open Actions:",
+            actionsResult.value.length
+          )
+
+          setOpenActions(actionsResult.value)
+        } else {
+          console.error(
+            "Actions error:",
+            actionsResult.reason
+          )
+        }
+
+        if (tasksResult.status === "fulfilled") {
+          console.log(
+            "Upcoming Tasks:",
+            tasksResult.value.length
+          )
+
+          setTasks(tasksResult.value)
+        } else {
+          console.error(
+            "Tasks error:",
+            tasksResult.reason
+          )
+        }
+
       } finally {
         setLoading(false)
       }
