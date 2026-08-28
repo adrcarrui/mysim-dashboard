@@ -6,12 +6,15 @@ import {
 } from "../api/jobs"
 
 import { getOpenDrs } from "../api/drs"
+import { getOpenActions } from "../api/actions"
 
 import type { Job } from "../types/job"
 import type { Dr } from "../types/dr"
+import type { Action } from "../types/action"
 
 import { JobsCarousel } from "../components/jobs/JobsCarousel"
 import { DrsCarousel } from "../components/drs/DrsCarousel"
+import { ActionsCarousel } from "../components/actions/ActionsCarousel"
 
 import "../styles/dashboard.css"
 
@@ -20,26 +23,34 @@ export function Dashboard() {
   const [expiringJobs, setExpiringJobs] = useState<Job[]>([])
   const [overdueJobs, setOverdueJobs] = useState<Job[]>([])
   const [openDrs, setOpenDrs] = useState<Dr[]>([])
+  const [openActions, setOpenActions] = useState<Action[]>([])
 
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function loadData() {
       try {
-        const [expiring, overdue, drs] =
-          await Promise.all([
-            getExpiringJobs(7),
-            getOverdueJobs(),
-            getOpenDrs(),
-          ])
+        const [
+          expiring,
+          overdue,
+          drs,
+          actions,
+        ] = await Promise.all([
+          getExpiringJobs(7),
+          getOverdueJobs(),
+          getOpenDrs(),
+          getOpenActions(),
+        ])
 
         console.log("Expiring jobs:", expiring.length)
         console.log("Overdue jobs:", overdue.length)
         console.log("Open DRs:", drs.length)
+        console.log("Open Actions:", actions.length)
 
         setExpiringJobs(expiring)
         setOverdueJobs(overdue)
         setOpenDrs(drs)
+        setOpenActions(actions)
       } catch (error) {
         console.error("Dashboard load error:", error)
       } finally {
@@ -74,6 +85,11 @@ export function Dashboard() {
       <DrsCarousel
         title={`OPEN DISCREPANCY REPORTS (${openDrs.length})`}
         drs={openDrs}
+      />
+
+      <ActionsCarousel
+        title={`OPEN ACTIONS (${openActions.length})`}
+        actions={openActions}
       />
 
       <JobsCarousel

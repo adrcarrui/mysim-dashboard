@@ -5,7 +5,7 @@ from app.services.actions_service import actions_service
 
 
 router = APIRouter(
-    prefix="/api/actions",
+    prefix="/actions",
     tags=["Actions"],
 )
 
