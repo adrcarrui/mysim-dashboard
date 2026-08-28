@@ -5,6 +5,8 @@ from html.parser import HTMLParser
 from app.schemas.job import Job
 from app.services.mysim_client import mysim_client
 
+from app.services.devices_service import devices_service
+
 
 PRIORITY_MAP = {
     18: 1,
@@ -87,6 +89,12 @@ class JobsService:
 
         for raw in raw_jobs:
 
+            device_id = raw.get("device")
+
+            device_name = await devices_service.get_name(
+                device_id
+            )
+
             target_date = (
                 datetime.fromisoformat(raw["targetDate"])
                 if raw.get("targetDate")
@@ -124,7 +132,8 @@ class JobsService:
 
                     alias=raw.get("alias"),
 
-                    device_id=raw.get("device"),
+                    device_id=device_id,
+                    device_name=device_name,
 
                     priority_id=raw.get("priority"),
                     priority=PRIORITY_MAP.get(
@@ -155,5 +164,84 @@ class JobsService:
 
         return jobs
 
+async def get_overdue_jobs(self) -> list[Job]:
+
+    today = date.today().strftime("%Y-%m-%d")
+
+    query = (
+        f"t.targetDate<'{today}' "
+        f"AND t.closingDate IS NULL"
+    )
+
+    response = await mysim_client.get(
+        entity="Job",
+        extra_query=query,
+    )
+
+    if response.get("status") == 404:
+        return []
+
+    raw_jobs = (
+        response
+        .get("data", {})
+        .get("data", [])
+    )
+
+    jobs: list[Job] = []
+
+    for raw in raw_jobs:
+        target_date = (
+            datetime.fromisoformat(raw["targetDate"])
+            if raw.get("targetDate")
+            else None
+        )
+
+        device_id = raw.get("device")
+
+        device_name = await devices_service.get_name(
+            device_id
+        )
+
+        days_remaining = None
+
+        if target_date:
+            days_remaining = (
+                target_date.date() - date.today()
+            ).days
+
+        jobs.append(
+            Job(
+                id=raw["id"],
+                job_number=raw["jobNumber"],
+                target_date=target_date,
+                description=clean_html(
+                    raw.get("jobDescription")
+                ),
+                alias=raw.get("alias"),
+                device_id=device_id,
+                device_name=device_name,
+                priority_id=raw.get("priority"),
+                priority=PRIORITY_MAP.get(
+                    raw.get("priority")
+                ),
+                status_id=raw.get("status"),
+                assigned_to_id=raw.get("asignedTo"),
+                related_maintenance_task_id=raw.get(
+                    "relatedMaintenanceTask"
+                ),
+                days_remaining=days_remaining,
+                urgency="overdue",
+            )
+        )
+
+    jobs.sort(
+        key=lambda job: (
+            job.target_date is None,
+            job.target_date,
+        )
+    )
+
+    return jobs
 
 jobs_service = JobsService()
+

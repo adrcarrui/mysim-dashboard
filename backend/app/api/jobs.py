@@ -24,3 +24,10 @@ async def get_expiring_jobs(
     return await jobs_service.get_expiring_jobs(
         days=days
     )
+
+@router.get(
+    "/overdue",
+    response_model=list[Job],
+)
+async def get_overdue_jobs():
+    return await jobs_service.get_overdue_jobs()
