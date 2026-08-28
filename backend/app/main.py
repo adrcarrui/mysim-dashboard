@@ -5,6 +5,7 @@ from app.api.health import router as health_router
 from app.api.jobs import router as jobs_router
 from app.api.drs import router as drs_router
 from app.api.actions import router as actions_router
+from app.api.tasks import router as tasks_router
 from app.version import APP_VERSION
 
 
@@ -30,6 +31,7 @@ app.include_router(health_router)
 app.include_router(jobs_router)
 app.include_router(drs_router,prefix="/api")
 app.include_router(actions_router,prefix="/api")
+app.include_router(tasks_router,prefix="/api")
 
 
 @app.get("/")

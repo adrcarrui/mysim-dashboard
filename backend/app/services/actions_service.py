@@ -1,6 +1,6 @@
-from app.schemas.action import Action
+from datetime import date, timedelta
+
 from app.services.mysim_client import mysim_client
-from app.services.devices_service import devices_service
 
 
 DONE_STATUS_ID = 22
@@ -12,58 +12,36 @@ class ActionsService:
         self,
         from_date: str | None = None,
         to_date: str | None = None,
-    ) -> list[Action]:
+    ):
+        # Si no vienen fechas desde frontend,
+        # usamos hoy -> hoy + 7 días
+        if from_date is None:
+            from_date = date.today().isoformat()
 
-        conditions: list[str] = []
+        if to_date is None:
+            to_date = (
+                date.today() + timedelta(days=7)
+            ).isoformat()
 
-        # -------------------------------------------------
-        # FILTROS QUE SÍ SOPORTA extraQuery
-        # -------------------------------------------------
+        extra_query = (
+            f"t.date>='{from_date}' "
+            f"AND t.date<'{to_date}'"
+        )
 
-        if from_date:
-            conditions.append(
-                f"t.date>='{from_date}'"
-            )
-
-        if to_date:
-            conditions.append(
-                f"t.date<'{to_date}'"
-            )
-
-        extra_query = None
-
-        if conditions:
-            where = " AND ".join(conditions)
-
-            extra_query = f"""
-                {where}
-                ORDER BY t.date DESC
-            """.strip()
-
-        # -------------------------------------------------
-        # CONSULTA A MYSIM
-        # -------------------------------------------------
+        print("ACTION QUERY:", extra_query)
 
         payload = await mysim_client.get(
             entity="action",
             extra_query=extra_query,
         )
+
         rows = (
             payload
             .get("data", {})
             .get("data", [])
         )
 
-        # -------------------------------------------------
-        # FILTRAR DONE
-        #
-        # mySim no permite de momento:
-        # t.status<>22
-        # t.status!=22
-        # t.status=19
-        #
-        # así que filtramos localmente.
-        # -------------------------------------------------
+        print("ACTIONS RECEIVED:", len(rows))
 
         open_rows = [
             row
@@ -71,41 +49,9 @@ class ActionsService:
             if row.get("status") != DONE_STATUS_ID
         ]
 
-        # -------------------------------------------------
-        # RESOLVER NOMBRE DEL DEVICE
-        # -------------------------------------------------
+        print("OPEN ACTIONS:", len(open_rows))
 
-        result: list[Action] = []
-
-        for row in open_rows:
-
-            device_id = row.get("device")
-
-            device_name = await devices_service.get_name(
-                device_id
-            )
-
-            enriched_row = {
-                **row,
-                "deviceName": device_name,
-            }
-
-            result.append(
-                Action.model_validate(enriched_row)
-            )
-
-        # -------------------------------------------------
-        # ORDEN LOCAL
-        #
-        # Necesario también cuando no mandamos extraQuery.
-        # -------------------------------------------------
-
-        result.sort(
-            key=lambda action: action.date or "",
-            reverse=True,
-        )
-
-        return result
+        return open_rows
 
 
 actions_service = ActionsService()
