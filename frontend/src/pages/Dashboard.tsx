@@ -33,11 +33,15 @@ export function Dashboard() {
             getOpenDrs(),
           ])
 
+        console.log("Expiring jobs:", expiring.length)
+        console.log("Overdue jobs:", overdue.length)
+        console.log("Open DRs:", drs.length)
+
         setExpiringJobs(expiring)
         setOverdueJobs(overdue)
         setOpenDrs(drs)
       } catch (error) {
-        console.error(error)
+        console.error("Dashboard load error:", error)
       } finally {
         setLoading(false)
       }
@@ -67,6 +71,11 @@ export function Dashboard() {
         </div>
       </header>
 
+      <DrsCarousel
+        title={`OPEN DISCREPANCY REPORTS (${openDrs.length})`}
+        drs={openDrs}
+      />
+
       <JobsCarousel
         title="JOBS EXPIRING"
         jobs={expiringJobs}
@@ -75,13 +84,6 @@ export function Dashboard() {
       <JobsCarousel
         title="OVERDUE JOBS"
         jobs={overdueJobs}
-      />
-<div style={{ color: "red", fontSize: "24px" }}>
-  DR COUNT: {openDrs.length}
-</div>
-      <DrsCarousel
-        title="OPEN DISCREPANCY REPORTS"
-        drs={openDrs}
       />
     </main>
   )

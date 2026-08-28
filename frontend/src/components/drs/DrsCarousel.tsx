@@ -1,8 +1,7 @@
 import { Swiper, SwiperSlide } from "swiper/react"
-import { Autoplay, Pagination } from "swiper/modules"
+import { Autoplay } from "swiper/modules"
 
 import "swiper/css"
-import "swiper/css/pagination"
 
 import type { Dr } from "../../types/dr"
 import { DrCard } from "./DrCard"
@@ -21,12 +20,9 @@ export function DrsCarousel({
       <h2>{title}</h2>
 
       <Swiper
-        modules={[Autoplay, Pagination]}
+        modules={[Autoplay]}
         spaceBetween={24}
         slidesPerView={3}
-        pagination={{
-          clickable: true,
-        }}
         autoplay={{
           delay: 10000,
           disableOnInteraction: false,
