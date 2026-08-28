@@ -7,31 +7,32 @@ class DrOut(BaseModel):
 
     id: int
 
-    drId: str | None = None
+    dr_id: str | None = None
 
-    reportedDate: datetime | None = None
-    closingDate: datetime | None = None
+    reported_date: datetime | None = None
+    closing_date: datetime | None = None
 
-    customerDescription: str | None = None
-    faultDescription: str | None = None
+    customer_description: str | None = None
+    fault_description: str | None = None
 
-    detectedBy: int | None = None
+    detected_by_id: int | None = None
     repetitions: int | None = None
 
-    manufacturerIdNumber: str | None = None
+    manufacturer_id_number: str | None = None
     ata: int | None = None
 
-    closeRemarks: str | None = None
-    rootCauseAnalysis: str | None = None
+    close_remarks: str | None = None
+    root_cause_analysis: str | None = None
 
-    notOur: bool | None = None
+    not_our: bool | None = None
 
-    priority: int | None = None
-    status: int | None = None
-    severity: int | None = None
+    priority_id: int | None = None
+    status_id: int | None = None
+    severity_id: int | None = None
 
-    affectedSystem: int | None = None
-    device: int | None = None
+    affected_system_id: int | None = None
+
+    device_id: int | None = None
     device_name: str | None = None
 
-    lastUpdated: datetime | None = None
+    last_updated: datetime | None = None

@@ -76,7 +76,9 @@ export function Dashboard() {
         title="OVERDUE JOBS"
         jobs={overdueJobs}
       />
-
+<div style={{ color: "red", fontSize: "24px" }}>
+  DR COUNT: {openDrs.length}
+</div>
       <DrsCarousel
         title="OPEN DISCREPANCY REPORTS"
         drs={openDrs}

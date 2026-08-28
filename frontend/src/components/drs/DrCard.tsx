@@ -35,41 +35,39 @@ export function DrCard({ dr }: Props) {
   }
 
   return (
-    <div className="rounded-xl border border-slate-700 bg-slate-900 p-4">
-      <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-white">
+    <div className="job-card">
+      <div className="job-card__header">
+        <span className="job-number">
           {dr.dr_id ?? `DR ${dr.id}`}
-        </h3>
+        </span>
 
-        <span className="text-sm text-slate-400">
-          {dr.device_name ?? "Unknown"}
+        <span className="urgency">
+          {getSeverityLabel(dr.severity_id)}
         </span>
       </div>
 
-      <p className="mt-3 text-sm text-slate-300">
+      <div className="job-device">
+        {dr.device_name ?? "Unknown device"}
+      </div>
+
+      <div className="job-description">
         {dr.customer_description ??
           dr.fault_description ??
-          "Sin descripción"}
-      </p>
+          "No description"}
+      </div>
 
-      <div className="mt-4 flex flex-wrap gap-4 text-xs text-slate-400">
+      <div className="job-meta">
         <span>
           Reported: {formatDate(dr.reported_date)}
-        </span>
-
-        <span>
-          Severity: {getSeverityLabel(dr.severity_id)}
         </span>
 
         <span>
           Repetitions: {dr.repetitions ?? 0}
         </span>
 
-        {dr.ata !== null && (
-          <span>
-            ATA: {dr.ata}
-          </span>
-        )}
+        <span>
+          ATA: {dr.ata ?? "-"}
+        </span>
       </div>
     </div>
   )
