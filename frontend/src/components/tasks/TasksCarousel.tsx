@@ -4,7 +4,7 @@ import { Autoplay, Pagination } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/pagination'
 
-import type { Task } from '../types'
+import type { Task } from '../../types/task'
 
 
 interface Props {

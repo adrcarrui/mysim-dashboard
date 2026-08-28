@@ -5,7 +5,7 @@ from app.services import tasks_service
 
 
 router = APIRouter(
-    prefix="/api/tasks",
+    prefix="/tasks",
     tags=["tasks"],
 )
 

@@ -106,12 +106,12 @@ export function Dashboard() {
       />
 
       <JobsCarousel
-        title="JOBS EXPIRING"
+        title={`JOBS EXPIRING (${expiringJobs.length})`}
         jobs={expiringJobs}
       />
 
       <JobsCarousel
-        title="OVERDUE JOBS"
+        title={`OVERDUE JOBS (${overdueJobs.length})`}
         jobs={overdueJobs}
       />
     </main>
