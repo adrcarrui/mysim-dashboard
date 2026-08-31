@@ -3,23 +3,23 @@ import { useEffect, useState } from "react"
 import {
   getExpiringJobs,
   getOverdueJobs,
-} from "../api/jobs"
+} from "../../api/jobs"
 
-import { getOpenDrs } from "../api/drs"
-import { getOpenActions } from "../api/actions"
-import { getUpcomingTasks } from "../api/tasks"
+import { getOpenDrs } from "../../api/drs"
+import { getOpenActions } from "../../api/actions"
+import { getUpcomingTasks } from "../../api/tasks"
 
-import type { Job } from "../types/job"
-import type { Dr } from "../types/dr"
-import type { Action } from "../types/action"
-import type { Task } from "../types/task"
+import type { Job } from "../../types/job"
+import type { Dr } from "../../types/dr"
+import type { Action } from "../../types/action"
+import type { Task } from "../../types/task"
 
-import { JobsCarousel } from "../components/jobs/JobsCarousel"
-import { DrsCarousel } from "../components/drs/DrsCarousel"
-import { ActionsCarousel } from "../components/actions/ActionsCarousel"
-import { TasksCarousel } from "../components/tasks/TasksCarousel"
+import { JobsCarousel } from "../../components/jobs/JobsCarousel"
+import { DrsCarousel } from "../../components/drs/DrsCarousel"
+import { ActionsCarousel } from "../../components/actions/ActionsCarousel"
+import { TasksCarousel } from "../../components/tasks/TasksCarousel"
 
-import "../styles/dashboard.css"
+import "./Dashboard.css"
 
 
 export function Dashboard() {

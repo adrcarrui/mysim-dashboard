@@ -1,0 +1,50 @@
+.airbus-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--airbus-space-2);
+  min-height: 24px;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid transparent;
+  border-radius: var(--airbus-radius-pill);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.airbus-badge__dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.airbus-badge--neutral {
+  color: #435762;
+  background: #edf1f3;
+  border-color: #d8e0e5;
+}
+
+.airbus-badge--info {
+  color: var(--airbus-blue-700);
+  background: rgba(0, 133, 173, 0.1);
+  border-color: rgba(0, 133, 173, 0.24);
+}
+
+.airbus-badge--success {
+  color: #4a6b00;
+  background: rgba(132, 189, 0, 0.12);
+  border-color: rgba(132, 189, 0, 0.3);
+}
+
+.airbus-badge--warning {
+  color: #9a3c00;
+  background: rgba(254, 80, 0, 0.1);
+  border-color: rgba(254, 80, 0, 0.28);
+}
+
+.airbus-badge--danger {
+  color: #a60020;
+  background: rgba(228, 0, 43, 0.09);
+  border-color: rgba(228, 0, 43, 0.25);
+}

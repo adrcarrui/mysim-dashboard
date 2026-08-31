@@ -1,0 +1,102 @@
+.airbus-card {
+  --airbus-card-accent: transparent;
+
+  position: relative;
+  overflow: hidden;
+  background: var(--airbus-surface);
+  border: 1px solid var(--airbus-border);
+  border-radius: var(--airbus-radius-md);
+  box-shadow: var(--airbus-shadow-sm);
+}
+
+.airbus-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--airbus-card-accent);
+}
+
+.airbus-card--accent-none::before {
+  display: none;
+}
+
+.airbus-card--accent-blue {
+  --airbus-card-accent: var(--airbus-blue);
+}
+
+.airbus-card--accent-cyan {
+  --airbus-card-accent: var(--airbus-cyan);
+}
+
+.airbus-card--accent-green {
+  --airbus-card-accent: var(--airbus-green);
+}
+
+.airbus-card--accent-orange {
+  --airbus-card-accent: var(--airbus-orange);
+}
+
+.airbus-card--accent-red {
+  --airbus-card-accent: var(--airbus-red);
+}
+
+.airbus-card--accent-pink {
+  --airbus-card-accent: var(--airbus-pink);
+}
+
+.airbus-card--accent-purple {
+  --airbus-card-accent: var(--airbus-purple);
+}
+
+.airbus-card--accent-lime {
+  --airbus-card-accent: var(--airbus-lime);
+}
+
+.airbus-card__header {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--airbus-space-4);
+  padding: var(--airbus-space-4) var(--airbus-space-5);
+  border-bottom: 1px solid var(--airbus-border);
+}
+
+.airbus-card__heading {
+  min-width: 0;
+}
+
+.airbus-card__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--airbus-text);
+}
+
+.airbus-card__subtitle {
+  margin-top: var(--airbus-space-1);
+  font-size: 0.8125rem;
+  color: var(--airbus-text-secondary);
+}
+
+.airbus-card__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--airbus-space-2);
+  flex: 0 0 auto;
+}
+
+.airbus-card__body {
+  padding: var(--airbus-space-5);
+}
+
+.airbus-card--flush .airbus-card__body {
+  padding: 0;
+}
+
+.airbus-card__footer {
+  padding: var(--airbus-space-3) var(--airbus-space-5);
+  background: var(--airbus-surface-soft);
+  border-top: 1px solid var(--airbus-border);
+}

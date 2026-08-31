@@ -1,0 +1,39 @@
+.airbus-ui {
+  font-family: var(--airbus-font-family);
+  color: var(--airbus-text-body);
+  font-size: 16px;
+  line-height: 1.5;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+.airbus-ui h1,
+.airbus-ui h2,
+.airbus-ui h3,
+.airbus-ui h4 {
+  color: var(--airbus-text);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.airbus-ui h1 {
+  font-size: clamp(1.75rem, 2.4vw, 2.25rem);
+}
+
+.airbus-ui h2 {
+  font-size: clamp(1.25rem, 1.8vw, 1.5rem);
+}
+
+.airbus-ui h3 {
+  font-size: 1.125rem;
+}
+
+.airbus-ui a {
+  color: var(--airbus-blue-700);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+.airbus-ui a:hover {
+  color: var(--airbus-blue-500);
+}

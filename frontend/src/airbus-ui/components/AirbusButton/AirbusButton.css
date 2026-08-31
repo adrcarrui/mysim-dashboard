@@ -1,0 +1,114 @@
+.airbus-button {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--airbus-space-2);
+  border: 1px solid transparent;
+  border-radius: var(--airbus-radius-sm);
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color var(--airbus-transition-fast),
+    border-color var(--airbus-transition-fast),
+    color var(--airbus-transition-fast),
+    box-shadow var(--airbus-transition-fast),
+    transform var(--airbus-transition-fast);
+}
+
+.airbus-button:focus-visible {
+  outline: 3px solid rgba(0, 174, 199, 0.28);
+  outline-offset: 2px;
+}
+
+.airbus-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.airbus-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.airbus-button--sm {
+  min-height: 32px;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.8125rem;
+}
+
+.airbus-button--md {
+  min-height: 40px;
+  padding: 0.65rem 1rem;
+  font-size: 0.875rem;
+}
+
+.airbus-button--lg {
+  min-height: 48px;
+  padding: 0.8rem 1.25rem;
+  font-size: 1rem;
+}
+
+.airbus-button--primary {
+  color: var(--airbus-text-inverse);
+  background: var(--airbus-primary);
+  border-color: var(--airbus-primary);
+}
+
+.airbus-button--primary:hover:not(:disabled) {
+  background: var(--airbus-primary-hover);
+  border-color: var(--airbus-primary-hover);
+}
+
+.airbus-button--secondary {
+  color: var(--airbus-primary);
+  background: var(--airbus-surface);
+  border-color: var(--airbus-primary);
+}
+
+.airbus-button--secondary:hover:not(:disabled) {
+  background: rgba(0, 32, 91, 0.06);
+}
+
+.airbus-button--ghost {
+  color: var(--airbus-primary);
+  background: transparent;
+  border-color: transparent;
+}
+
+.airbus-button--ghost:hover:not(:disabled) {
+  background: rgba(0, 32, 91, 0.06);
+}
+
+.airbus-button--danger {
+  color: var(--airbus-text-inverse);
+  background: var(--airbus-danger);
+  border-color: var(--airbus-danger);
+}
+
+.airbus-button--danger:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+.airbus-button--full-width {
+  width: 100%;
+}
+
+.airbus-button__icon {
+  display: inline-flex;
+  width: 1.1em;
+  height: 1.1em;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.airbus-button__icon > svg,
+.airbus-button__icon > img {
+  width: 100%;
+  height: 100%;
+}
+
+.airbus-button__label {
+  min-width: 0;
+}

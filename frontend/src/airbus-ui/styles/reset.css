@@ -1,0 +1,31 @@
+.airbus-ui,
+.airbus-ui *,
+.airbus-ui *::before,
+.airbus-ui *::after {
+  box-sizing: border-box;
+}
+
+.airbus-ui h1,
+.airbus-ui h2,
+.airbus-ui h3,
+.airbus-ui h4,
+.airbus-ui p {
+  margin: 0;
+}
+
+.airbus-ui button,
+.airbus-ui input,
+.airbus-ui select,
+.airbus-ui textarea {
+  font: inherit;
+}
+
+.airbus-ui button {
+  margin: 0;
+}
+
+.airbus-ui img,
+.airbus-ui svg {
+  display: block;
+  max-width: 100%;
+}

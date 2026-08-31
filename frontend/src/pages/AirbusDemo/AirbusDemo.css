@@ -1,0 +1,29 @@
+.airbus-demo__grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fit, minmax(240px, 1fr));
+
+  gap:
+    var(--airbus-space-5);
+
+  margin-bottom:
+    var(--airbus-space-6);
+}
+
+.airbus-demo__metric {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap:
+    var(--airbus-space-4);
+}
+
+.airbus-demo__metric strong {
+  font-size: 36px;
+  font-weight: 600;
+
+  color:
+    var(--airbus-primary);
+}

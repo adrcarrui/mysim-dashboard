@@ -1,0 +1,46 @@
+.airbus-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  color: var(--airbus-blue-500);
+}
+
+.airbus-icon > svg,
+.airbus-icon > img {
+  width: 100%;
+  height: 100%;
+}
+
+.airbus-icon > svg {
+  fill: currentColor;
+  stroke: currentColor;
+}
+
+.airbus-icon--default {
+  color: var(--airbus-blue-500);
+}
+
+.airbus-icon--muted {
+  color: var(--airbus-blue-300);
+}
+
+.airbus-icon--inverse {
+  color: var(--airbus-white);
+}
+
+.airbus-icon--info {
+  color: var(--airbus-info);
+}
+
+.airbus-icon--success {
+  color: var(--airbus-success);
+}
+
+.airbus-icon--warning {
+  color: var(--airbus-warning);
+}
+
+.airbus-icon--danger {
+  color: var(--airbus-danger);
+}

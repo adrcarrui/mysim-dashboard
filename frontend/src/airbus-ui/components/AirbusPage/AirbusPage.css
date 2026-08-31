@@ -1,0 +1,62 @@
+.airbus-page {
+  --airbus-page-highlight: var(--airbus-cyan);
+
+  width: 100%;
+  min-height: 100vh;
+  background: var(--airbus-bg);
+  color: var(--airbus-text-body);
+}
+
+.airbus-page--highlight-cyan {
+  --airbus-page-highlight: var(--airbus-cyan);
+}
+
+.airbus-page--highlight-green {
+  --airbus-page-highlight: var(--airbus-green);
+}
+
+.airbus-page--highlight-lime {
+  --airbus-page-highlight: var(--airbus-lime);
+}
+
+.airbus-page--highlight-orange {
+  --airbus-page-highlight: var(--airbus-orange);
+}
+
+.airbus-page--highlight-red {
+  --airbus-page-highlight: var(--airbus-red);
+}
+
+.airbus-page--highlight-pink {
+  --airbus-page-highlight: var(--airbus-pink);
+}
+
+.airbus-page--highlight-purple {
+  --airbus-page-highlight: var(--airbus-purple);
+}
+
+.airbus-page__main {
+  width: 100%;
+}
+
+.airbus-page__content {
+  width: min(100%, var(--airbus-content-max-width));
+  margin-inline: auto;
+  padding: var(--airbus-space-6) var(--airbus-space-7) var(--airbus-space-8);
+}
+
+.airbus-page--full-width .airbus-page__content {
+  max-width: none;
+}
+
+@media (max-width: 900px) {
+  .airbus-page__content {
+    padding-inline: var(--airbus-space-5);
+  }
+}
+
+@media (max-width: 600px) {
+  .airbus-page__content {
+    padding: var(--airbus-space-5) var(--airbus-space-4) var(--airbus-space-7);
+  }
+}
