@@ -46,6 +46,16 @@ class MySimClient:
                 headers=headers,
             )
 
+            print("========== mySim DEBUG ==========")
+            print("Request URL:", response.request.url)
+            print("Status:", response.status_code)
+            print("Location:", response.headers.get("location"))
+            print("Content-Type:", response.headers.get("content-type"))
+            print("Token configured:", bool(self.token))
+            print("Response body:", response.text[:500])
+            print("=================================")
+
+
         content_type = response.headers.get("content-type", "")
 
         if "application/json" not in content_type:

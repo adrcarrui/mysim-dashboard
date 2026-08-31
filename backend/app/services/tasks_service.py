@@ -35,19 +35,14 @@ def get_task_id_from_schedule_code(
     if not schedule_code:
         return "UNKNOWN"
 
-    parts = schedule_code.split("-")
-
-    if len(parts) < 4:
-        return schedule_code
-
-    return "-".join(parts[2:])
+    return schedule_code
 
 
 def get_device_from_task_id(task_id: str) -> str:
-    match = re.match(r"^(.*)-\d+$", task_id)
+    parts = task_id.split("-")
 
-    if match:
-        return match.group(1)
+    if len(parts) >= 4:
+        return parts[2]
 
     return task_id
 
@@ -74,7 +69,7 @@ async def get_upcoming_tasks(
     #
     query = (
         f"t.plannedDate>='{start_date}' "
-        f"AND t.plannedDate<'{end_date}'"
+        f"AND t.plannedDate<'{end_date}' "
     )
 
     logger.info(
@@ -89,6 +84,15 @@ async def get_upcoming_tasks(
 
     rows = extract_rows(response)
 
+    rows = [
+        row
+        for row in rows
+        if str(row.get("status")) != "201"
+    ]
+
+    rows.sort(
+        key=lambda row: row.get("plannedDate") or ""
+    )
     logger.info(
         "scheduledTasks returned %d rows",
         len(rows),
@@ -151,7 +155,7 @@ async def get_upcoming_tasks(
                     task_id
                 ),
                 description="",
-                planned_date=planned_date,
+                planned_date=row.get("plannedDate"),
                 status_id=status_id,
                 status=STATUS_MAP.get(
                     status_id,

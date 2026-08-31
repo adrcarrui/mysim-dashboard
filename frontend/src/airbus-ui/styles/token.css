@@ -1,0 +1,44 @@
+:root {
+  /* Airbus main brand colours */
+  --airbus-white: #ffffff;
+  --airbus-black: #000000;
+
+  --airbus-blue: #00205b;
+  --airbus-blue-700: #005587;
+  --airbus-blue-500: #0085ad;
+  --airbus-blue-300: #6399ae;
+  --airbus-blue-100: #b7c9d3;
+
+  /* Highlight colours */
+  --airbus-green: #84bd00;
+  --airbus-lime: #e1e000;
+  --airbus-orange: #fe5000;
+  --airbus-red: #e4002b;
+  --airbus-pink: #da1884;
+  --airbus-purple: #a51890;
+  --airbus-cyan: #00aec7;
+
+  /* Application semantics */
+  --airbus-bg: #f5f7f9;
+  --airbus-surface: #ffffff;
+
+  --airbus-text: #00205b;
+  --airbus-text-secondary: #6399ae;
+
+  --airbus-border: #d8e0e5;
+
+  --airbus-primary: #00205b;
+  --airbus-primary-hover: #005587;
+
+  --airbus-info: #0085ad;
+  --airbus-success: #84bd00;
+  --airbus-warning: #fe5000;
+  --airbus-danger: #e4002b;
+
+  --airbus-radius-sm: 4px;
+  --airbus-radius-md: 8px;
+  --airbus-radius-lg: 12px;
+
+  --airbus-shadow:
+    0 2px 8px rgba(0, 32, 91, 0.12);
+}
