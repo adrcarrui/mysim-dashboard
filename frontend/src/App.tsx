@@ -4,25 +4,39 @@ import {
   Route,
 } from "react-router-dom";
 
-import { Dashboard } from "./pages/Dashboard";
-import { Tasks } from "./pages/Tasks";
+import { AppLayout } from "./layouts/AppLayout";
 
-function App() {
+import { Dashboard } from "./pages/Dashboard/Dashboard";
+import { Tasks } from "./pages/Tasks/Tasks";
+import { AirbusDemo } from "./pages/AirbusDemo/AirbusDemo";
+
+
+export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route
-          path="/"
-          element={<Dashboard />}
-        />
+        <Route element={<AppLayout />}>
+          <Route
+            path="/"
+            element={<Dashboard />}
+          />
 
-        <Route
-          path="/tasks"
-          element={<Tasks />}
-        />
+          <Route
+            path="/dashboard"
+            element={<Dashboard />}
+          />
+
+          <Route
+            path="/new"
+            element={<AirbusDemo />}
+          />
+
+          <Route
+            path="/tasks"
+            element={<Tasks />}
+          />
+        </Route>
       </Routes>
     </BrowserRouter>
   );
 }
-
-export default App;
