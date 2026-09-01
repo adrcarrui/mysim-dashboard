@@ -1,9 +1,23 @@
+// frontend/src/types/task.ts
+
 export interface Task {
-  id: number
-  task_id: string
-  device: string
-  description: string
-  planned_date: string
-  status_id: number
-  status: string
+  scheduled_task_id: number;
+  maintenance_task_id: number;
+
+  schedule_code: string;
+
+  device: string;
+  task_code: string;
+
+  description: string | null;
+
+  planned_date: string;
+
+  status: string;
+  status_id: number;
+
+  remarks: string | null;
+  done_at: string | null;
+  performed_by: number | null;
+  performance_remarks: string | null;
 }

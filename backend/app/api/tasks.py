@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Query
 
 from app.schemas.task import Task
-from app.services import tasks_service
+from app.services.tasks_service import (
+    get_upcoming_tasks,
+)
 
 
 router = APIRouter(
@@ -14,7 +16,13 @@ router = APIRouter(
     "/upcoming",
     response_model=list[Task],
 )
-async def get_upcoming_tasks(
-    days: int = Query(default=7, ge=1, le=30),
+async def upcoming_tasks(
+    days: int = Query(
+        default=7,
+        ge=1,
+        le=31,
+    ),
 ):
-    return await tasks_service.get_upcoming_tasks(days)
+    return await get_upcoming_tasks(
+        days=days,
+    )

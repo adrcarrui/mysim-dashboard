@@ -4,14 +4,22 @@ from pydantic import BaseModel
 
 
 class Task(BaseModel):
-    id: int
-    task_id: str
+    scheduled_task_id: int
+    maintenance_task_id: int
+
+    schedule_code: str
+
     device: str
-    description: str
+    task_code: str
+
+    description: str | None = None
+
     planned_date: datetime
 
-    status_id: int
     status: str
+    status_id: int
 
-    performed_by_id: int | None = None
+    remarks: str | None = None
+    done_at: datetime | None = None
+    performed_by: int | None = None
     performance_remarks: str | None = None

@@ -1,20 +1,22 @@
-import type { Task } from '../types/task'
+// frontend/src/api/tasks.ts
 
-const API_BASE_URL =
-  `${window.location.protocol}//${window.location.hostname}:8000`
+import type { Task } from "../types/task";
+
+const API_BASE_URL = "http://localhost:8000/api";
+
 
 export async function getUpcomingTasks(
-  days = 7,
+  days = 7
 ): Promise<Task[]> {
   const response = await fetch(
-    `${API_BASE_URL}/api/tasks/upcoming?days=${days}`
-  )
+    `${API_BASE_URL}/tasks/upcoming?days=${days}`
+  );
 
   if (!response.ok) {
     throw new Error(
-      `Error loading tasks: ${response.status}`
-    )
+      `Failed to load tasks: ${response.status}`
+    );
   }
 
-  return response.json()
+  return response.json();
 }

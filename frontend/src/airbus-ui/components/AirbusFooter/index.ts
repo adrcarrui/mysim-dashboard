@@ -1,0 +1,1 @@
+export { AirbusFooter } from "./AirbusFooter";

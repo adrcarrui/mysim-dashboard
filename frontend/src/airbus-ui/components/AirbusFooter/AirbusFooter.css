@@ -1,0 +1,31 @@
+.airbus-footer {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: var(--airbus-space-4);
+
+  min-height: 44px;
+
+  padding:
+    var(--airbus-space-2)
+    var(--airbus-space-5);
+
+  border-top:
+    1px solid var(--airbus-border);
+
+  background:
+    var(--airbus-surface);
+
+  color:
+    var(--airbus-text-secondary);
+
+  font-size: 12px;
+}
+
+.airbus-footer__left,
+.airbus-footer__right {
+  white-space: nowrap;
+}

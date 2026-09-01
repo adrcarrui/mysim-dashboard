@@ -1,0 +1,163 @@
+.airbus-sidebar {
+  width: 180px;
+  min-width: 180px;
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  background: var(--airbus-primary);
+  color: var(--airbus-white);
+
+  transition:
+    width 180ms ease,
+    min-width 180ms ease;
+}
+
+.airbus-sidebar--collapsed {
+  width: 72px;
+  min-width: 72px;
+}
+
+.airbus-sidebar__header {
+  padding:
+    var(--airbus-space-5)
+    var(--airbus-space-4);
+
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.15);
+}
+
+.airbus-sidebar--collapsed
+.airbus-sidebar__header {
+  padding:
+    var(--airbus-space-4)
+    var(--airbus-space-2);
+}
+
+.airbus-sidebar__header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap:
+    var(--airbus-space-3);
+}
+
+.airbus-sidebar__brand {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.airbus-sidebar__title {
+  margin-top:
+    var(--airbus-space-1);
+
+  font-size: 13px;
+
+  color:
+    var(--airbus-blue-100);
+}
+
+.airbus-sidebar__toggle {
+  width: 100%;
+  min-height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 10px;
+
+  border: 0;
+  border-radius: var(--airbus-radius-sm);
+
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--airbus-white);
+
+  font-size: 20px;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.airbus-sidebar__toggle:hover {
+  background:
+    rgba(255, 255, 255, 0.16);
+}
+
+.airbus-sidebar__nav {
+  display: flex;
+  flex-direction: column;
+
+  padding:
+    var(--airbus-space-4)
+    var(--airbus-space-3);
+
+  gap:
+    var(--airbus-space-1);
+}
+
+.airbus-sidebar--collapsed
+.airbus-sidebar__nav {
+  padding:
+    var(--airbus-space-4)
+    var(--airbus-space-2);
+}
+
+.airbus-sidebar__item {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+
+  gap:
+    var(--airbus-space-3);
+
+  padding:
+    var(--airbus-space-3)
+    var(--airbus-space-4);
+
+  border: 0;
+  border-radius:
+    var(--airbus-radius-sm);
+
+  background: transparent;
+  color:
+    var(--airbus-white);
+
+  font: inherit;
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.airbus-sidebar--collapsed
+.airbus-sidebar__item {
+  justify-content: center;
+
+  padding:
+    var(--airbus-space-3);
+}
+
+.airbus-sidebar__item:hover {
+  background:
+    rgba(255, 255, 255, 0.08);
+}
+
+.airbus-sidebar__item--active {
+  background:
+    var(--airbus-blue-500);
+}
+
+.airbus-sidebar__icon {
+  width: 20px;
+  height: 20px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 auto;
+}

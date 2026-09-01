@@ -1,8 +1,38 @@
 .airbus-header {
   position: relative;
   z-index: 10;
+
   background: var(--airbus-surface);
-  border-bottom: 4px solid var(--airbus-primary);
+
+  border-bottom:
+    4px solid var(--airbus-primary);
+
+  overflow: hidden;
+}
+
+/* Carbon Grid */
+.airbus-header::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background-image:
+    url("../../assets/patterns/airbus-carbon-grid.png");
+
+  background-repeat: no-repeat;
+
+  background-position:
+     center;
+
+  background-size:
+    cover;
+
+  opacity: 0.40;
+
+  pointer-events: none;
+
+  z-index: 0;
 }
 
 .airbus-header--sticky {
@@ -10,15 +40,32 @@
   top: 0;
 }
 
+/* Header content above Carbon Grid */
 .airbus-header__inner {
-  width: min(100%, var(--airbus-content-max-width));
-  min-height: var(--airbus-header-height);
+  position: relative;
+  z-index: 1;
+
+  width: min(
+    100%,
+    var(--airbus-content-max-width)
+  );
+
+  min-height:
+    var(--airbus-header-height);
+
   margin-inline: auto;
-  padding: var(--airbus-space-4) var(--airbus-space-7);
+
+  padding:
+    var(--airbus-space-4)
+    var(--airbus-space-7);
+
   display: flex;
+
   align-items: center;
   justify-content: space-between;
-  gap: var(--airbus-space-6);
+
+  gap:
+    var(--airbus-space-6);
 }
 
 .airbus-header__heading {
@@ -26,25 +73,40 @@
 }
 
 .airbus-header__eyebrow {
-  margin-bottom: var(--airbus-space-1);
-  color: var(--airbus-blue-500);
+  margin-bottom:
+    var(--airbus-space-1);
+
+  color:
+    var(--airbus-blue-500);
+
   font-size: 0.75rem;
   font-weight: 700;
+
   letter-spacing: 0.08em;
+
   text-transform: uppercase;
 }
 
 .airbus-header__title {
   margin: 0;
-  color: var(--airbus-primary);
-  font-size: clamp(1.5rem, 2.3vw, 2rem);
+
+  color:
+    var(--airbus-primary);
+
+  font-size:
+    clamp(1.5rem, 2.3vw, 2rem);
+
   font-weight: 600;
   line-height: 1.15;
 }
 
 .airbus-header__subtitle {
-  margin-top: var(--airbus-space-1);
-  color: var(--airbus-text-secondary);
+  margin-top:
+    var(--airbus-space-1);
+
+  color:
+    var(--airbus-text-secondary);
+
   font-size: 0.875rem;
 }
 
@@ -52,31 +114,52 @@
 .airbus-header__actions {
   display: flex;
   align-items: center;
-  gap: var(--airbus-space-3);
+
+  gap:
+    var(--airbus-space-3);
 }
 
 .airbus-header__right {
   flex: 0 0 auto;
-  gap: var(--airbus-space-5);
+
+  gap:
+    var(--airbus-space-5);
 }
 
 .airbus-header__brand {
   display: flex;
   align-items: center;
-  color: var(--airbus-primary);
+
+  color:
+    var(--airbus-primary);
+
   font-weight: 800;
 }
 
 @media (max-width: 700px) {
   .airbus-header__inner {
-    padding-inline: var(--airbus-space-4);
+    padding-inline:
+      var(--airbus-space-4);
+
     align-items: flex-start;
+
     flex-direction: column;
-    gap: var(--airbus-space-3);
+
+    gap:
+      var(--airbus-space-3);
   }
 
   .airbus-header__right {
     width: 100%;
-    justify-content: space-between;
+
+    justify-content:
+      space-between;
+  }
+
+  .airbus-header::before {
+    background-size:
+      auto 160%;
+
+    opacity: 0.12;
   }
 }

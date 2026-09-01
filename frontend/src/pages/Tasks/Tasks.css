@@ -1,0 +1,83 @@
+/* frontend/src/pages/Tasks/Tasks.css */
+
+.tasks-page {
+  width: min(
+    100%,
+    1440px
+  );
+
+  margin-inline: auto;
+
+  padding: 32px;
+}
+
+.tasks-page__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 32px;
+
+  margin-bottom: 32px;
+}
+
+.tasks-page__eyebrow {
+  margin-bottom: 6px;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+
+  color: #0085ad;
+}
+
+.tasks-page__title {
+  margin: 0;
+
+  font-size: 32px;
+  line-height: 1.1;
+
+  color: #00205b;
+}
+
+.tasks-page__subtitle {
+  margin: 8px 0 0;
+
+  font-size: 14px;
+
+  color: #6399ae;
+}
+
+.tasks-page__total {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.tasks-page__total strong {
+  font-size: 28px;
+
+  color: #00205b;
+}
+
+.tasks-page__total span {
+  font-size: 12px;
+
+  color: #6399ae;
+}
+
+.tasks-page__error {
+  padding: 20px;
+
+  color: #e4002b;
+
+  background: rgba(
+    228,
+    0,
+    43,
+    0.06
+  );
+}

@@ -1,0 +1,21 @@
+.airbus-clock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  line-height: 1.2;
+}
+
+.airbus-clock__date {
+  font-size: 13px;
+  color: var(--airbus-text-secondary);
+}
+
+.airbus-clock__time {
+  margin-top: var(--airbus-space-1);
+
+  font-size: 22px;
+  font-weight: 600;
+
+  color: var(--airbus-primary);
+}

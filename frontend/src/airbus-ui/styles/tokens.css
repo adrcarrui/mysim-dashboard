@@ -1,5 +1,6 @@
 :root {
-  /* Official Airbus brand colours from the supplied palette */
+  /* Official Airbus brand colours */
+
   --airbus-white: #ffffff;
   --airbus-black: #000000;
 
@@ -17,9 +18,11 @@
   --airbus-purple: #a51890;
   --airbus-cyan: #00aec7;
 
-  /* Semantic aliases used by the UI library */
+  /* Semantic aliases */
+
   --airbus-primary: var(--airbus-blue);
   --airbus-primary-hover: var(--airbus-blue-700);
+
   --airbus-highlight: var(--airbus-cyan);
 
   --airbus-info: var(--airbus-blue-500);
@@ -27,9 +30,25 @@
   --airbus-warning: var(--airbus-orange);
   --airbus-danger: var(--airbus-red);
 
-  --airbus-bg: #f5f7f9;
+  /* Backgrounds */
+
+  --airbus-bg: #f7f9fb;
+  --airbus-bg-soft: #fbfcfd;
+
   --airbus-surface: var(--airbus-white);
   --airbus-surface-soft: #f8fafb;
+
+  --airbus-sidebar-bg: var(--airbus-blue);
+  --airbus-header-bg: var(--airbus-white);
+  --airbus-footer-bg: var(--airbus-white);
+
+  /* Carbon Grid */
+
+  --airbus-carbon-grid-opacity: 0.5;
+  --airbus-carbon-grid-size: 100% auto;
+  --airbus-carbon-grid-position: center;
+
+  /* Text */
 
   --airbus-text: var(--airbus-blue);
   --airbus-text-body: #243746;
@@ -37,10 +56,13 @@
   --airbus-text-muted: #7f919c;
   --airbus-text-inverse: var(--airbus-white);
 
+  /* Borders */
+
   --airbus-border: #d8e0e5;
   --airbus-border-strong: var(--airbus-blue-100);
 
-  /* Library layout tokens. These are implementation choices, not brand-source values. */
+  /* Spacing */
+
   --airbus-space-1: 0.25rem;
   --airbus-space-2: 0.5rem;
   --airbus-space-3: 0.75rem;
@@ -50,19 +72,41 @@
   --airbus-space-7: 2.5rem;
   --airbus-space-8: 3rem;
 
+  /* Radius */
+
   --airbus-radius-sm: 0.25rem;
   --airbus-radius-md: 0.5rem;
   --airbus-radius-lg: 0.75rem;
   --airbus-radius-pill: 999px;
 
-  --airbus-shadow-sm: 0 1px 3px rgba(0, 32, 91, 0.08);
-  --airbus-shadow-md: 0 3px 12px rgba(0, 32, 91, 0.12);
+  /* Shadows */
+
+  --airbus-shadow-sm:
+    0 1px 3px rgba(0, 32, 91, 0.08);
+
+  --airbus-shadow-md:
+    0 3px 12px rgba(0, 32, 91, 0.12);
+
+  /* Layout */
 
   --airbus-content-max-width: 1600px;
+
   --airbus-header-height: 84px;
+
+  --airbus-sidebar-width: 260px;
+  --airbus-sidebar-collapsed-width: 64px;
+
+  --airbus-footer-height: 44px;
+
+  /* Transitions */
 
   --airbus-transition-fast: 140ms ease;
   --airbus-transition-normal: 220ms ease;
 
-  --airbus-font-family: Arial, Helvetica, sans-serif;
+  /* Typography */
+
+  --airbus-font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
 }
