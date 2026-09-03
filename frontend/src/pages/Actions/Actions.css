@@ -1,0 +1,212 @@
+.actions-page {
+  width: 100%;
+}
+
+
+/* ================================
+   HEADER
+================================ */
+
+.actions-page__header {
+  display: flex;
+
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap:
+    var(--airbus-space-5);
+
+  margin-bottom:
+    var(--airbus-space-6);
+}
+
+
+.actions-page__title {
+  margin: 0;
+
+  font-size: 26px;
+  font-weight: 600;
+
+  color:
+    var(--airbus-primary);
+}
+
+
+.actions-page__total {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: flex-end;
+}
+
+
+.actions-page__total strong {
+  font-size: 28px;
+  font-weight: 600;
+
+  color:
+    var(--airbus-primary);
+}
+
+
+.actions-page__total span {
+  font-size: 11px;
+
+  color:
+    var(--airbus-text-muted);
+}
+
+
+/* ================================
+   DEVICE SECTIONS
+================================ */
+
+.actions-device-section {
+  margin-bottom:
+    var(--airbus-space-7);
+}
+
+
+.actions-device-section__header {
+  display: flex;
+
+  align-items: baseline;
+
+  gap:
+    var(--airbus-space-3);
+
+  margin-bottom:
+    var(--airbus-space-4);
+
+  padding-bottom:
+    var(--airbus-space-2);
+
+  border-bottom:
+    2px solid
+    var(--airbus-primary);
+}
+
+
+.actions-device-section__header h2 {
+  margin: 0;
+
+  font-size: 18px;
+  font-weight: 600;
+
+  color:
+    var(--airbus-primary);
+}
+
+
+.actions-device-section__header span {
+  font-size: 11px;
+
+  color:
+    var(--airbus-text-muted);
+}
+
+
+/* ================================
+   DEVICE GRID
+================================ */
+
+.actions-device-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fill,
+      220px
+    );
+
+  gap:
+    var(--airbus-space-4);
+
+  justify-content: start;
+}
+
+.actions-device-grid--ffs {
+  grid-template-columns:
+    repeat(
+      5,
+      minmax(0, 1fr)
+    );
+}
+
+
+/* ================================
+   ERROR
+================================ */
+
+.actions-page__error {
+  padding:
+    var(--airbus-space-4);
+
+  color:
+    var(--airbus-danger);
+
+  background:
+    var(--airbus-surface);
+
+  border:
+    1px solid
+    var(--airbus-danger);
+
+  border-radius: 4px;
+}
+
+
+/* ================================
+   RESPONSIVE
+================================ */
+
+@media (
+  max-width: 1200px
+) {
+
+  .actions-device-grid--ffs {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      );
+  }
+}
+
+
+@media (
+  max-width: 800px
+) {
+
+  .actions-page__header {
+    flex-direction: column;
+  }
+
+
+  .actions-page__total {
+    align-items: flex-start;
+  }
+
+
+  .actions-device-grid,
+  .actions-device-grid--ffs {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+}
+
+
+@media (
+  max-width: 520px
+) {
+
+  .actions-device-grid,
+  .actions-device-grid--ffs {
+    grid-template-columns:
+      1fr;
+  }
+}

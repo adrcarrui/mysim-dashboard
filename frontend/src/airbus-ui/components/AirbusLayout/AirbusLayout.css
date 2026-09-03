@@ -1,11 +1,10 @@
 .airbus-layout {
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
 
   display: flex;
 
-  background:
-    var(--airbus-bg);
+  background: var(--airbus-bg);
 
   overflow: hidden;
 }
@@ -14,13 +13,14 @@
   flex: 1;
 
   min-width: 0;
-  min-height: 100vh;
+  height: 100vh;
 
   display: flex;
   flex-direction: column;
 
-  background:
-    var(--airbus-bg);
+  background: var(--airbus-bg);
+
+  overflow: hidden;
 }
 
 .airbus-layout__content {
@@ -30,24 +30,25 @@
 
   width: 100%;
   min-width: 0;
+  min-height: 0;
 
   padding:
     var(--airbus-space-6)
     var(--airbus-space-7);
 
-  background:
-    var(--airbus-bg);
+  background: var(--airbus-bg);
 
   box-sizing: border-box;
 
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .airbus-layout__content-inner {
   position: relative;
 
   width: 100%;
-  min-height: 100%;
+  min-width: 0;
 
   z-index: 1;
 }

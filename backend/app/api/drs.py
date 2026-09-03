@@ -5,7 +5,7 @@ from app.services.drs_service import get_open_drs
 
 router = APIRouter(
     prefix="/drs",
-    tags=["drs"],
+    tags=["Drs"],
 )
 
 @router.get(

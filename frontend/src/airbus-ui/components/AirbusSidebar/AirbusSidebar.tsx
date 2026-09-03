@@ -37,10 +37,6 @@ export function AirbusSidebar({
               <div className="airbus-sidebar__brand">
                 AIRBUS
               </div>
-
-              <div className="airbus-sidebar__title">
-                {title}
-              </div>
             </div>
           )}
 

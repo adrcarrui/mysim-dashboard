@@ -1,0 +1,264 @@
+.actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+
+.actions-date-group {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+
+.actions-date-header {
+  display: flex;
+
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  padding-bottom: 12px;
+
+  border-bottom:
+    2px solid
+    var(--airbus-primary);
+}
+
+
+.actions-date-value {
+  display: block;
+
+  font-size: 22px;
+  font-weight: 700;
+
+  color:
+    var(--airbus-primary);
+}
+
+
+.actions-date-count {
+  font-size: 13px;
+  font-weight: 600;
+
+  color:
+    var(--airbus-blue-500);
+}
+
+
+/* Device group */
+
+.actions-device-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+
+.actions-device-header {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  padding:
+    8px
+    12px;
+
+  background:
+    var(--airbus-bg);
+
+  border-left:
+    4px solid
+    var(--airbus-blue-500);
+}
+
+
+.actions-device-name {
+  font-size: 16px;
+  font-weight: 700;
+
+  color:
+    var(--airbus-primary);
+}
+
+
+.actions-device-count {
+  font-size: 12px;
+  font-weight: 600;
+
+  color:
+    var(--airbus-blue-300);
+}
+
+
+/* Actions */
+
+.actions-device-items {
+  display: flex;
+  flex-direction: column;
+}
+
+
+.action-row {
+  display: flex;
+
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 24px;
+
+  padding:
+    16px
+    12px;
+
+  background:
+    var(--airbus-surface);
+
+  border-bottom:
+    1px solid
+    var(--airbus-border);
+}
+
+
+.action-row:hover {
+  background:
+    var(--airbus-bg);
+}
+
+
+.action-row__main {
+  min-width: 0;
+  flex: 1;
+}
+
+
+.action-row__title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.45;
+
+  color:
+    var(--airbus-primary);
+}
+
+
+.action-row__meta {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 12px;
+
+  margin-top: 6px;
+
+  font-size: 12px;
+
+  color:
+    var(--airbus-blue-300);
+}
+
+
+.action-row__secondary {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 12px;
+
+  margin-top: 6px;
+
+  font-size: 12px;
+
+  color:
+    var(--airbus-text-muted);
+}
+
+
+/* Status */
+
+.action-row__status {
+  flex-shrink: 0;
+}
+
+
+.action-status {
+  display: inline-flex;
+
+  align-items: center;
+
+  padding:
+    5px
+    10px;
+
+  border-radius:
+    999px;
+
+  font-size:
+    11px;
+
+  font-weight:
+    700;
+
+  white-space:
+    nowrap;
+}
+
+
+.action-status--open {
+  color:
+    var(--airbus-danger);
+
+  background:
+    color-mix(
+      in srgb,
+      var(--airbus-danger) 8%,
+      transparent
+    );
+}
+
+
+.action-status--ongoing {
+  color:
+    var(--airbus-blue-500);
+
+  background:
+    color-mix(
+      in srgb,
+      var(--airbus-blue-500) 8%,
+      transparent
+    );
+}
+
+
+/* Empty */
+
+.actions-empty {
+  padding:
+    40px;
+
+  text-align:
+    center;
+
+  color:
+    var(--airbus-blue-300);
+}
+
+
+/* Responsive */
+
+@media (
+  max-width: 700px
+) {
+
+  .action-row {
+    flex-direction:
+      column;
+  }
+
+
+  .action-row__status {
+    width:
+      100%;
+  }
+}

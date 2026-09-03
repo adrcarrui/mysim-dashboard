@@ -41,9 +41,11 @@
 
   margin-top: 4px;
 
-  font-size: 13px;
+  font-size: 22px;
+  font-weight: 700;
 
-  color: #6399ae;
+  color:
+    var(--airbus-primary);
 }
 
 .tasks-date-count {

@@ -14,7 +14,15 @@ class Task(BaseModel):
 
     description: str | None = None
 
+    frequency_id: int | None = None
+    frequency: str | None = None
+    frequency_num_of_days: int | None = None
+
     planned_date: datetime
+
+    tolerance_start: datetime | None = None
+    tolerance_end: datetime | None = None
+    tolerance_status: str | None = None
 
     status: str
     status_id: int

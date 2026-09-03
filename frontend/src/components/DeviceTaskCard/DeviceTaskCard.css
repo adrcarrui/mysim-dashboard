@@ -1,0 +1,254 @@
+.device-task-card {
+  position: relative;
+
+  width: 100%;
+
+  padding:
+    var(--airbus-space-4);
+
+  text-align: left;
+
+  background:
+    var(--airbus-surface);
+
+  border:
+    1px solid
+    var(--airbus-border);
+
+  border-radius: 6px;
+
+  overflow: hidden;
+
+  cursor: pointer;
+
+  transition:
+    transform 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+
+.device-task-card:hover {
+  transform:
+    translateY(-2px);
+
+  border-color:
+    var(--airbus-blue-500);
+
+  box-shadow:
+    0 4px 12px
+    rgba(0, 32, 91, 0.08);
+}
+
+
+/* ================================
+   BACKGROUND DEVICE IMAGE
+================================ */
+
+.device-task-card::before {
+  content: "";
+
+  position: absolute;
+
+  right: 10px;
+  bottom: 8px;
+
+  width: 130px;
+  height: 70px;
+
+  background-repeat: no-repeat;
+
+  background-position:
+    center;
+
+  background-size:
+    contain;
+
+  opacity: 0.18;
+
+  pointer-events: none;
+}
+
+
+.device-task-card > * {
+  position: relative;
+
+  z-index: 1;
+}
+
+
+.device-task-card--a400m::before {
+  background-image:
+    url("src/assets/devices/a400m.png");
+
+}
+
+
+.device-task-card--c295::before {
+  background-image:
+    url("src/assets/devices/c295.png");
+}
+
+
+.device-task-card--c295-ts03::before {
+  background-image:
+    url("src/assets/devices/c295-ts03.png");
+}
+
+
+.device-task-card--cn235::before {
+  background-image:
+    url("src/assets/devices/cn235.png");
+}
+
+
+.device-task-card--mrtt::before {
+  background-image:
+    url("src/assets/devices/mrtt.png");
+}
+
+
+/* ================================
+   HEADER
+================================ */
+
+.device-task-card__header {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap:
+    var(--airbus-space-3);
+}
+
+
+.device-task-card__header strong {
+  font-size: 18px;
+  font-weight: 600;
+
+  color:
+    var(--airbus-primary);
+}
+
+
+.device-task-card__total {
+  min-width: 36px;
+
+  padding:
+    3px 10px;
+
+  text-align: center;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  color:
+    var(--airbus-primary);
+
+  background:
+    rgba(255, 255, 255, 0.92);
+
+  border:
+    1px solid
+    var(--airbus-border);
+
+  border-radius: 999px;
+
+  box-shadow:
+    0 1px 3px
+    rgba(0, 32, 91, 0.08);
+}
+
+
+.device-task-card__label {
+  margin-top: 2px;
+
+  margin-bottom:
+    var(--airbus-space-4);
+
+  font-size: 11px;
+
+  color:
+    var(--airbus-text-muted);
+}
+
+
+/* ================================
+   STATS
+================================ */
+
+.device-task-card__stats {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+
+.device-task-card__stat {
+  display: grid;
+
+  grid-template-columns:
+    8px
+    24px
+    1fr;
+
+  align-items: center;
+
+  gap: 6px;
+
+  font-size: 12px;
+}
+
+
+.device-task-card__stat strong {
+  font-weight: 700;
+}
+
+
+.device-task-card__dot {
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+}
+
+
+/* Critical */
+
+.device-task-card__stat--critical {
+  color: #c62828;
+}
+
+.device-task-card__stat--critical
+.device-task-card__dot {
+  background: #c62828;
+}
+
+
+/* Warning */
+
+.device-task-card__stat--warning {
+  color: #a45a00;
+}
+
+.device-task-card__stat--warning
+.device-task-card__dot {
+  background: #a45a00;
+}
+
+
+/* Normal */
+
+.device-task-card__stat--normal {
+  color:
+    var(--airbus-blue-500);
+}
+
+.device-task-card__stat--normal
+.device-task-card__dot {
+  background:
+    var(--airbus-blue-500);
+}

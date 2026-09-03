@@ -6,6 +6,7 @@ import "./TasksList.css";
 
 interface TasksListProps {
   tasks: Task[];
+  groupByDevice?: boolean;
 }
 
 
@@ -220,6 +221,7 @@ function formatTime(
 
 export function TasksList({
   tasks,
+  groupByDevice = true,
 }: TasksListProps) {
   const groups =
     groupTasks(tasks);
@@ -244,10 +246,6 @@ export function TasksList({
           >
             <div className="tasks-date-header">
               <div>
-                <span className="tasks-date-label">
-                  {group.label}
-                </span>
-
                 <span className="tasks-date-value">
                   {new Date(
                     `${group.date}T00:00:00`
@@ -286,21 +284,23 @@ export function TasksList({
                   }
                   className="tasks-device-group"
                 >
-                  <div className="tasks-device-header">
-                    <span className="tasks-device-name">
-                      {
-                        deviceGroup.device
-                      }
-                    </span>
+                  {groupByDevice && (
+                    <div className="tasks-device-header">
+                      <span className="tasks-device-name">
+                        {
+                          deviceGroup.device
+                        }
+                      </span>
 
-                    <span className="tasks-device-count">
-                      {
-                        deviceGroup.tasks
-                          .length
-                      }{" "}
-                      tasks
-                    </span>
-                  </div>
+                      <span className="tasks-device-count">
+                        {
+                          deviceGroup.tasks
+                            .length
+                        }{" "}
+                        tasks
+                      </span>
+                    </div>
+                  )}
 
                   <div className="tasks-device-items">
                     {deviceGroup.tasks.map(

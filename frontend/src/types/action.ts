@@ -1,19 +1,23 @@
-// src/types/action.ts
+export type Action = {
+  id: string | null
+  action_id: string | null
 
-export interface Action {
-  id?: number | null;
-  actionId?: string | null;
-  date?: string | null;
-  actionDescription?: string | null;
+  device_id: number | null
+  device: string | null
 
-  performedBy?: number | null;
-  asignedTo?: number | null;
+  status_id: number | null
+  status: string | null
 
-  status?: number | null;
-  device?: number | null;
+  performed_by_id: number | null
+  performed_by: string | null
 
-  performedDatetime?: string | null;
-  lastUpdated?: string | null;
+  assigned_to_id: number | null
+  assigned_to: string | null
 
-  deviceName?: string | null;
+  shift_to_be_done_id: number | null
+  shift_to_be_done: string | null
+
+  date: string | null
+  description: string | null
+  last_updated: string | null
 }

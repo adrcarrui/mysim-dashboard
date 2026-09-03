@@ -1,6 +1,5 @@
-// src/layouts/AppLayout.tsx
-
 import { useState } from "react";
+
 import {
   Outlet,
   useLocation,
@@ -8,8 +7,17 @@ import {
 } from "react-router-dom";
 
 import {
+  LayoutDashboard,
+  BriefcaseBusiness,
+  FileWarning,
+  ListChecks,
+  CalendarClock,
+} from "lucide-react";
+
+import {
   AirbusLayout,
-} from "../airbus-ui/components/AirbusLayout/AirbusLayout";
+  AirbusClock,
+} from "../airbus-ui";
 
 
 export function AppLayout() {
@@ -23,44 +31,91 @@ export function AppLayout() {
 
   return (
     <AirbusLayout
-      title="Maintenance & Support"
-      subtitle="mySim Operations Dashboard"
+      title="Maintenance & Support Dashboard"
 
-      sidebarCollapsed={sidebarCollapsed}
+      headerActions={
+        <AirbusClock />
+      }
+
+      sidebarCollapsed={
+        sidebarCollapsed
+      }
 
       onSidebarToggle={() =>
         setSidebarCollapsed(
-          (current) => !current
+          (value) => !value
         )
       }
 
       sidebarItems={[
         {
-          label: "Dashboard",
+          label: "Overview",
+          icon: (
+            <LayoutDashboard
+              size={20}
+              strokeWidth={1.8}
+            />
+          ),
           active:
             location.pathname === "/" ||
             location.pathname === "/dashboard",
           onClick: () =>
             navigate("/dashboard"),
         },
+
         {
-          label: "New",
-          active:
-            location.pathname === "/new",
-          onClick: () =>
-            navigate("/new"),
+          label: "Jobs",
+          icon: (
+            <BriefcaseBusiness
+              size={20}
+              strokeWidth={1.8}
+            />
+          ),
         },
+
+        {
+          label: "DRs",
+          icon: (
+            <FileWarning
+              size={20}
+              strokeWidth={1.8}
+            />
+          ),
+          active:
+            location.pathname === "/drs",
+          onClick: () =>
+            navigate("/drs"),
+          
+        },
+
+        {
+          label: "Actions",
+          icon: (
+            <ListChecks
+              size={20}
+              strokeWidth={1.8}
+            />
+          ),
+          active:
+            location.pathname === "/actions",
+          onClick: () =>
+            navigate("/actions"),
+        },
+
         {
           label: "Tasks",
+          icon: (
+            <CalendarClock
+              size={20}
+              strokeWidth={1.8}
+            />
+          ),
           active:
             location.pathname === "/tasks",
           onClick: () =>
             navigate("/tasks"),
         },
       ]}
-
-      footerLeft="Airbus"
-      footerRight="mySim"
     >
       <Outlet />
     </AirbusLayout>

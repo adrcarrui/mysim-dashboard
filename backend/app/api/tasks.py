@@ -8,7 +8,7 @@ from app.services.tasks_service import (
 
 router = APIRouter(
     prefix="/tasks",
-    tags=["tasks"],
+    tags=["Tasks"],
 )
 
 

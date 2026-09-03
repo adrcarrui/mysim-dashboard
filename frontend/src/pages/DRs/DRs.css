@@ -1,0 +1,329 @@
+.drs-page {
+  width: 100%;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap:
+    var(--airbus-space-7);
+}
+
+
+/* ========================================
+   PAGE HEADER
+   ======================================== */
+
+.drs-page__header {
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  gap:
+    var(--airbus-space-4);
+}
+
+
+.drs-page__title {
+  margin: 0;
+
+  color:
+    var(--airbus-primary);
+
+  font-size:
+    1.55rem;
+
+  font-weight:
+    700;
+
+  line-height:
+    1;
+}
+
+
+.drs-page__total {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: flex-end;
+
+  gap: 1px;
+}
+
+
+.drs-page__total-value {
+  color:
+    var(--airbus-primary);
+
+  font-size:
+    1.75rem;
+
+  font-weight:
+    700;
+
+  line-height:
+    1;
+}
+
+
+.drs-page__total-label {
+  color:
+    var(--airbus-text-muted);
+
+  font-size:
+    0.68rem;
+
+  font-weight:
+    400;
+
+  text-transform:
+    lowercase;
+}
+
+
+/* ========================================
+   CONTENT
+   ======================================== */
+
+.drs-page__content {
+  display: flex;
+
+  flex-direction: column;
+
+  gap:
+    var(--airbus-space-7);
+}
+
+
+/* ========================================
+   SECTIONS
+   ======================================== */
+
+.drs-section {
+  width: 100%;
+
+  min-width: 0;
+}
+
+
+.drs-section__heading {
+  display: flex;
+
+  align-items: baseline;
+
+  gap:
+    var(--airbus-space-3);
+
+  margin-bottom:
+    var(--airbus-space-2);
+}
+
+
+.drs-section__title {
+  margin: 0;
+
+  color:
+    var(--airbus-primary);
+
+  font-size:
+    1rem;
+
+  font-weight:
+    700;
+
+  line-height:
+    1.2;
+}
+
+
+.drs-section__subtitle {
+  color:
+    var(--airbus-text-muted);
+
+  font-size:
+    0.68rem;
+
+  font-weight:
+    400;
+}
+
+
+.drs-section__separator {
+  width: 100%;
+
+  height: 2px;
+
+  margin-bottom:
+    var(--airbus-space-4);
+
+  background:
+    var(--airbus-primary);
+}
+
+
+/* ========================================
+   FFS GRID
+   ======================================== */
+
+.drs-page__ffs-grid {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      5,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap:
+    var(--airbus-space-4);
+
+  align-items: stretch;
+}
+
+
+/*
+ * Las tarjetas FFS ocupan
+ * completamente su columna.
+ */
+.drs-page__ffs-grid
+.device-dr-card {
+  width: 100%;
+
+  max-width: none;
+}
+
+
+/* ========================================
+   OTHERS GRID
+   ======================================== */
+
+.drs-page__others-grid {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fill,
+      220px
+    );
+
+  gap:
+    var(--airbus-space-4);
+
+  justify-content: start;
+
+  align-items: stretch;
+}
+
+
+/*
+ * Tarjetas compactas en Others,
+ * igual que en Actions.
+ */
+.drs-page__others-grid
+.device-dr-card {
+  width: 220px;
+
+  max-width: 220px;
+}
+
+
+/* ========================================
+   LOADING / ERROR / EMPTY
+   ======================================== */
+
+.drs-page__state {
+  padding:
+    var(--airbus-space-6);
+
+  color:
+    var(--airbus-text-muted);
+
+  background:
+    var(--airbus-surface);
+
+  border:
+    1px solid
+    var(--airbus-border);
+
+  border-radius:
+    var(--airbus-radius-md);
+
+  text-align:
+    center;
+}
+
+
+.drs-page__state--error {
+  color:
+    var(--airbus-danger);
+}
+
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (
+  max-width: 1300px
+) {
+  .drs-page__ffs-grid {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+}
+
+
+@media (
+  max-width: 900px
+) {
+  .drs-page__ffs-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+}
+
+
+@media (
+  max-width: 600px
+) {
+  .drs-page__header {
+    align-items: flex-start;
+  }
+
+
+  .drs-page__ffs-grid,
+  .drs-page__others-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .drs-page__others-grid
+  .device-dr-card {
+    width: 100%;
+
+    max-width: none;
+  }
+}

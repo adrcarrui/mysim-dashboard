@@ -45,19 +45,18 @@
   position: relative;
   z-index: 1;
 
-  width: min(
-    100%,
-    var(--airbus-content-max-width)
-  );
+  width: 100%;
 
   min-height:
     var(--airbus-header-height);
 
-  margin-inline: auto;
+  margin: 0;
 
   padding:
     var(--airbus-space-4)
-    var(--airbus-space-7);
+    var(--airbus-space-5);
+
+  box-sizing: border-box;
 
   display: flex;
 
