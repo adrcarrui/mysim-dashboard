@@ -39,9 +39,7 @@ const FFS_DEVICES = new Set(
 
 interface DeviceSummary {
   device: string
-
   total: number
-
   open: number
   ongoing: number
   today: number
@@ -55,9 +53,13 @@ function isToday(
     return false
   }
 
-  const actionDate = new Date(
-    value.replace(" ", "T")
-  )
+  const actionDate =
+    new Date(
+      value.replace(
+        " ",
+        "T"
+      )
+    )
 
   if (
     Number.isNaN(
@@ -67,7 +69,8 @@ function isToday(
     return false
   }
 
-  const today = new Date()
+  const today =
+    new Date()
 
   return (
     actionDate.getFullYear() ===
@@ -87,7 +90,8 @@ function buildDeviceSummary(
   const deviceActions =
     actions.filter(
       (action) =>
-        action.device === device
+        action.device ===
+        device
     )
 
   return {
@@ -99,19 +103,23 @@ function buildDeviceSummary(
     open:
       deviceActions.filter(
         (action) =>
-          action.status === "Open"
+          action.status ===
+          "Open"
       ).length,
 
     ongoing:
       deviceActions.filter(
         (action) =>
-          action.status === "On going"
+          action.status ===
+          "On going"
       ).length,
 
     today:
       deviceActions.filter(
         (action) =>
-          isToday(action.date)
+          isToday(
+            action.date
+          )
       ).length,
   }
 }
@@ -144,6 +152,8 @@ export function Actions() {
 
 
   useEffect(() => {
+    let cancelled = false
+
     async function loadActions() {
       try {
         setLoading(true)
@@ -152,19 +162,32 @@ export function Actions() {
         const data =
           await getOpenActions()
 
-        setActions(data)
+        if (!cancelled) {
+          setActions(data)
+        }
       } catch (err) {
-        console.error(err)
-
-        setError(
-          "Unable to load actions."
+        console.error(
+          "Error loading actions:",
+          err
         )
+
+        if (!cancelled) {
+          setError(
+            "Unable to load actions."
+          )
+        }
       } finally {
-        setLoading(false)
+        if (!cancelled) {
+          setLoading(false)
+        }
       }
     }
 
     loadActions()
+
+    return () => {
+      cancelled = true
+    }
   }, [])
 
 
@@ -261,26 +284,6 @@ export function Actions() {
     ])
 
 
-  if (loading) {
-    return (
-      <main className="actions-page">
-        Loading actions...
-      </main>
-    )
-  }
-
-
-  if (error) {
-    return (
-      <main className="actions-page">
-        <div className="actions-page__error">
-          {error}
-        </div>
-      </main>
-    )
-  }
-
-
   return (
     <main className="actions-page">
 
@@ -308,120 +311,157 @@ export function Actions() {
       </header>
 
 
-      <section className="actions-device-section">
-
-        <div className="actions-device-section__header">
-
-          <h2>
-            FFS
-          </h2>
-
-          <span>
-            Full Flight Simulators
-          </span>
-
+      {loading && (
+        <div className="actions-page__state">
+          Loading actions...
         </div>
+      )}
 
 
-        <div className="actions-device-grid actions-device-grid--ffs">
+      {!loading &&
+        error && (
+          <div
+            className="
+              actions-page__state
+              actions-page__state--error
+            "
+          >
+            {error}
+          </div>
+        )}
 
-          {ffsSummaries.map(
-            (summary) => (
-              <DeviceActionCard
-                key={
-                  summary.device
-                }
 
-                device={
-                  summary.device
-                }
+      {!loading &&
+        !error &&
+        actions.length === 0 && (
+          <div className="actions-page__state">
+            No actions found.
+          </div>
+        )}
 
-                total={
-                  summary.total
-                }
 
-                open={
-                  summary.open
-                }
+      {!loading &&
+        !error &&
+        actions.length > 0 && (
+          <div className="actions-page__content">
 
-                ongoing={
-                  summary.ongoing
-                }
+            <section className="actions-device-section">
 
-                today={
-                  summary.today
-                }
+              <div className="actions-device-section__header">
 
-                onClick={() =>
-                  setSelectedDevice(
-                    summary.device
+                <h2>
+                  FFS
+                </h2>
+
+                <span>
+                  Full Flight Simulators
+                </span>
+
+              </div>
+
+
+              <div className="actions-device-grid actions-device-grid--ffs">
+
+                {ffsSummaries.map(
+                  (summary) => (
+                    <DeviceActionCard
+                      key={
+                        summary.device
+                      }
+
+                      device={
+                        summary.device
+                      }
+
+                      total={
+                        summary.total
+                      }
+
+                      open={
+                        summary.open
+                      }
+
+                      ongoing={
+                        summary.ongoing
+                      }
+
+                      today={
+                        summary.today
+                      }
+
+                      onClick={() =>
+                        setSelectedDevice(
+                          summary.device
+                        )
+                      }
+                    />
                   )
-                }
-              />
-            )
-          )}
+                )}
 
-        </div>
+              </div>
 
-      </section>
+            </section>
 
 
-      <section className="actions-device-section">
+            <section className="actions-device-section">
 
-        <div className="actions-device-section__header">
+              <div className="actions-device-section__header">
 
-          <h2>
-            Others
-          </h2>
+                <h2>
+                  Others
+                </h2>
 
-          <span>
-            Other training devices
-          </span>
+                <span>
+                  Other training devices
+                </span>
 
-        </div>
+              </div>
 
 
-        <div className="actions-device-grid">
+              <div className="actions-device-grid">
 
-          {otherSummaries.map(
-            (summary) => (
-              <DeviceActionCard
-                key={
-                  summary.device
-                }
+                {otherSummaries.map(
+                  (summary) => (
+                    <DeviceActionCard
+                      key={
+                        summary.device
+                      }
 
-                device={
-                  summary.device
-                }
+                      device={
+                        summary.device
+                      }
 
-                total={
-                  summary.total
-                }
+                      total={
+                        summary.total
+                      }
 
-                open={
-                  summary.open
-                }
+                      open={
+                        summary.open
+                      }
 
-                ongoing={
-                  summary.ongoing
-                }
+                      ongoing={
+                        summary.ongoing
+                      }
 
-                today={
-                  summary.today
-                }
+                      today={
+                        summary.today
+                      }
 
-                onClick={() =>
-                  setSelectedDevice(
-                    summary.device
+                      onClick={() =>
+                        setSelectedDevice(
+                          summary.device
+                        )
+                      }
+                    />
                   )
-                }
-              />
-            )
-          )}
+                )}
 
-        </div>
+              </div>
 
-      </section>
+            </section>
+
+          </div>
+        )}
 
 
       <ActionDeviceModal

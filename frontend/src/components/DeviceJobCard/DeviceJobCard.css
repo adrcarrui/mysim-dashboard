@@ -1,0 +1,284 @@
+.device-job-card {
+  position: relative;
+
+  width: 100%;
+  max-width: 220px;
+
+  height: 135px;
+
+  padding:
+    var(--airbus-space-3)
+    var(--airbus-space-4)
+    var(--airbus-space-4);
+
+  overflow: hidden;
+
+  text-align: left;
+
+  color:
+    inherit;
+
+  background:
+    var(--airbus-surface);
+
+  border:
+    1px solid
+    var(--airbus-border);
+
+  border-radius:
+    var(--airbus-radius-md);
+
+  box-shadow:
+    var(--airbus-shadow-sm);
+
+  cursor: pointer;
+
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.device-job-card:hover {
+  transform:
+    translateY(-2px);
+
+  border-color:
+    var(--airbus-blue-300);
+
+  box-shadow:
+    var(--airbus-shadow-md);
+}
+
+
+.device-job-card:focus-visible {
+  outline:
+    2px solid
+    var(--airbus-primary);
+
+  outline-offset:
+    2px;
+}
+
+
+/* =========================
+   Header
+   ========================= */
+
+.device-job-card__header {
+  position: relative;
+
+  z-index: 2;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap:
+    var(--airbus-space-3);
+
+  min-height: 28px;
+}
+
+
+.device-job-card__name {
+  min-width: 0;
+
+  margin: 0;
+
+  overflow: hidden;
+
+  color:
+    var(--airbus-blue-700);
+
+  font-size: 1rem;
+
+  font-weight: 700;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+.device-job-card__count {
+  flex-shrink: 0;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  min-width: 38px;
+
+  height: 24px;
+
+  padding-inline:
+    var(--airbus-space-2);
+
+  color:
+    var(--airbus-blue-700);
+
+  background:
+    var(--airbus-surface);
+
+  border:
+    1px solid
+    var(--airbus-border);
+
+  border-radius: 999px;
+
+  box-shadow:
+    var(--airbus-shadow-sm);
+
+  font-size: 0.78rem;
+
+  font-weight: 700;
+}
+
+
+/* =========================
+   Summary
+   ========================= */
+
+.device-job-card__summary {
+  position: relative;
+
+  z-index: 2;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 6px;
+
+  margin-top:
+    var(--airbus-space-3);
+}
+
+
+.device-job-card__row {
+  display: grid;
+
+  grid-template-columns:
+    8px
+    22px
+    auto;
+
+  align-items: center;
+
+  gap: 5px;
+
+  width: fit-content;
+
+  min-width: 0;
+
+  font-size: 0.75rem;
+
+  line-height: 1.15;
+}
+
+
+.device-job-card__row strong {
+  color:
+    var(--airbus-blue-700);
+
+  font-size: 0.75rem;
+
+  font-weight: 700;
+}
+
+
+/* =========================
+   Dots
+   ========================= */
+
+.device-job-card__dot {
+  width: 7px;
+
+  height: 7px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+}
+
+
+.device-job-card__dot--overdue {
+  background:
+    var(--airbus-danger);
+}
+
+
+.device-job-card__dot--today {
+  background:
+    var(--airbus-warning);
+}
+
+
+.device-job-card__dot--upcoming {
+  background:
+    var(--airbus-blue-500);
+}
+
+
+/* =========================
+   Labels
+   ========================= */
+
+.device-job-card__label {
+  white-space: nowrap;
+
+  font-size: 0.72rem;
+}
+
+
+.device-job-card__label--overdue {
+  color:
+    var(--airbus-danger);
+}
+
+
+.device-job-card__label--today {
+  color:
+    var(--airbus-warning);
+}
+
+
+.device-job-card__label--upcoming {
+  color:
+    var(--airbus-blue-500);
+}
+
+
+/* =========================
+   Device image
+   ========================= */
+
+.device-job-card__image {
+  position: absolute;
+
+  right: 8px;
+
+  bottom: -4px;
+
+  width: 145px;
+
+  height: 85px;
+
+  object-fit: contain;
+
+  opacity: 0.12;
+
+  pointer-events: none;
+
+  user-select: none;
+}
+
+.jobs-device-grid--ffs
+.device-job-card {
+  max-width: none;
+}

@@ -71,6 +71,11 @@ export function AppLayout() {
               strokeWidth={1.8}
             />
           ),
+            active:
+              location.pathname === "/jobs",
+
+            onClick: () =>
+              navigate("/jobs"),
         },
 
         {

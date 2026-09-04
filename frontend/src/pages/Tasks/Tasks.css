@@ -72,6 +72,17 @@
 
 
 /* ================================
+   CONTENT
+================================ */
+
+.tasks-page__content {
+  display: flex;
+
+  flex-direction: column;
+}
+
+
+/* ================================
    DEVICE SECTIONS
 ================================ */
 
@@ -130,7 +141,10 @@
   grid-template-columns:
     repeat(
       auto-fit,
-      minmax(190px, 1fr)
+      minmax(
+        190px,
+        1fr
+      )
     );
 
   gap:
@@ -138,11 +152,6 @@
 }
 
 
-/*
-   FFS:
-   queremos los 5 simuladores
-   en una sola fila cuando hay espacio.
-*/
 .tasks-device-grid--ffs {
   grid-template-columns:
     repeat(
@@ -153,24 +162,34 @@
 
 
 /* ================================
-   ERROR / STATES
+   LOADING / ERROR / EMPTY
 ================================ */
 
-.tasks-page__error {
+.tasks-page__state {
   padding:
-    var(--airbus-space-4);
+    var(--airbus-space-6);
 
   color:
-    var(--airbus-danger);
+    var(--airbus-text-muted);
 
   background:
     var(--airbus-surface);
 
   border:
     1px solid
-    var(--airbus-danger);
+    var(--airbus-border);
 
-  border-radius: 4px;
+  border-radius:
+    var(--airbus-radius-md);
+
+  text-align:
+    center;
+}
+
+
+.tasks-page__state--error {
+  color:
+    var(--airbus-danger);
 }
 
 

@@ -1,4 +1,4 @@
-.action-device-modal__overlay {
+.job-device-modal__overlay {
   position: fixed;
 
   top:
@@ -29,7 +29,7 @@
 }
 
 
-.action-device-modal {
+.job-device-modal {
   width:
     min(
       900px,
@@ -74,7 +74,7 @@
    HEADER
 ================================ */
 
-.action-device-modal__header {
+.job-device-modal__header {
   flex-shrink: 0;
 
   display: flex;
@@ -93,7 +93,7 @@
 }
 
 
-.action-device-modal__header-top {
+.job-device-modal__header-top {
   display: flex;
 
   align-items: center;
@@ -105,7 +105,7 @@
 }
 
 
-.action-device-modal__title-row {
+.job-device-modal__title-row {
   display: flex;
 
   align-items: baseline;
@@ -115,7 +115,7 @@
 }
 
 
-.action-device-modal__title-row h2 {
+.job-device-modal__title-row h2 {
   margin: 0;
 
   color:
@@ -129,7 +129,7 @@
 }
 
 
-.action-device-modal__action-count {
+.job-device-modal__job-count {
   margin: 0;
 
   color:
@@ -147,12 +147,12 @@
    FILTERS
 ================================ */
 
-.action-device-modal__filters {
+.job-device-modal__filters {
   display: grid;
 
   grid-template-columns:
     repeat(
-      3,
+      4,
       minmax(
         0,
         1fr
@@ -164,7 +164,7 @@
 }
 
 
-.action-device-modal__filter {
+.job-device-modal__filter {
   display: flex;
 
   align-items: center;
@@ -203,7 +203,7 @@
 }
 
 
-.action-device-modal__filter span {
+.job-device-modal__filter span {
   margin: 0;
 
   color: inherit;
@@ -212,7 +212,7 @@
 }
 
 
-.action-device-modal__filter strong {
+.job-device-modal__filter strong {
   min-width: 28px;
 
   padding:
@@ -242,7 +242,7 @@
 }
 
 
-.action-device-modal__filter:hover {
+.job-device-modal__filter:hover {
   border-color:
     currentColor;
 }
@@ -250,23 +250,31 @@
 
 /* All */
 
-.action-device-modal__filter--all {
+.job-device-modal__filter--all {
   color:
     var(--airbus-primary);
 }
 
 
-/* Open */
+/* Overdue */
 
-.action-device-modal__filter--open {
+.job-device-modal__filter--overdue {
   color:
     var(--airbus-danger);
 }
 
 
-/* On going */
+/* Today */
 
-.action-device-modal__filter--ongoing {
+.job-device-modal__filter--today {
+  color:
+    var(--airbus-warning);
+}
+
+
+/* Upcoming */
+
+.job-device-modal__filter--upcoming {
   color:
     var(--airbus-blue-500);
 }
@@ -274,7 +282,7 @@
 
 /* Active */
 
-.action-device-modal__filter--active {
+.job-device-modal__filter--active {
   border-color:
     currentColor;
 
@@ -284,13 +292,13 @@
 }
 
 
-.action-device-modal__filter--all.action-device-modal__filter--active {
+.job-device-modal__filter--all.job-device-modal__filter--active {
   background:
     var(--airbus-blue-100);
 }
 
 
-.action-device-modal__filter--open.action-device-modal__filter--active {
+.job-device-modal__filter--overdue.job-device-modal__filter--active {
   background:
     color-mix(
       in srgb,
@@ -300,7 +308,17 @@
 }
 
 
-.action-device-modal__filter--ongoing.action-device-modal__filter--active {
+.job-device-modal__filter--today.job-device-modal__filter--active {
+  background:
+    color-mix(
+      in srgb,
+      var(--airbus-warning) 8%,
+      white
+    );
+}
+
+
+.job-device-modal__filter--upcoming.job-device-modal__filter--active {
   background:
     var(--airbus-blue-100);
 }
@@ -310,7 +328,7 @@
    CLOSE
 ================================ */
 
-.action-device-modal__close {
+.job-device-modal__close {
   flex-shrink: 0;
 
   width: 34px;
@@ -344,7 +362,7 @@
 }
 
 
-.action-device-modal__close:hover {
+.job-device-modal__close:hover {
   background:
     var(--airbus-blue-100);
 }
@@ -354,7 +372,7 @@
    CONTENT
 ================================ */
 
-.action-device-modal__content {
+.job-device-modal__content {
   flex: 1;
 
   min-height: 0;
@@ -374,13 +392,13 @@
   max-width: 600px
 ) {
 
-  .action-device-modal__overlay {
+  .job-device-modal__overlay {
     padding:
       var(--airbus-space-3);
   }
 
 
-  .action-device-modal {
+  .job-device-modal {
     width: 100%;
 
     height:
@@ -392,20 +410,26 @@
   }
 
 
-  .action-device-modal__header,
-  .action-device-modal__content {
+  .job-device-modal__header,
+  .job-device-modal__content {
     padding:
       var(--airbus-space-4);
   }
 
 
-  .action-device-modal__filters {
+  .job-device-modal__filters {
     grid-template-columns:
-      1fr;
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
   }
 
 
-  .action-device-modal__title-row {
+  .job-device-modal__title-row {
     gap:
       var(--airbus-space-2);
   }

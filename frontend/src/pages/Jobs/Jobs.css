@@ -1,4 +1,4 @@
-.actions-page {
+.jobs-page {
   width: 100%;
 }
 
@@ -7,7 +7,7 @@
    HEADER
 ================================ */
 
-.actions-page__header {
+.jobs-page__header {
   display: flex;
 
   align-items: flex-start;
@@ -21,7 +21,7 @@
 }
 
 
-.actions-page__title {
+.jobs-page__title {
   margin: 0;
 
   font-size: 26px;
@@ -32,7 +32,7 @@
 }
 
 
-.actions-page__total {
+.jobs-page__total {
   display: flex;
 
   flex-direction: column;
@@ -41,7 +41,7 @@
 }
 
 
-.actions-page__total strong {
+.jobs-page__total strong {
   font-size: 28px;
   font-weight: 600;
 
@@ -50,7 +50,7 @@
 }
 
 
-.actions-page__total span {
+.jobs-page__total span {
   font-size: 11px;
 
   color:
@@ -62,7 +62,7 @@
    CONTENT
 ================================ */
 
-.actions-page__content {
+.jobs-page__content {
   display: flex;
 
   flex-direction: column;
@@ -73,13 +73,13 @@
    DEVICE SECTIONS
 ================================ */
 
-.actions-device-section {
+.jobs-device-section {
   margin-bottom:
     var(--airbus-space-7);
 }
 
 
-.actions-device-section__header {
+.jobs-device-section__header {
   display: flex;
 
   align-items: baseline;
@@ -99,7 +99,7 @@
 }
 
 
-.actions-device-section__header h2 {
+.jobs-device-section__header h2 {
   margin: 0;
 
   font-size: 18px;
@@ -110,7 +110,7 @@
 }
 
 
-.actions-device-section__header span {
+.jobs-device-section__header span {
   font-size: 11px;
 
   color:
@@ -122,7 +122,7 @@
    DEVICE GRID
 ================================ */
 
-.actions-device-grid {
+.jobs-device-grid {
   display: grid;
 
   grid-template-columns:
@@ -138,7 +138,7 @@
 }
 
 
-.actions-device-grid--ffs {
+.jobs-device-grid--ffs {
   grid-template-columns:
     repeat(
       5,
@@ -151,7 +151,7 @@
    LOADING / ERROR / EMPTY
 ================================ */
 
-.actions-page__state {
+.jobs-page__state {
   padding:
     var(--airbus-space-6);
 
@@ -173,7 +173,7 @@
 }
 
 
-.actions-page__state--error {
+.jobs-page__state--error {
   color:
     var(--airbus-danger);
 }
@@ -187,7 +187,7 @@
   max-width: 1200px
 ) {
 
-  .actions-device-grid--ffs {
+  .jobs-device-grid--ffs {
     grid-template-columns:
       repeat(
         3,
@@ -201,18 +201,18 @@
   max-width: 800px
 ) {
 
-  .actions-page__header {
+  .jobs-page__header {
     flex-direction: column;
   }
 
 
-  .actions-page__total {
+  .jobs-page__total {
     align-items: flex-start;
   }
 
 
-  .actions-device-grid,
-  .actions-device-grid--ffs {
+  .jobs-device-grid,
+  .jobs-device-grid--ffs {
     grid-template-columns:
       repeat(
         2,
@@ -226,8 +226,8 @@
   max-width: 520px
 ) {
 
-  .actions-device-grid,
-  .actions-device-grid--ffs {
+  .jobs-device-grid,
+  .jobs-device-grid--ffs {
     grid-template-columns:
       1fr;
   }

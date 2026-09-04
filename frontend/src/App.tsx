@@ -13,6 +13,10 @@ import {
   Dashboard,
 } from "./pages/Dashboard/Dashboard";
 
+import {
+  Jobs,
+} from "./pages/Jobs/Jobs";
+
 import { 
   DRs,
 } from "./pages/DRs/DRs";
@@ -24,7 +28,6 @@ import {
 import {
   Tasks,
 } from "./pages/Tasks/Tasks";
-
 
 export default function App() {
   return (
@@ -48,6 +51,11 @@ export default function App() {
           <Route
             path="dashboard"
             element={<Dashboard />}
+          />
+
+          <Route
+            path="jobs"
+            element={<Jobs />}
           />
           
           <Route

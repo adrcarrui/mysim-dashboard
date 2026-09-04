@@ -2,6 +2,9 @@
   position: relative;
 
   width: 100%;
+  max-width: 220px;
+
+  height: 135px;
 
   padding:
     var(--airbus-space-4);
@@ -26,7 +29,6 @@
     border-color 120ms ease,
     box-shadow 120ms ease;
 }
-
 
 .device-task-card:hover {
   transform:
@@ -251,4 +253,9 @@
 .device-task-card__dot {
   background:
     var(--airbus-blue-500);
+}
+
+.tasks-device-grid--ffs
+.device-task-card {
+  max-width: none;
 }

@@ -1,13 +1,30 @@
-from fastapi import APIRouter, Query
+from fastapi import (
+    APIRouter,
+    Query,
+)
 
 from app.schemas.job import Job
-from app.services.jobs_service import jobs_service
+
+from app.services.jobs_service import (
+    jobs_service,
+)
 
 
 router = APIRouter(
     prefix="/api/jobs",
     tags=["Jobs"],
 )
+
+
+@router.get(
+    "/open",
+    response_model=list[Job],
+)
+async def get_open_jobs():
+    return (
+        await
+        jobs_service.get_open_jobs()
+    )
 
 
 @router.get(
@@ -21,13 +38,20 @@ async def get_expiring_jobs(
         le=365,
     ),
 ):
-    return await jobs_service.get_expiring_jobs(
-        days=days
+    return (
+        await
+        jobs_service.get_expiring_jobs(
+            days=days
+        )
     )
+
 
 @router.get(
     "/overdue",
     response_model=list[Job],
 )
 async def get_overdue_jobs():
-    return await jobs_service.get_overdue_jobs()
+    return (
+        await
+        jobs_service.get_overdue_jobs()
+    )

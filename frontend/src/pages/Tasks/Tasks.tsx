@@ -1,28 +1,26 @@
-// frontend/src/pages/Tasks/Tasks.tsx
-
 import {
   useEffect,
   useMemo,
   useState,
-} from "react";
+} from "react"
 
 import {
   getUpcomingTasks,
-} from "../../api/tasks";
+} from "../../api/tasks"
 
 import type {
   Task,
-} from "../../types/task";
+} from "../../types/task"
 
 import {
   DeviceTaskCard,
-} from "../../components/DeviceTaskCard";
+} from "../../components/DeviceTaskCard"
 
 import {
   TaskDeviceModal,
-} from "../../components/TaskDeviceModal";
+} from "../../components/TaskDeviceModal"
 
-import "./Tasks.css";
+import "./Tasks.css"
 
 
 const FFS_DEVICE_LIST = [
@@ -31,22 +29,20 @@ const FFS_DEVICE_LIST = [
   "C295 TS03",
   "C295",
   "CN235",
-];
+]
 
 
 const FFS_DEVICES = new Set(
   FFS_DEVICE_LIST
-);
+)
 
 
 interface DeviceSummary {
-  device: string;
-
-  total: number;
-
-  outOfTolerance: number;
-  inTolerance: number;
-  upcoming: number;
+  device: string
+  total: number
+  outOfTolerance: number
+  inTolerance: number
+  upcoming: number
 }
 
 
@@ -54,12 +50,11 @@ function buildDeviceSummary(
   device: string,
   tasks: Task[],
 ): DeviceSummary {
-
   const deviceTasks =
     tasks.filter(
       (task) =>
         task.device === device
-    );
+    )
 
   return {
     device,
@@ -87,7 +82,7 @@ function buildDeviceSummary(
           task.tolerance_status ===
           "upcoming"
       ).length,
-  };
+  }
 }
 
 
@@ -95,51 +90,66 @@ export function Tasks() {
   const [
     tasks,
     setTasks,
-  ] = useState<Task[]>([]);
+  ] = useState<Task[]>([])
 
   const [
     loading,
     setLoading,
-  ] = useState(true);
+  ] = useState(true)
 
   const [
     error,
     setError,
   ] = useState<string | null>(
     null
-  );
+  )
 
   const [
     selectedDevice,
     setSelectedDevice,
   ] = useState<string | null>(
     null
-  );
+  )
 
 
   useEffect(() => {
+    let cancelled = false
+
     async function loadTasks() {
       try {
-        setLoading(true);
-        setError(null);
+        setLoading(true)
+        setError(null)
 
         const data =
-          await getUpcomingTasks(7);
+          await getUpcomingTasks(7)
 
-        setTasks(data);
+        if (!cancelled) {
+          setTasks(data)
+        }
       } catch (err) {
-        console.error(err);
+        console.error(
+          "Error loading tasks:",
+          err
+        )
 
-        setError(
-          "Unable to load scheduled tasks."
-        );
+        if (!cancelled) {
+          setError(
+            "Unable to load scheduled tasks."
+          )
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false)
+        }
       }
     }
 
-    loadTasks();
-  }, []);
+    loadTasks()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
 
   const ffsSummaries =
@@ -153,7 +163,7 @@ export function Tasks() {
             )
         ),
       [tasks]
-    );
+    )
 
 
   const otherDevices =
@@ -175,7 +185,7 @@ export function Tasks() {
           )
         ),
       [tasks]
-    );
+    )
 
 
   const otherSummaries =
@@ -198,71 +208,54 @@ export function Tasks() {
                 return (
                   b.outOfTolerance -
                   a.outOfTolerance
-                );
+                )
               }
 
               return (
                 a.device.localeCompare(
                   b.device
                 )
-              );
+              )
             }
           ),
       [
         otherDevices,
         tasks,
       ]
-    );
+    )
 
 
   const selectedDeviceTasks =
     useMemo(() => {
       if (!selectedDevice) {
-        return [];
+        return []
       }
 
       return tasks.filter(
         (task) =>
           task.device ===
           selectedDevice
-      );
+      )
     }, [
       tasks,
       selectedDevice,
-    ]);
-
-
-  if (loading) {
-    return (
-      <main className="tasks-page">
-        Loading tasks...
-      </main>
-    );
-  }
-
-
-  if (error) {
-    return (
-      <main className="tasks-page">
-        <div className="tasks-page__error">
-          {error}
-        </div>
-      </main>
-    );
-  }
+    ])
 
 
   return (
     <main className="tasks-page">
+
       <header className="tasks-page__header">
+
         <div>
           <h1 className="tasks-page__title">
             Scheduled Tasks
           </h1>
-
         </div>
 
+
         <div className="tasks-page__total">
+
           <strong>
             {tasks.length}
           </strong>
@@ -270,106 +263,163 @@ export function Tasks() {
           <span>
             tasks
           </span>
+
         </div>
+
       </header>
 
 
-      <section className="tasks-device-section">
-        <div className="tasks-device-section__header">
-          <h2>
-            FFS
-          </h2>
-
-          <span>
-            Full Flight Simulators
-          </span>
+      {loading && (
+        <div className="tasks-page__state">
+          Loading scheduled tasks...
         </div>
+      )}
 
-        <div className="tasks-device-grid tasks-device-grid--ffs">
-          {ffsSummaries.map(
-            (summary) => (
-              <DeviceTaskCard
-                key={summary.device}
 
-                device={
-                  summary.device
-                }
+      {!loading &&
+        error && (
+          <div
+            className="
+              tasks-page__state
+              tasks-page__state--error
+            "
+          >
+            {error}
+          </div>
+        )}
 
-                total={
-                  summary.total
-                }
 
-                outOfTolerance={
-                  summary.outOfTolerance
-                }
+      {!loading &&
+        !error &&
+        tasks.length === 0 && (
+          <div className="tasks-page__state">
+            No scheduled tasks found.
+          </div>
+        )}
 
-                inTolerance={
-                  summary.inTolerance
-                }
 
-                upcoming={
-                  summary.upcoming
-                }
+      {!loading &&
+        !error &&
+        tasks.length > 0 && (
+          <div className="tasks-page__content">
 
-                onClick={() =>
-                  setSelectedDevice(
-                    summary.device
+            <section className="tasks-device-section">
+
+              <div className="tasks-device-section__header">
+
+                <h2>
+                  FFS
+                </h2>
+
+                <span>
+                  Full Flight Simulators
+                </span>
+
+              </div>
+
+
+              <div className="tasks-device-grid tasks-device-grid--ffs">
+
+                {ffsSummaries.map(
+                  (summary) => (
+                    <DeviceTaskCard
+                      key={
+                        summary.device
+                      }
+
+                      device={
+                        summary.device
+                      }
+
+                      total={
+                        summary.total
+                      }
+
+                      outOfTolerance={
+                        summary.outOfTolerance
+                      }
+
+                      inTolerance={
+                        summary.inTolerance
+                      }
+
+                      upcoming={
+                        summary.upcoming
+                      }
+
+                      onClick={() =>
+                        setSelectedDevice(
+                          summary.device
+                        )
+                      }
+                    />
                   )
-                }
-              />
-            )
-          )}
-        </div>
-      </section>
+                )}
+
+              </div>
+
+            </section>
 
 
-      <section className="tasks-device-section">
-        <div className="tasks-device-section__header">
-          <h2>
-            Others
-          </h2>
+            <section className="tasks-device-section">
 
-          <span>
-            Other training devices
-          </span>
-        </div>
+              <div className="tasks-device-section__header">
 
-        <div className="tasks-device-grid">
-          {otherSummaries.map(
-            (summary) => (
-              <DeviceTaskCard
-                key={summary.device}
+                <h2>
+                  Others
+                </h2>
 
-                device={
-                  summary.device
-                }
+                <span>
+                  Other training devices
+                </span>
 
-                total={
-                  summary.total
-                }
+              </div>
 
-                outOfTolerance={
-                  summary.outOfTolerance
-                }
 
-                inTolerance={
-                  summary.inTolerance
-                }
+              <div className="tasks-device-grid">
 
-                upcoming={
-                  summary.upcoming
-                }
+                {otherSummaries.map(
+                  (summary) => (
+                    <DeviceTaskCard
+                      key={
+                        summary.device
+                      }
 
-                onClick={() =>
-                  setSelectedDevice(
-                    summary.device
+                      device={
+                        summary.device
+                      }
+
+                      total={
+                        summary.total
+                      }
+
+                      outOfTolerance={
+                        summary.outOfTolerance
+                      }
+
+                      inTolerance={
+                        summary.inTolerance
+                      }
+
+                      upcoming={
+                        summary.upcoming
+                      }
+
+                      onClick={() =>
+                        setSelectedDevice(
+                          summary.device
+                        )
+                      }
+                    />
                   )
-                }
-              />
-            )
-          )}
-        </div>
-      </section>
+                )}
+
+              </div>
+
+            </section>
+
+          </div>
+        )}
 
 
       <TaskDeviceModal
@@ -387,6 +437,7 @@ export function Tasks() {
           )
         }
       />
+
     </main>
-  );
+  )
 }

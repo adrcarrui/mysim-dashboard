@@ -25,6 +25,7 @@ export function DrDeviceModal({
   drs,
   onClose,
 }: DrDeviceModalProps) {
+
   useEffect(() => {
     function handleKeyDown(
       event: KeyboardEvent
@@ -42,8 +43,7 @@ export function DrDeviceModal({
     )
 
     const previousOverflow =
-      document.body.style
-        .overflow
+      document.body.style.overflow
 
     document.body.style.overflow =
       "hidden"
@@ -62,70 +62,65 @@ export function DrDeviceModal({
 
   return (
     <div
-      className="dr-device-modal"
+      className="dr-device-modal__overlay"
       role="dialog"
       aria-modal="true"
       aria-labelledby="dr-device-modal-title"
+      onMouseDown={onClose}
     >
-      <button
-        type="button"
-        className="dr-device-modal__backdrop"
-        aria-label="Close DR details"
-        onClick={onClose}
-      />
 
+      <div
+        className="dr-device-modal"
+        onMouseDown={
+          (event) =>
+            event.stopPropagation()
+        }
+      >
 
-      <div className="dr-device-modal__panel">
         <header className="dr-device-modal__header">
-          <div className="dr-device-modal__heading">
-            <span className="dr-device-modal__eyebrow">
-              Open DRs
-            </span>
+
+          <div className="dr-device-modal__header-top">
 
             <div className="dr-device-modal__title-row">
+
               <h2
                 id="dr-device-modal-title"
-                className="dr-device-modal__title"
               >
                 {deviceName}
               </h2>
 
-              <span className="dr-device-modal__count">
-                {drs.length}
+
+              <span className="dr-device-modal__dr-count">
+                {drs.length} DRs
               </span>
+
             </div>
+
+
+            <button
+              type="button"
+              className="dr-device-modal__close"
+              onClick={onClose}
+              aria-label="Close"
+            >
+              ×
+            </button>
+
           </div>
 
-
-          <button
-            type="button"
-            className="dr-device-modal__close"
-            onClick={onClose}
-            aria-label="Close"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path
-                d="
-                  M6 6
-                  L18 18
-                  M18 6
-                  L6 18
-                "
-              />
-            </svg>
-          </button>
         </header>
 
 
-        <div className="dr-device-modal__body">
+        <div className="dr-device-modal__content">
+
           <DrsList
             drs={drs}
           />
+
         </div>
+
       </div>
+
     </div>
   )
 }

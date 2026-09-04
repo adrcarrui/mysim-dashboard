@@ -4,33 +4,33 @@ import {
 } from "react"
 
 import type {
-  Task,
-} from "../../types/task"
+  Job,
+} from "../../types/job"
 
 import {
-  TasksList,
-} from "../TasksList"
+  JobsList,
+} from "../JobsList"
 
-import "./TaskDeviceModal.css"
+import "./JobDeviceModal.css"
 
 
-interface TaskDeviceModalProps {
+interface JobDeviceModalProps {
   device: string | null
-  tasks: Task[]
+  jobs: Job[]
   onClose: () => void
 }
 
 
-type TaskFilter =
+type JobFilter =
   | "all"
-  | "pending"
-  | "progress"
-  | "not-done"
+  | "overdue"
+  | "today"
+  | "upcoming"
 
 
 function matchesFilter(
-  task: Task,
-  filter: TaskFilter,
+  job: Job,
+  filter: JobFilter,
 ): boolean {
   if (
     filter === "all"
@@ -39,37 +39,43 @@ function matchesFilter(
   }
 
   if (
-    filter === "pending"
+    job.days_remaining === null
+  ) {
+    return false
+  }
+
+  if (
+    filter === "overdue"
   ) {
     return (
-      task.status_id === 199
+      job.days_remaining < 0
     )
   }
 
   if (
-    filter === "progress"
+    filter === "today"
   ) {
     return (
-      task.status_id === 200
+      job.days_remaining === 0
     )
   }
 
   return (
-    task.status_id === 2542
+    job.days_remaining > 0
   )
 }
 
 
-export function TaskDeviceModal({
+export function JobDeviceModal({
   device,
-  tasks,
+  jobs,
   onClose,
-}: TaskDeviceModalProps) {
+}: JobDeviceModalProps) {
 
   const [
     activeFilter,
     setActiveFilter,
-  ] = useState<TaskFilter>(
+  ] = useState<JobFilter>(
     "all"
   )
 
@@ -78,42 +84,44 @@ export function TaskDeviceModal({
     useMemo(
       () => ({
         all:
-          tasks.length,
+          jobs.length,
 
-        pending:
-          tasks.filter(
-            (task) =>
-              task.status_id === 199
+        overdue:
+          jobs.filter(
+            (job) =>
+              job.days_remaining !== null &&
+              job.days_remaining < 0
           ).length,
 
-        progress:
-          tasks.filter(
-            (task) =>
-              task.status_id === 200
+        today:
+          jobs.filter(
+            (job) =>
+              job.days_remaining === 0
           ).length,
 
-        notDone:
-          tasks.filter(
-            (task) =>
-              task.status_id === 2542
+        upcoming:
+          jobs.filter(
+            (job) =>
+              job.days_remaining !== null &&
+              job.days_remaining > 0
           ).length,
       }),
-      [tasks]
+      [jobs]
     )
 
 
-  const filteredTasks =
+  const filteredJobs =
     useMemo(
       () =>
-        tasks.filter(
-          (task) =>
+        jobs.filter(
+          (job) =>
             matchesFilter(
-              task,
+              job,
               activeFilter
             )
         ),
       [
-        tasks,
+        jobs,
         activeFilter,
       ]
     )
@@ -126,33 +134,30 @@ export function TaskDeviceModal({
 
   return (
     <div
-      className="task-device-modal__overlay"
+      className="job-device-modal__overlay"
       onMouseDown={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-label={`Tasks for ${device}`}
     >
 
       <div
-        className="task-device-modal"
+        className="job-device-modal"
         onMouseDown={
           (event) =>
             event.stopPropagation()
         }
       >
 
-        <header className="task-device-modal__header">
+        <header className="job-device-modal__header">
 
-          <div className="task-device-modal__header-top">
+          <div className="job-device-modal__header-top">
 
-            <div className="task-device-modal__title-row">
+            <div className="job-device-modal__title-row">
 
               <h2>
                 {device}
               </h2>
 
-              <span className="task-device-modal__task-count">
-                {tasks.length} tasks
+              <span className="job-device-modal__job-count">
+                {jobs.length} jobs
               </span>
 
             </div>
@@ -160,7 +165,7 @@ export function TaskDeviceModal({
 
             <button
               type="button"
-              className="task-device-modal__close"
+              className="job-device-modal__close"
               onClick={onClose}
               aria-label="Close"
             >
@@ -170,16 +175,16 @@ export function TaskDeviceModal({
           </div>
 
 
-          <div className="task-device-modal__filters">
+          <div className="job-device-modal__filters">
 
             <button
               type="button"
               className={`
-                task-device-modal__filter
-                task-device-modal__filter--all
+                job-device-modal__filter
+                job-device-modal__filter--all
                 ${
                   activeFilter === "all"
-                    ? "task-device-modal__filter--active"
+                    ? "job-device-modal__filter--active"
                     : ""
                 }
               `}
@@ -189,6 +194,7 @@ export function TaskDeviceModal({
                 )
               }
             >
+
               <span>
                 All
               </span>
@@ -196,87 +202,94 @@ export function TaskDeviceModal({
               <strong>
                 {counts.all}
               </strong>
+
             </button>
 
 
             <button
               type="button"
               className={`
-                task-device-modal__filter
-                task-device-modal__filter--pending
+                job-device-modal__filter
+                job-device-modal__filter--overdue
                 ${
-                  activeFilter === "pending"
-                    ? "task-device-modal__filter--active"
+                  activeFilter === "overdue"
+                    ? "job-device-modal__filter--active"
                     : ""
                 }
               `}
               onClick={() =>
                 setActiveFilter(
-                  "pending"
+                  "overdue"
                 )
               }
             >
+
               <span>
-                Pending
+                Overdue
               </span>
 
               <strong>
-                {counts.pending}
+                {counts.overdue}
               </strong>
+
             </button>
 
 
             <button
               type="button"
               className={`
-                task-device-modal__filter
-                task-device-modal__filter--progress
+                job-device-modal__filter
+                job-device-modal__filter--today
                 ${
-                  activeFilter === "progress"
-                    ? "task-device-modal__filter--active"
+                  activeFilter === "today"
+                    ? "job-device-modal__filter--active"
                     : ""
                 }
               `}
               onClick={() =>
                 setActiveFilter(
-                  "progress"
+                  "today"
                 )
               }
             >
+
               <span>
-                In process
+                Today
               </span>
 
               <strong>
-                {counts.progress}
+                {counts.today}
               </strong>
+
             </button>
 
 
             <button
               type="button"
               className={`
-                task-device-modal__filter
-                task-device-modal__filter--not-done
+                job-device-modal__filter
+                job-device-modal__filter--upcoming
                 ${
-                  activeFilter === "not-done"
-                    ? "task-device-modal__filter--active"
+                  activeFilter === "upcoming"
+                    ? "job-device-modal__filter--active"
                     : ""
                 }
               `}
               onClick={() =>
                 setActiveFilter(
-                  "not-done"
+                  "upcoming"
                 )
               }
             >
+
               <span>
-                Not done
+                Upcoming
               </span>
 
               <strong>
-                {counts.notDone}
+                {counts.upcoming}
               </strong>
+
             </button>
 
           </div>
@@ -284,11 +297,11 @@ export function TaskDeviceModal({
         </header>
 
 
-        <div className="task-device-modal__content">
+        <div className="job-device-modal__content">
 
-          <TasksList
-            tasks={
-              filteredTasks
+          <JobsList
+            jobs={
+              filteredJobs
             }
           />
 
