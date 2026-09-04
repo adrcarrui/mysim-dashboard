@@ -10,6 +10,10 @@ import {
 } from "./layouts/AppLayout";
 
 import {
+  Availability,
+} from "./pages/Availability/Availability";
+
+import {
   Dashboard,
 } from "./pages/Dashboard/Dashboard";
 
@@ -42,15 +46,15 @@ export default function App() {
             index
             element={
               <Navigate
-                to="/dashboard"
+                to="/availability"
                 replace
               />
             }
           />
 
           <Route
-            path="dashboard"
-            element={<Dashboard />}
+            path="availability"
+            element={<Availability />}
           />
 
           <Route

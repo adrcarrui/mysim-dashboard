@@ -12,6 +12,7 @@ import {
   FileWarning,
   ListChecks,
   CalendarClock,
+  CalendarRange,
 } from "lucide-react";
 
 import {
@@ -119,6 +120,20 @@ export function AppLayout() {
             location.pathname === "/tasks",
           onClick: () =>
             navigate("/tasks"),
+        },
+         {
+          label: "Availability",
+          icon: (
+            <CalendarRange
+              size={20}
+              strokeWidth={1.8}
+            />
+          ),
+          active:
+            location.pathname === "/" ||
+            location.pathname === "/availability",
+          onClick: () =>
+            navigate("/availability"),
         },
       ]}
     >
