@@ -6,6 +6,9 @@ import time
 
 from app.schemas.task import Task
 from app.services.mysim_client import mysim_client
+from app.services.task_frequencies_service import (
+    task_frequencies_service,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -83,13 +86,13 @@ DEVICE_MAP = {
 
 
 #
-# Número máximo de peticiones concurrentes a mySim.
+# NÃºmero mÃ¡ximo de peticiones concurrentes a mySim.
 #
 MYSIM_CONCURRENCY = 10
 
 
 #
-# Tiempo de vida de la caché.
+# Tiempo de vida de la cachÃ©.
 #
 # 3600 segundos = 1 hora.
 #
@@ -97,7 +100,7 @@ CACHE_TTL_SECONDS = 3600
 
 
 #
-# Caché de MaintenanceTask.
+# CachÃ© de MaintenanceTask.
 #
 # {
 #     maintenance_task_id: (
@@ -113,27 +116,12 @@ maintenance_task_cache: dict[
 
 
 #
-# Caché de TaskFrequency.
-#
-frequency_cache: dict[
-    int,
-    tuple[float, dict | None]
-] = {}
-
-
-#
 # Locks por ID.
 #
-# Evitan que dos peticiones simultáneas
+# Evitan que dos peticiones simultÃ¡neas
 # consulten el mismo dato a mySim.
 #
 maintenance_task_locks: dict[
-    int,
-    asyncio.Lock
-] = {}
-
-
-frequency_locks: dict[
     int,
     asyncio.Lock
 ] = {}
@@ -276,7 +264,7 @@ async def get_maintenance_task_details(
 ) -> dict | None:
 
     #
-    # 1. Comprobar caché.
+    # 1. Comprobar cachÃ©.
     #
     cached = (
         maintenance_task_cache.get(
@@ -300,7 +288,7 @@ async def get_maintenance_task_details(
             return details
 
     #
-    # 2. Lock específico para este ID.
+    # 2. Lock especÃ­fico para este ID.
     #
     lock = (
         maintenance_task_locks.setdefault(
@@ -312,9 +300,9 @@ async def get_maintenance_task_details(
     async with lock:
 
         #
-        # Volvemos a comprobar la caché
-        # porque otra coroutine podría haberla
-        # rellenado mientras esperábamos el lock.
+        # Volvemos a comprobar la cachÃ©
+        # porque otra coroutine podrÃ­a haberla
+        # rellenado mientras esperÃ¡bamos el lock.
         #
         cached = (
             maintenance_task_cache.get(
@@ -371,134 +359,12 @@ async def get_maintenance_task_details(
             details = rows[0]
 
         #
-        # Guardar resultado en caché.
+        # Guardar resultado en cachÃ©.
         #
         maintenance_task_cache[
             maintenance_task_id
         ] = (
             time.monotonic(),
-            details,
-        )
-
-        return details
-
-
-async def get_task_frequency_details(
-    frequency_id: int,
-) -> dict | None:
-
-    #
-    # 1. Comprobar caché.
-    #
-    cached = (
-        frequency_cache.get(
-            frequency_id
-        )
-    )
-
-    if cached is not None:
-
-        cached_at, details = cached
-
-        if is_cache_valid(
-            cached_at
-        ):
-
-            logger.debug(
-                "TaskFrequency CACHE HIT: %s",
-                frequency_id,
-            )
-
-            return details
-
-    #
-    # 2. Lock específico para esta frecuencia.
-    #
-    lock = (
-        frequency_locks.setdefault(
-            frequency_id,
-            asyncio.Lock(),
-        )
-    )
-
-    async with lock:
-
-        cached = (
-            frequency_cache.get(
-                frequency_id
-            )
-        )
-
-        if cached is not None:
-
-            cached_at, details = cached
-
-            if is_cache_valid(
-                cached_at
-            ):
-
-                logger.debug(
-                    "TaskFrequency CACHE HIT AFTER LOCK: %s",
-                    frequency_id,
-                )
-
-                return details
-
-        logger.debug(
-            "TaskFrequency CACHE MISS: %s",
-            frequency_id,
-        )
-
-        query = (
-            f"t.id={frequency_id}"
-        )
-
-        response = (
-            await mysim_client.get(
-                entity="TaskFrequency",
-                extra_query=query,
-            )
-        )
-
-        rows = extract_rows(
-            response
-        )
-
-        if not rows:
-
-            logger.warning(
-                "TaskFrequency %s not found",
-                frequency_id,
-            )
-
-            details = None
-
-        else:
-
-            row = rows[0]
-
-            details = {
-                "id": row.get(
-                    "id"
-                ),
-                "name": row.get(
-                    "name"
-                ),
-                "num_of_days": row.get(
-                    "numOfDays"
-                ),
-            }
-
-        frequency_cache[
-            frequency_id
-        ] = (
-            time.monotonic(),
-            details,
-        )
-
-        logger.debug(
-            "TASK FREQUENCY %s: %s",
-            frequency_id,
             details,
         )
 
@@ -587,8 +453,8 @@ async def get_upcoming_tasks(
     today = now.date()
 
     #
-    # Recuperamos suficiente histórico y futuro
-    # para cubrir la tolerancia máxima de ±5 semanas.
+    # Recuperamos suficiente histÃ³rico y futuro
+    # para cubrir la tolerancia mÃ¡xima de Â±5 semanas.
     #
     start_date = (
         today
@@ -656,7 +522,7 @@ async def get_upcoming_tasks(
     )
 
     #
-    # IDs únicos de MaintenanceTask.
+    # IDs Ãºnicos de MaintenanceTask.
     #
     maintenance_task_ids = {
         row.get(
@@ -680,8 +546,8 @@ async def get_upcoming_tasks(
     )
 
     #
-    # Número de IDs que ya tenemos
-    # disponibles en caché.
+    # NÃºmero de IDs que ya tenemos
+    # disponibles en cachÃ©.
     #
     valid_cached_maintenance = sum(
         1
@@ -716,7 +582,7 @@ async def get_upcoming_tasks(
     #
     # Cargar MaintenanceTask.
     #
-    # Los que estén en caché se devolverán
+    # Los que estÃ©n en cachÃ© se devolverÃ¡n
     # inmediatamente.
     #
     async def load_maintenance_task(
@@ -764,7 +630,7 @@ async def get_upcoming_tasks(
     }
 
     #
-    # IDs únicos de frecuencia.
+    # IDs Ãºnicos de frecuencia.
     #
     frequency_ids = {
         details.get(
@@ -793,80 +659,22 @@ async def get_upcoming_tasks(
         ),
     )
 
-    valid_cached_frequencies = sum(
-        1
-        for frequency_id
-        in frequency_ids
-        if (
-            frequency_id
-            in frequency_cache
-            and is_cache_valid(
-                frequency_cache[
-                    frequency_id
-                ][0]
-            )
+    frequency_details = await (
+        task_frequencies_service.get_many(
+            frequency_ids
         )
     )
 
     logger.info(
-        "TASK FREQUENCY CACHE: %s/%s",
-        valid_cached_frequencies,
-        len(
-            frequency_ids
-        ),
+        "TASK FREQUENCIES FROM POSTGRESQL: %s/%s",
+        len(frequency_details),
+        len(frequency_ids),
     )
-
-    #
-    # Cargar TaskFrequency.
-    #
-    async def load_frequency(
-        frequency_id: int,
-    ) -> tuple[
-        int,
-        dict | None,
-    ]:
-
-        async with semaphore:
-
-            details = (
-                await get_task_frequency_details(
-                    frequency_id
-                )
-            )
-
-            return (
-                frequency_id,
-                details,
-            )
-
-    frequency_results = (
-        await asyncio.gather(
-            *[
-                load_frequency(
-                    frequency_id
-                )
-                for frequency_id
-                in frequency_ids
-            ]
-        )
-    )
-
-    frequency_details: dict[
-        int,
-        dict | None
-    ] = {
-        frequency_id: details
-        for (
-            frequency_id,
-            details,
-        )
-        in frequency_results
-    }
 
     tasks: list[Task] = []
 
     #
-    # Construcción de tareas enriquecidas.
+    # ConstrucciÃ³n de tareas enriquecidas.
     #
     for row in rows:
 
@@ -1110,7 +918,7 @@ async def get_upcoming_tasks(
     #
     # - Siempre out of tolerance.
     # - Siempre in tolerance.
-    # - Upcoming solamente próximos 3 días.
+    # - Upcoming solamente prÃ³ximos 3 dÃ­as.
     #
     display_limit = (
         now

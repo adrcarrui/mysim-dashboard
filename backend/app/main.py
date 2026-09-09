@@ -15,6 +15,7 @@ from app.api.recommendations import (
     router as recommendations_router,
 )
 from app.api.tasks import router as tasks_router
+from app.api.task_frequencies import router as task_frequencies_router
 from app.database import close_database_connection
 from app.services.devices_service import devices_service
 from app.services.devices_sync_service import (
@@ -105,6 +106,11 @@ app.include_router(
 
 app.include_router(
     devices_router,
+    prefix="/api",
+)
+
+app.include_router(
+    task_frequencies_router,
     prefix="/api",
 )
 
