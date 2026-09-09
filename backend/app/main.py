@@ -16,6 +16,8 @@ from app.api.recommendations import (
 )
 from app.api.tasks import router as tasks_router
 from app.api.task_frequencies import router as task_frequencies_router
+from app.api.maintenance_tasks import router as maintenance_tasks_router
+from app.services.reference_data_sync_service import run_reference_data_synchronization
 from app.database import close_database_connection
 from app.services.devices_service import devices_service
 from app.services.devices_sync_service import (
@@ -47,12 +49,20 @@ async def lifespan(app: FastAPI):
         run_devices_synchronization()
     )
 
+    reference_data_task = asyncio.create_task(
+        run_reference_data_synchronization()
+    )
+
     yield
 
     synchronization_task.cancel()
+    reference_data_task.cancel()
 
     with suppress(asyncio.CancelledError):
         await synchronization_task
+
+    with suppress(asyncio.CancelledError):
+        await reference_data_task
 
     await close_database_connection()
 
@@ -114,6 +124,10 @@ app.include_router(
     prefix="/api",
 )
 
+app.include_router(
+    maintenance_tasks_router,
+    prefix="/api",
+)
 
 @app.get("/")
 async def root():

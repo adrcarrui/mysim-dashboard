@@ -27,5 +27,7 @@ class Settings(BaseSettings):
         case_sensitive=False,
     )
 
+    reference_data_sync_interval_seconds: int = 86400
+    
 
 settings = Settings()

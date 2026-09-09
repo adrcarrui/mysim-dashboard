@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta
-import asyncio
 import logging
 import re
-import time
 
 from app.schemas.task import Task
+from app.services.maintenance_tasks_service import (
+    maintenance_tasks_service,
+)
 from app.services.mysim_client import mysim_client
 from app.services.task_frequencies_service import (
     task_frequencies_service,
@@ -83,48 +84,6 @@ DEVICE_MAP = {
     "ARMS": "ARMS",
     "LE": "LE",
 }
-
-
-#
-# NÃºmero mÃ¡ximo de peticiones concurrentes a mySim.
-#
-MYSIM_CONCURRENCY = 10
-
-
-#
-# Tiempo de vida de la cachÃ©.
-#
-# 3600 segundos = 1 hora.
-#
-CACHE_TTL_SECONDS = 3600
-
-
-#
-# CachÃ© de MaintenanceTask.
-#
-# {
-#     maintenance_task_id: (
-#         timestamp,
-#         details,
-#     )
-# }
-#
-maintenance_task_cache: dict[
-    int,
-    tuple[float, dict | None]
-] = {}
-
-
-#
-# Locks por ID.
-#
-# Evitan que dos peticiones simultÃ¡neas
-# consulten el mismo dato a mySim.
-#
-maintenance_task_locks: dict[
-    int,
-    asyncio.Lock
-] = {}
 
 
 def extract_rows(
@@ -248,129 +207,6 @@ def clean_html_text(
     )
 
 
-def is_cache_valid(
-    cached_at: float,
-) -> bool:
-
-    return (
-        time.monotonic()
-        - cached_at
-        < CACHE_TTL_SECONDS
-    )
-
-
-async def get_maintenance_task_details(
-    maintenance_task_id: int,
-) -> dict | None:
-
-    #
-    # 1. Comprobar cachÃ©.
-    #
-    cached = (
-        maintenance_task_cache.get(
-            maintenance_task_id
-        )
-    )
-
-    if cached is not None:
-
-        cached_at, details = cached
-
-        if is_cache_valid(
-            cached_at
-        ):
-
-            logger.debug(
-                "MaintenanceTask CACHE HIT: %s",
-                maintenance_task_id,
-            )
-
-            return details
-
-    #
-    # 2. Lock especÃ­fico para este ID.
-    #
-    lock = (
-        maintenance_task_locks.setdefault(
-            maintenance_task_id,
-            asyncio.Lock(),
-        )
-    )
-
-    async with lock:
-
-        #
-        # Volvemos a comprobar la cachÃ©
-        # porque otra coroutine podrÃ­a haberla
-        # rellenado mientras esperÃ¡bamos el lock.
-        #
-        cached = (
-            maintenance_task_cache.get(
-                maintenance_task_id
-            )
-        )
-
-        if cached is not None:
-
-            cached_at, details = cached
-
-            if is_cache_valid(
-                cached_at
-            ):
-
-                logger.debug(
-                    "MaintenanceTask CACHE HIT AFTER LOCK: %s",
-                    maintenance_task_id,
-                )
-
-                return details
-
-        logger.debug(
-            "MaintenanceTask CACHE MISS: %s",
-            maintenance_task_id,
-        )
-
-        query = (
-            f"t.id={maintenance_task_id}"
-        )
-
-        response = (
-            await mysim_client.get(
-                entity="maintenanceTask",
-                extra_query=query,
-            )
-        )
-
-        rows = extract_rows(
-            response
-        )
-
-        if not rows:
-
-            logger.warning(
-                "MaintenanceTask %s not found",
-                maintenance_task_id,
-            )
-
-            details = None
-
-        else:
-
-            details = rows[0]
-
-        #
-        # Guardar resultado en cachÃ©.
-        #
-        maintenance_task_cache[
-            maintenance_task_id
-        ] = (
-            time.monotonic(),
-            details,
-        )
-
-        return details
-
-
 def get_tolerance_window(
     planned_date: datetime,
     frequency: str | None,
@@ -453,8 +289,8 @@ async def get_upcoming_tasks(
     today = now.date()
 
     #
-    # Recuperamos suficiente histÃ³rico y futuro
-    # para cubrir la tolerancia mÃ¡xima de Â±5 semanas.
+    # Recuperamos suficiente histórico y futuro
+    # para cubrir la tolerancia máxima de ±5 semanas.
     #
     start_date = (
         today
@@ -522,7 +358,7 @@ async def get_upcoming_tasks(
     )
 
     #
-    # IDs Ãºnicos de MaintenanceTask.
+    # IDs únicos de MaintenanceTask.
     #
     maintenance_task_ids = {
         row.get(
@@ -545,92 +381,20 @@ async def get_upcoming_tasks(
         ),
     )
 
-    #
-    # NÃºmero de IDs que ya tenemos
-    # disponibles en cachÃ©.
-    #
-    valid_cached_maintenance = sum(
-        1
-        for maintenance_task_id
-        in maintenance_task_ids
-        if (
-            maintenance_task_id
-            in maintenance_task_cache
-            and is_cache_valid(
-                maintenance_task_cache[
-                    maintenance_task_id
-                ][0]
-            )
+    maintenance_details = await (
+        maintenance_tasks_service.get_many(
+            maintenance_task_ids
         )
     )
 
     logger.info(
-        "MAINTENANCE TASK CACHE: %s/%s",
-        valid_cached_maintenance,
-        len(
-            maintenance_task_ids
-        ),
+        "MAINTENANCE TASKS FROM POSTGRESQL: %s/%s",
+        len(maintenance_details),
+        len(maintenance_task_ids),
     )
 
     #
-    # Limitador de concurrencia.
-    #
-    semaphore = asyncio.Semaphore(
-        MYSIM_CONCURRENCY
-    )
-
-    #
-    # Cargar MaintenanceTask.
-    #
-    # Los que estÃ©n en cachÃ© se devolverÃ¡n
-    # inmediatamente.
-    #
-    async def load_maintenance_task(
-        maintenance_task_id: int,
-    ) -> tuple[
-        int,
-        dict | None,
-    ]:
-
-        async with semaphore:
-
-            details = (
-                await get_maintenance_task_details(
-                    maintenance_task_id
-                )
-            )
-
-            return (
-                maintenance_task_id,
-                details,
-            )
-
-    maintenance_results = (
-        await asyncio.gather(
-            *[
-                load_maintenance_task(
-                    maintenance_task_id
-                )
-                for maintenance_task_id
-                in maintenance_task_ids
-            ]
-        )
-    )
-
-    maintenance_details: dict[
-        int,
-        dict | None
-    ] = {
-        maintenance_task_id: details
-        for (
-            maintenance_task_id,
-            details,
-        )
-        in maintenance_results
-    }
-
-    #
-    # IDs Ãºnicos de frecuencia.
+    # IDs únicos de frecuencia.
     #
     frequency_ids = {
         details.get(
@@ -674,7 +438,7 @@ async def get_upcoming_tasks(
     tasks: list[Task] = []
 
     #
-    # ConstrucciÃ³n de tareas enriquecidas.
+    # Construcción de tareas enriquecidas.
     #
     for row in rows:
 
@@ -918,7 +682,7 @@ async def get_upcoming_tasks(
     #
     # - Siempre out of tolerance.
     # - Siempre in tolerance.
-    # - Upcoming solamente prÃ³ximos 3 dÃ­as.
+    # - Upcoming solamente próximos 3 días.
     #
     display_limit = (
         now
