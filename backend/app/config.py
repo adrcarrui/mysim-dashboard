@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     )
 
     reference_data_sync_interval_seconds: int = 86400
+    dynamic_query_cache_seconds: int = 120
     
 
 settings = Settings()

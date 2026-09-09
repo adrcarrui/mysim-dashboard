@@ -11,18 +11,15 @@ from app.api.devices import router as devices_router
 from app.api.drs import router as drs_router
 from app.api.health import router as health_router
 from app.api.jobs import router as jobs_router
-from app.api.recommendations import (
-    router as recommendations_router,
-)
+from app.api.recommendations import router as recommendations_router
 from app.api.tasks import router as tasks_router
 from app.api.task_frequencies import router as task_frequencies_router
 from app.api.maintenance_tasks import router as maintenance_tasks_router
 from app.services.reference_data_sync_service import run_reference_data_synchronization
 from app.database import close_database_connection
 from app.services.devices_service import devices_service
-from app.services.devices_sync_service import (
-    run_devices_synchronization,
-)
+from app.services.devices_sync_service import run_devices_synchronization
+from app.services.mysim_query_service import cached_mysim_client as mysim_client
 from app.version import APP_VERSION
 
 

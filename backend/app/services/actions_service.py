@@ -3,7 +3,9 @@ from html import unescape
 from html.parser import HTMLParser
 
 from app.schemas.action import Action
-from app.services.mysim_client import mysim_client
+from app.services.mysim_query_service import (
+    cached_mysim_client as mysim_client,
+)
 from app.services.devices_service import devices_service
 
 
@@ -34,43 +36,6 @@ ACCOUNT_MAP = {
     4255: "Alejandro Puerta Delgado",
     4353: "Carlos Domínguez Nicolás",
 }
-
-async def debug_shift_entity(
-    shift_id: int | None,
-):
-    if shift_id is None:
-        return
-
-    possible_entities = [
-        "Shift",
-        "shift",
-        "ActionShift",
-        "ShiftToBeDone",
-    ]
-
-    for entity in possible_entities:
-        try:
-            payload = await mysim_client.get(
-                entity=entity,
-                extra_query=f"t.id={shift_id}",
-            )
-
-            rows = (
-                payload
-                .get("data", {})
-                .get("data", [])
-            )
-
-            print(
-                f"SHIFT DEBUG {entity}:",
-                rows[:1],
-            )
-
-        except Exception as exc:
-            print(
-                f"SHIFT DEBUG ERROR {entity}:",
-                exc,
-            )
 
 class HTMLTextExtractor(HTMLParser):
     def __init__(self):
@@ -198,8 +163,6 @@ class ActionsService:
 
         actions: list[Action] = []
 
-        shift_debug_done = False
-
         for row in rows:
 
             status_id = row.get("status")
@@ -221,15 +184,6 @@ class ActionsService:
             shift_to_be_done_id = row.get(
                 "shiftToBeDone"
             )
-            if (
-                not shift_debug_done
-                and shift_to_be_done_id is not None
-            ):
-                await debug_shift_entity(
-                    shift_to_be_done_id
-                )
-
-                shift_debug_done = True
 
             # Resolver nombre del dispositivo
             # usando el servicio común de Devices.

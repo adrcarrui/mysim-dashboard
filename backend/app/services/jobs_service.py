@@ -16,8 +16,8 @@ from app.services.devices_service import (
     devices_service,
 )
 
-from app.services.mysim_client import (
-    mysim_client,
+from app.services.mysim_query_service import (
+    cached_mysim_client as mysim_client,
 )
 
 
