@@ -1,4 +1,4 @@
-import os
+from app.config import settings
 from collections.abc import AsyncGenerator
 
 from sqlalchemy import text
@@ -9,10 +9,7 @@ from sqlalchemy.ext.asyncio import (
 )
 
 
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql+asyncpg://postgres@127.0.0.1:5432/mysim_dashboard",
-)
+DATABASE_URL = settings.database_url
 
 
 engine = create_async_engine(
