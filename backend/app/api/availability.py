@@ -10,11 +10,12 @@ from fastapi import (
     Query,
 )
 
-from app.schemas.availability import (
-    DeviceAvailability,
-)
 from app.services.availability_service import (
     get_availability,
+)
+from app.services.mysim_query_service import (
+    begin_cache_trace,
+    get_cache_trace_metadata,
 )
 
 
@@ -26,9 +27,7 @@ router = APIRouter(
 
 @router.get(
     "",
-    response_model=list[
-        DeviceAvailability
-    ],
+    response_model=None,
 )
 async def availability(
     from_date: date = Query(
@@ -50,6 +49,10 @@ async def availability(
             "and request fresh data from mySIM"
         ),
     ),
+    include_cache_metadata: bool = Query(
+        False,
+        description="Wrap the response with cache metadata",
+    ),
 ):
     if to_date <= from_date:
         raise HTTPException(
@@ -70,8 +73,17 @@ async def availability(
         time.min,
     )
 
-    return await get_availability(
+    begin_cache_trace()
+    data = await get_availability(
         window_start=window_start,
         window_end=window_end,
         force_refresh=force_refresh,
     )
+
+    if include_cache_metadata:
+        return {
+            "data": data,
+            "cache": get_cache_trace_metadata(),
+        }
+
+    return data

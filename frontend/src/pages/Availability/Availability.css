@@ -1468,3 +1468,80 @@
       var(--airbus-space-1);
   }
 }
+
+
+/* Availability cache status and refresh */
+.availability-page__cache-info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--airbus-space-2);
+  margin-top: var(--airbus-space-2);
+  font-size: 11px;
+  color: var(--airbus-text-muted);
+}
+
+.availability-page__cache-badge {
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--airbus-surface-muted);
+}
+
+.availability-page__cache-badge--hit {
+  color: #087f5b;
+  background: #e6fcf5;
+}
+
+.availability-page__cache-badge--miss {
+  color: var(--airbus-blue-700);
+  background: rgba(0, 133, 173, 0.1);
+}
+
+.availability-page__cache-badge--stale {
+  color: #9c6500;
+  background: #fff4ce;
+}
+
+.availability-page__refresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--airbus-space-2);
+  height: 38px;
+  padding: 0 var(--airbus-space-4);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--airbus-blue-500);
+  border: 0;
+  border-radius: var(--airbus-radius-sm);
+  cursor: pointer;
+}
+
+.availability-page__refresh:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.availability-page__refresh-icon--loading {
+  animation: availability-spin 0.9s linear infinite;
+}
+
+.availability-page__stale-warning {
+  margin-bottom: var(--airbus-space-4);
+  padding: var(--airbus-space-3) var(--airbus-space-4);
+  color: #6b4700;
+  background: #fff4ce;
+  border: 1px solid #f0c36d;
+  border-radius: var(--airbus-radius-sm);
+  font-size: 12px;
+}
+
+@keyframes availability-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

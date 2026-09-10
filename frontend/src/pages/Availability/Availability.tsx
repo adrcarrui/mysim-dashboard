@@ -1,6 +1,7 @@
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -15,11 +16,15 @@ import type {
 import {
   CalendarClock,
   Clock3,
+  RefreshCw,
   X,
 } from "lucide-react";
 
 import {
   getAvailability,
+} from "../../api/availability";
+import type {
+  AvailabilityCacheMetadata,
 } from "../../api/availability";
 
 import {
@@ -1098,12 +1103,23 @@ export function Availability() {
     string | null
   >(null);
 
+  const [cacheMetadata, setCacheMetadata] =
+    useState<AvailabilityCacheMetadata | null>(null);
+
+  const [refreshNonce, setRefreshNonce] =
+    useState(0);
+
+  const forceRefreshRef = useRef(false);
+
 
   useEffect(() => {
     let cancelled = false;
 
 
     async function load() {
+      const forceRefresh = forceRefreshRef.current;
+      forceRefreshRef.current = false;
+
       try {
         setLoading(
           true,
@@ -1121,6 +1137,7 @@ export function Availability() {
           getAvailability(
             fromDate,
             toDate,
+            forceRefresh,
           ),
 
           getRecommendations(
@@ -1133,7 +1150,11 @@ export function Availability() {
 
         if (!cancelled) {
           setDevices(
-            availabilityData,
+            availabilityData.data,
+          );
+
+          setCacheMetadata(
+            availabilityData.cache,
           );
 
           setRecommendations(
@@ -1172,6 +1193,7 @@ export function Availability() {
   }, [
     fromDate,
     toDate,
+    refreshNonce,
   ]);
 
 
@@ -1258,6 +1280,20 @@ export function Availability() {
           >
             Availability
           </h1>
+
+          {cacheMetadata && (
+            <div className="availability-page__cache-info">
+              <span className={`availability-page__cache-badge availability-page__cache-badge--${cacheMetadata.status.toLowerCase()}`}>
+                {cacheMetadata.status}
+              </span>
+              <span>
+                Source: {cacheMetadata.source === "mysim" ? "mySIM" : "PostgreSQL"}
+              </span>
+              <span>
+                Last checked: {new Date(cacheMetadata.checkedAt).toLocaleTimeString("es-ES")}
+              </span>
+            </div>
+          )}
         </div>
 
 
@@ -1306,8 +1342,30 @@ export function Availability() {
               }
             />
           </label>
+
+          <button
+            type="button"
+            className="availability-page__refresh"
+            disabled={loading}
+            onClick={() => {
+              forceRefreshRef.current = true;
+              setRefreshNonce((value) => value + 1);
+            }}
+          >
+            <RefreshCw
+              size={16}
+              className={loading ? "availability-page__refresh-icon--loading" : undefined}
+            />
+            {loading ? "Refreshing..." : "Refresh"}
+          </button>
         </div>
       </header>
+
+      {cacheMetadata?.stale && (
+        <div className="availability-page__stale-warning" role="status">
+          mySIM is unavailable. Showing the latest cached availability data.
+        </div>
+      )}
 
 
       {loading && (

@@ -2,6 +2,8 @@ import asyncio
 import hashlib
 import json
 import logging
+from contextvars import ContextVar
+from datetime import datetime, timezone
 from time import perf_counter
 from collections.abc import Awaitable, Callable
 from typing import Any
@@ -14,6 +16,33 @@ from app.services.mysim_client import mysim_client
 
 
 logger = logging.getLogger(__name__)
+
+_cache_events: ContextVar[tuple[str, ...]] = ContextVar("mysim_cache_events", default=())
+
+
+def begin_cache_trace() -> None:
+    _cache_events.set(())
+
+
+def _record_cache_event(status: str) -> None:
+    _cache_events.set((*_cache_events.get(), status))
+
+
+def get_cache_trace_metadata() -> dict[str, Any]:
+    events = _cache_events.get()
+    if "STALE" in events:
+        status, source, stale = "STALE", "postgresql", True
+    elif "MISS" in events:
+        status, source, stale = "MISS", "mysim", False
+    else:
+        status, source, stale = "HIT", "postgresql", False
+
+    return {
+        "status": status,
+        "source": source,
+        "stale": stale,
+        "checkedAt": datetime.now(timezone.utc).isoformat(),
+    }
 
 
 class CachedMySimClient:
@@ -114,6 +143,7 @@ class CachedMySimClient:
             )
 
             if cached is not None:
+                _record_cache_event("HIT")
                 logger.info(
                     "mySim CACHE HIT | entity=%s | "
                     "postgres=%.3fs | total=%.3fs",
@@ -145,6 +175,7 @@ class CachedMySimClient:
                 )
 
                 if cached is not None:
+                    _record_cache_event("HIT")
                     logger.info(
                         "mySim CACHE HIT AFTER LOCK | "
                         "entity=%s | postgres=%.3fs | "
@@ -199,6 +230,8 @@ class CachedMySimClient:
                     perf_counter() - total_started_at,
                 )
 
+                _record_cache_event("MISS")
+
                 return response
 
             except Exception:
@@ -208,6 +241,7 @@ class CachedMySimClient:
                 )
 
                 if stale is not None:
+                    _record_cache_event("STALE")
                     logger.warning(
                         "mySim STALE CACHE | entity=%s | "
                         "total=%.3fs",
