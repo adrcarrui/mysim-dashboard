@@ -1,0 +1,47 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - backend/*
+      - azure-pipelines.yml
+
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - backend/*
+      - azure-pipelines.yml
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  MYSIM_BASE_URL: http://127.0.0.1:9999/api/v1/pub
+  MYSIM_AUTH_TOKEN: ci-placeholder
+  DATABASE_URL: postgresql+asyncpg://postgres@127.0.0.1:5432/mysim_dashboard
+
+steps:
+  - task: UsePythonVersion@0
+    displayName: Use Python 3.12
+    inputs:
+      versionSpec: "3.12"
+
+  - script: python -m pip install -r requirements-test.txt
+    displayName: Install test dependencies
+    workingDirectory: backend
+
+  - script: python -m compileall -q app tests
+    displayName: Compile backend
+    workingDirectory: backend
+
+  - script: >
+      python -m pytest
+      tests/test_health.py
+      tests/test_mysim_query_cache.py
+      -v
+    displayName: Run backend tests
+    workingDirectory: backend

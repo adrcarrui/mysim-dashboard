@@ -1,0 +1,51 @@
+name: Backend tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-tests.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-tests.yml"
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    env:
+      MYSIM_BASE_URL: http://127.0.0.1:9999/api/v1/pub
+      MYSIM_AUTH_TOKEN: ci-placeholder
+      DATABASE_URL: postgresql+asyncpg://postgres@127.0.0.1:5432/mysim_dashboard
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements-test.txt
+
+      - name: Install test dependencies
+        run: python -m pip install -r requirements-test.txt
+
+      - name: Compile backend
+        run: python -m compileall -q app tests
+
+      - name: Run backend tests
+        run: >
+          python -m pytest
+          tests/test_health.py
+          tests/test_mysim_query_cache.py
+          -v
