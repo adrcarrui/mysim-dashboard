@@ -1,17 +1,14 @@
 from fastapi import APIRouter
 
-from app.version import APP_VERSION
+from app.services.health_service import get_health
 
 
 router = APIRouter(
-    prefix="/api",
-    tags=["System"],
+    prefix="/api/health",
+    tags=["Health"],
 )
 
 
-@router.get("/health")
+@router.get("")
 async def health():
-    return {
-        "status": "online",
-        "version": APP_VERSION,
-    }
+    return await get_health()

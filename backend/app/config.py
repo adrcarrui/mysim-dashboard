@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     mysim_password: str | None = None
 
     mysim_timeout: float = 20.0
+    health_mysim_timeout_seconds: float = 3.0
 
     database_url: str = (
         "postgresql+asyncpg://"
