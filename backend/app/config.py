@@ -20,15 +20,17 @@ class Settings(BaseSettings):
     )
 
     devices_sync_interval_seconds: int = 43200
+    reference_data_sync_interval_seconds: int = 86400
+    dynamic_query_cache_seconds: int = 120
+    availability_cache_seconds: int = 7200
+
+    query_cache_cleanup_interval_seconds: int = 3600
+    query_cache_stale_retention_seconds: int = 86400
 
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=False,
     )
-
-    reference_data_sync_interval_seconds: int = 86400
-    dynamic_query_cache_seconds: int = 120
-    
 
 settings = Settings()

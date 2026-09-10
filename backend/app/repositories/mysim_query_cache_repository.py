@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.dialects.postgresql import insert
 
 from app.database import AsyncSessionLocal
@@ -11,6 +11,30 @@ from app.models.mysim_query_cache import (
 
 
 class MySimQueryCacheRepository:
+    async def delete_expired_older_than(
+        self,
+        retention_seconds: int,
+    ) -> int:
+        cutoff = (
+            datetime.now(timezone.utc)
+            - timedelta(seconds=retention_seconds)
+        )
+
+        async with AsyncSessionLocal() as session:
+            async with session.begin():
+                statement = delete(
+                    MySimQueryCache
+                ).where(
+                    MySimQueryCache.expires_at
+                    < cutoff
+                )
+
+                result = await session.execute(
+                    statement
+                )
+
+                return result.rowcount or 0
+
     async def get_fresh(
         self,
         cache_key: str,

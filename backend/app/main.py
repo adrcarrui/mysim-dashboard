@@ -15,15 +15,51 @@ from app.api.recommendations import router as recommendations_router
 from app.api.tasks import router as tasks_router
 from app.api.task_frequencies import router as task_frequencies_router
 from app.api.maintenance_tasks import router as maintenance_tasks_router
-from app.services.reference_data_sync_service import run_reference_data_synchronization
+from app.config import settings
 from app.database import close_database_connection
+from app.repositories.mysim_query_cache_repository import (
+    mysim_query_cache_repository,
+)
 from app.services.devices_service import devices_service
 from app.services.devices_sync_service import run_devices_synchronization
-from app.services.mysim_query_service import cached_mysim_client as mysim_client
+from app.services.reference_data_sync_service import (
+    run_reference_data_synchronization,
+)
 from app.version import APP_VERSION
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("uvicorn.error")
+
+
+async def run_query_cache_cleanup() -> None:
+    while True:
+        try:
+            deleted = await (
+                mysim_query_cache_repository
+                .delete_expired_older_than(
+                    settings
+                    .query_cache_stale_retention_seconds
+                )
+            )
+
+            logger.info(
+                "Query cache cleanup completed: "
+                "%s entries deleted",
+                deleted,
+            )
+
+        except asyncio.CancelledError:
+            raise
+
+        except Exception:
+            logger.exception(
+                "Query cache cleanup failed"
+            )
+
+        await asyncio.sleep(
+            settings
+            .query_cache_cleanup_interval_seconds
+        )
 
 
 @asynccontextmanager
@@ -50,16 +86,24 @@ async def lifespan(app: FastAPI):
         run_reference_data_synchronization()
     )
 
+    query_cache_cleanup_task = asyncio.create_task(
+        run_query_cache_cleanup()
+    )
+
     yield
 
     synchronization_task.cancel()
     reference_data_task.cancel()
+    query_cache_cleanup_task.cancel()
 
     with suppress(asyncio.CancelledError):
         await synchronization_task
 
     with suppress(asyncio.CancelledError):
         await reference_data_task
+
+    with suppress(asyncio.CancelledError):
+        await query_cache_cleanup_task
 
     await close_database_connection()
 

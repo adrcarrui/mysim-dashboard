@@ -10,6 +10,7 @@ const API_BASE_URL =
 export async function getAvailability(
   fromDate: string,
   toDate: string,
+  forceRefresh = false,
 ): Promise<DeviceAvailability[]> {
 
   const params =
@@ -17,6 +18,10 @@ export async function getAvailability(
       from_date: fromDate,
       to_date: toDate,
     });
+
+  if (forceRefresh) {
+    params.set("force_refresh", "true");
+  }
 
   const response = await fetch(
     `${API_BASE_URL}/availability?${params.toString()}`,

@@ -13,8 +13,9 @@ from app.schemas.availability import (
 from app.services.devices_service import (
     devices_service,
 )
-from app.services.mysim_client import (
-    mysim_client,
+from app.config import settings
+from app.services.mysim_query_service import (
+    cached_mysim_client as mysim_client,
 )
 
 
@@ -108,6 +109,7 @@ async def get_slots_rows(
     *,
     window_start: datetime,
     window_end: datetime,
+    force_refresh: bool = False,
 ) -> list[dict]:
     """
     Obtiene todos los registros de mySlots
@@ -163,6 +165,11 @@ async def get_slots_rows(
             .get_datatable(
                 "Slots",
                 params=params,
+                ttl_seconds=(
+                    settings
+                    .availability_cache_seconds
+                ),
+                force_refresh=force_refresh,
             )
         )
 
@@ -412,12 +419,14 @@ async def get_availability(
     *,
     window_start: datetime,
     window_end: datetime,
+    force_refresh: bool = False,
 ) -> list[
     DeviceAvailability
 ]:
     rows = await get_slots_rows(
         window_start=window_start,
         window_end=window_end,
+        force_refresh=force_refresh,
     )
 
     #

@@ -43,6 +43,13 @@ async def availability(
             "End date, exclusive"
         ),
     ),
+    force_refresh: bool = Query(
+        False,
+        description=(
+            "Ignore cached Availability data "
+            "and request fresh data from mySIM"
+        ),
+    ),
 ):
     if to_date <= from_date:
         raise HTTPException(
@@ -66,4 +73,5 @@ async def availability(
     return await get_availability(
         window_start=window_start,
         window_end=window_end,
+        force_refresh=force_refresh,
     )
