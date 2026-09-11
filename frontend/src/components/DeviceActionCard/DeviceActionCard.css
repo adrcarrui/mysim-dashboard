@@ -88,31 +88,31 @@
 
 .device-action-card--a400m::before {
   background-image:
-    url("src/assets/devices/a400m.png");
+    url("../../assets/devices/a400m.png");
 }
 
 
 .device-action-card--c295::before {
   background-image:
-    url("src/assets/devices/c295.png");
+    url("../../assets/devices/c295.png");
 }
 
 
 .device-action-card--c295-ts03::before {
   background-image:
-    url("src/assets/devices/c295-ts03.png");
+    url("../../assets/devices/c295-ts03.png");
 }
 
 
 .device-action-card--cn235::before {
   background-image:
-    url("src/assets/devices/cn235.png");
+    url("../../assets/devices/cn235.png");
 }
 
 
 .device-action-card--mrtt::before {
   background-image:
-    url("src/assets/devices/mrtt.png");
+    url("../../assets/devices/mrtt.png");
 }
 
 

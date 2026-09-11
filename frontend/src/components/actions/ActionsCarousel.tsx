@@ -28,9 +28,13 @@ export function ActionsCarousel({
           disableOnInteraction: false,
         }}
       >
-        {actions.map((action) => (
+        {actions.map((action, index) => (
           <SwiperSlide
-            key={action.id ?? action.actionId}
+            key={
+              action.id ??
+              action.action_id ??
+              `action-${index}`
+            }
           >
             <ActionCard action={action} />
           </SwiperSlide>

@@ -81,32 +81,32 @@
 
 .device-task-card--a400m::before {
   background-image:
-    url("src/assets/devices/a400m.png");
+    url("../../assets/devices/a400m.png");
 
 }
 
 
 .device-task-card--c295::before {
   background-image:
-    url("src/assets/devices/c295.png");
+    url("../../assets/devices/c295.png");
 }
 
 
 .device-task-card--c295-ts03::before {
   background-image:
-    url("src/assets/devices/c295-ts03.png");
+    url("../../assets/devices/c295-ts03.png");
 }
 
 
 .device-task-card--cn235::before {
   background-image:
-    url("src/assets/devices/cn235.png");
+    url("../../assets/devices/cn235.png");
 }
 
 
 .device-task-card--mrtt::before {
   background-image:
-    url("src/assets/devices/mrtt.png");
+    url("../../assets/devices/mrtt.png");
 }
 
 

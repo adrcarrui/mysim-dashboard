@@ -11,7 +11,7 @@ export type AirbusPageHighlight =
   | "pink"
   | "purple";
 
-export interface AirbusPageProps extends HTMLAttributes<HTMLDivElement> {
+export interface AirbusPageProps extends Omit<HTMLAttributes<HTMLDivElement>, "title"> {
   title: ReactNode;
   subtitle?: ReactNode;
   eyebrow?: ReactNode;

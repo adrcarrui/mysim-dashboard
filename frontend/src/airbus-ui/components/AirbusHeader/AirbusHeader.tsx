@@ -1,7 +1,7 @@
 import type { HTMLAttributes, ReactNode } from "react";
 import "./AirbusHeader.css";
 
-export interface AirbusHeaderProps extends HTMLAttributes<HTMLElement> {
+export interface AirbusHeaderProps extends Omit<HTMLAttributes<HTMLElement>, "title"> {
   title: ReactNode;
   subtitle?: ReactNode;
   eyebrow?: ReactNode;

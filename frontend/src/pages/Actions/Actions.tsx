@@ -219,7 +219,7 @@ export function Actions() {
                 (
                   device
                 ): device is string =>
-                  Boolean(device) &&
+                  device !== null &&
                   !FFS_DEVICES.has(
                     device
                   )

@@ -44,8 +44,4 @@ jobs:
         run: python -m compileall -q app tests
 
       - name: Run backend tests
-        run: >
-          python -m pytest
-          tests/test_health.py
-          tests/test_mysim_query_cache.py
-          -v
+        run: python -m pytest tests -v

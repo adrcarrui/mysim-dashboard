@@ -40,7 +40,7 @@ export function TasksCarousel({
         }}
       >
         {tasks.map((task) => (
-          <SwiperSlide key={task.id}>
+          <SwiperSlide key={task.scheduled_task_id}>
             <TaskCard task={task} />
           </SwiperSlide>
         ))}

@@ -38,20 +38,20 @@ export function ActionCard({
     <div className="job-card">
       <div className="job-card__header">
         <span className="job-number">
-          {action.actionId ?? `Action ${action.id ?? "-"}`}
+          {action.action_id ?? `Action ${action.id ?? "-"}`}
         </span>
 
         <span className="urgency">
-          {getStatusLabel(action.status)}
+          {getStatusLabel(action.status_id)}
         </span>
       </div>
 
       <div className="job-device">
-        {action.deviceName ?? "Unknown device"}
+        {action.device ?? "Unknown device"}
       </div>
 
       <div className="job-description">
-        {htmlToText(action.actionDescription) ||
+        {htmlToText(action.description) ||
           "No description"}
       </div>
 

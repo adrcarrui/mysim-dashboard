@@ -67,7 +67,7 @@ const FFS_DEVICES = [
 ] as const
 
 
-const FFS_DEVICE_SET = new Set(
+const FFS_DEVICE_SET: ReadonlySet<string> = new Set(
   FFS_DEVICES.map(
     (device) =>
       device.rawName
@@ -222,7 +222,7 @@ export function Jobs() {
                 (
                   device
                 ): device is string =>
-                  Boolean(device) &&
+                  device !== null &&
                   !FFS_DEVICE_SET.has(
                     device
                   )

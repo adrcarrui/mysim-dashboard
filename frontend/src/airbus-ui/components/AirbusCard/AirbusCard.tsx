@@ -12,7 +12,7 @@ export type AirbusCardAccent =
   | "purple"
   | "lime";
 
-export interface AirbusCardProps extends HTMLAttributes<HTMLElement> {
+export interface AirbusCardProps extends Omit<HTMLAttributes<HTMLElement>, "title"> {
   title?: ReactNode;
   subtitle?: ReactNode;
   actions?: ReactNode;

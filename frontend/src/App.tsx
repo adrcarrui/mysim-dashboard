@@ -14,10 +14,6 @@ import {
 } from "./pages/Availability/Availability";
 
 import {
-  Dashboard,
-} from "./pages/Dashboard/Dashboard";
-
-import {
   Jobs,
 } from "./pages/Jobs/Jobs";
 

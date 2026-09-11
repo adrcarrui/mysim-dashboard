@@ -82,7 +82,7 @@ export default function TaskCard({
       <div className="job-card__header">
 
         <span className="job-number">
-          {task.task_id}
+          {task.task_code}
         </span>
 
         <span

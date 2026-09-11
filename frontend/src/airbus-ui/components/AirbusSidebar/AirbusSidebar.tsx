@@ -35,7 +35,7 @@ export function AirbusSidebar({
           {!collapsed && (
             <div>
               <div className="airbus-sidebar__brand">
-                AIRBUS
+                {title}
               </div>
             </div>
           )}

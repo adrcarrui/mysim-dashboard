@@ -881,6 +881,7 @@ function AvailabilityCard({
         <button
           type="button"
           className="availability-card__tasks-button"
+          aria-label={`Tasks (${taskCount})`}
           onClick={
             onOpenTasks
           }
