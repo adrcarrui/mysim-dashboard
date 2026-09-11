@@ -48,3 +48,4 @@ backend/devices_response.json
 backend/task_frequencies_response.json
 backend/maintenance_tasks_response.json
 
+frontend/coverage/
