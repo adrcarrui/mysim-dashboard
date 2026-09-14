@@ -1,4 +1,4 @@
-import react from "@vitejs/plugin-react"
+﻿import react from "@vitejs/plugin-react"
 import {
   defineConfig,
 } from "vitest/config"
@@ -19,5 +19,17 @@ export default defineConfig({
 
     css:
       true,
+
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "html"],
+      exclude: ["src/assets/**", "**/*.css"],
+      thresholds: {
+        statements: 80,
+        branches: 70,
+        functions: 80,
+        lines: 80,
+      },
+    },
   },
 })
