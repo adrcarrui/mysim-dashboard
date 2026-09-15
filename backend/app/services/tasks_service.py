@@ -14,31 +14,12 @@ from app.services.task_frequencies_service import (
 )
 
 
+from app.services.task_tolerance_rules import (
+    get_documented_window,
+    get_planning_category,
+)
+
 logger = logging.getLogger(__name__)
-
-
-TOLERANCE_MAP = {
-    "Daily": timedelta(hours=12),
-
-    "Weekly": timedelta(days=1),
-
-    "Biweekly": timedelta(days=2),
-
-    "Monthly": timedelta(weeks=1),
-    "28 days": timedelta(weeks=1),
-
-    "Quarterly": timedelta(weeks=3),
-
-    "SemiAnnual": timedelta(weeks=4),
-
-    "Annual": timedelta(weeks=5),
-    "Biennial": timedelta(weeks=5),
-    "Triannual": timedelta(weeks=5),
-    "Quadrennial": timedelta(weeks=5),
-    "Quinquennial": timedelta(weeks=5),
-    "5 years": timedelta(weeks=5),
-    "10 Years": timedelta(weeks=5),
-}
 
 
 STATUS_MAP = {
@@ -62,6 +43,7 @@ DEVICE_MAP = {
     "295": "C295",
     "C295": "C295",
     "295_2": "C295 TS03",
+    "295/2": "C295 TS03",
 
     "235": "CN235",
     "CN235": "CN235",
@@ -209,107 +191,37 @@ def clean_html_text(
     )
 
 
-def get_tolerance_window(
-    planned_date: datetime,
-    frequency: str | None,
-) -> tuple[
-    datetime | None,
-    datetime | None,
-]:
-
-    if not frequency:
-        return (
-            None,
-            None,
-        )
-
-    tolerance = (
-        TOLERANCE_MAP.get(
-            frequency
-        )
-    )
-
-    if tolerance is None:
-        return (
-            None,
-            None,
-        )
-
-    return (
-        planned_date
-        - tolerance,
-
-        planned_date
-        + tolerance,
-    )
-
-
-def get_tolerance_status(
-    *,
-    now: datetime,
-    planned_date: datetime,
-    tolerance_start: datetime | None,
-    tolerance_end: datetime | None,
-    frequency: str | None,
-) -> str:
-
-    if (
-        frequency
-        and frequency
-        not in TOLERANCE_MAP
-    ):
-        return (
-            "unknown_tolerance"
-        )
-
-    if (
-        tolerance_start is None
-        or tolerance_end is None
-    ):
-        return (
-            "unknown_tolerance"
-        )
-
+def get_tolerance_status(*, now, tolerance_start, tolerance_end) -> str:
+    if tolerance_start is None or tolerance_end is None:
+        return "unknown_tolerance"
     if now < tolerance_start:
         return "upcoming"
-
     if now > tolerance_end:
-        return (
-            "out_of_tolerance"
-        )
-
-    return (
-        "in_tolerance"
-    )
+        return "out_of_tolerance"
+    return "in_tolerance"
 
 
 async def get_upcoming_tasks(
     days: int = 7,
 ) -> list[Task]:
 
+    if not 1 <= days <= 31:
+        raise ValueError("days must be between 1 and 31")
+
+    # mySim timestamps are interpreted in the backend's local timezone,
+    # preserving the existing convention.
     now = datetime.now()
     today = now.date()
 
-    #
-    # Recuperamos suficiente histórico y futuro
-    # para cubrir la tolerancia máxima de ±5 semanas.
-    #
-    start_date = (
-        today
-        - timedelta(
-            weeks=5
-        )
+    # No lower date bound: old pending occurrences must remain visible.
+    # Fetch enough future dates to include windows opening during the horizon.
+    horizon_end = datetime.combine(
+        today + timedelta(days=days + 1),
+        datetime.min.time(),
     )
 
-    end_date = (
-        today
-        + timedelta(
-            weeks=5
-        )
-        + timedelta(
-            days=1
-        )
-    )
+    start_date = today - timedelta(weeks=5)
+    end_date = horizon_end.date() + timedelta(days=35)
 
     query = (
         "t.entity='MaintenanceSchedule' "
@@ -332,9 +244,10 @@ async def get_upcoming_tasks(
         )
     )
 
-    rows = extract_rows(
-        response
-    )
+    if response.get("status") != 200:
+        raise RuntimeError("Could not retrieve scheduledTasks from mySim")
+
+    rows = extract_rows(response)
 
     logger.info(
         "SCHEDULED TASKS RECEIVED: %s",
@@ -571,22 +484,33 @@ async def get_upcoming_tasks(
         (
             tolerance_start,
             tolerance_end,
-        ) = get_tolerance_window(
-            planned_date,
-            frequency,
+        ) = get_documented_window(
+            planned_date=planned_date,
+            device_id=details.get("device") if isinstance(details, dict) else None,
+            manual_version=(details.get("preventiveManualVersion")
+                            if isinstance(details, dict) else None),
+            frequency=frequency,
+            has_planned_time=len(str(row.get("plannedDate", "")).strip()) > 10,
         )
 
         tolerance_status = (
             get_tolerance_status(
                 now=now,
-                planned_date=planned_date,
                 tolerance_start=tolerance_start,
                 tolerance_end=tolerance_end,
-                frequency=frequency,
             )
         )
 
+        planning_category = get_planning_category(
+            now=now, planned_date=planned_date,
+            tolerance_end=tolerance_end, frequency=frequency,
+        )
+
         task = Task(
+            planning_category=planning_category,
+            device_id=details.get("device") if isinstance(details, dict) else None,
+            preventive_manual_version=(details.get("preventiveManualVersion")
+                                       if isinstance(details, dict) else None),
             scheduled_task_id=(
                 scheduled_task_id
             ),
@@ -679,56 +603,26 @@ async def get_upcoming_tasks(
             task
         )
 
-    #
-    # Mostrar:
-    #
-    # - Siempre out of tolerance.
-    # - Siempre in tolerance.
-    # - Upcoming solamente próximos 3 días.
-    #
-    display_limit = (
-        now
-        + timedelta(
-            days=3
-        )
-    )
-
-    tasks = [
-        task
-        for task
-        in tasks
-        if (
-            task.tolerance_status
-            in {
-                "out_of_tolerance",
-                "in_tolerance",
-            }
-            or (
-                task.tolerance_status
-                == "upcoming"
-                and task.planned_date
-                <= display_limit
-            )
-            or (
-                task.tolerance_status
-                == "unknown_tolerance"
-                and task.planned_date
-                <= display_limit
-            )
-        )
-    ]
+    # Include all past pending tasks, plus future planned dates/windows
+    # intersecting today through today + days (inclusive).
+    tasks = [task for task in tasks if (
+        task.planned_date < horizon_end
+        or (task.tolerance_start is not None
+            and task.tolerance_start < horizon_end)
+    )]
 
     tolerance_status_order = {
         "out_of_tolerance": 0,
-        "in_tolerance": 1,
-        "upcoming": 2,
-        "unknown_tolerance": 3,
+        "backlog": 1,
+        "today": 2,
+        "upcoming": 3,
+        "unknown_tolerance": 4,
     }
 
     tasks.sort(
         key=lambda task: (
             tolerance_status_order.get(
-                task.tolerance_status,
+                task.planning_category,
                 99,
             ),
 

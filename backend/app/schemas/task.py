@@ -12,6 +12,10 @@ class Task(BaseModel):
     device: str
     task_code: str
 
+    device_id: int | None = None
+    preventive_manual_version: str | None = None
+    planning_category: str | None = None
+
     description: str | None = None
 
     frequency_id: int | None = None
