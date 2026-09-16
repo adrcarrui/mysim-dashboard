@@ -41,8 +41,10 @@ interface DeviceSummary {
   device: string
   total: number
   outOfTolerance: number
-  inTolerance: number
+  backlog: number
+  today: number
   upcoming: number
+  unknownTolerance: number
 }
 
 
@@ -65,22 +67,36 @@ function buildDeviceSummary(
     outOfTolerance:
       deviceTasks.filter(
         (task) =>
-          task.tolerance_status ===
+          task.planning_category ===
           "out_of_tolerance"
       ).length,
 
-    inTolerance:
+    backlog:
       deviceTasks.filter(
         (task) =>
-          task.tolerance_status ===
-          "in_tolerance"
+          task.planning_category ===
+          "backlog"
+      ).length,
+
+    today:
+      deviceTasks.filter(
+        (task) =>
+          task.planning_category ===
+          "today"
       ).length,
 
     upcoming:
       deviceTasks.filter(
         (task) =>
-          task.tolerance_status ===
+          task.planning_category ===
           "upcoming"
+      ).length,
+
+    unknownTolerance:
+      deviceTasks.filter(
+        (task) =>
+          task.planning_category ===
+          "unknown_tolerance"
       ).length,
   }
 }
@@ -208,6 +224,16 @@ export function Tasks() {
                 return (
                   b.outOfTolerance -
                   a.outOfTolerance
+                )
+              }
+
+              if (
+                b.backlog !==
+                a.backlog
+              ) {
+                return (
+                  b.backlog -
+                  a.backlog
                 )
               }
 
@@ -339,12 +365,20 @@ export function Tasks() {
                         summary.outOfTolerance
                       }
 
-                      inTolerance={
-                        summary.inTolerance
+                      backlog={
+                        summary.backlog
+                      }
+
+                      today={
+                        summary.today
                       }
 
                       upcoming={
                         summary.upcoming
+                      }
+
+                      unknownTolerance={
+                        summary.unknownTolerance
                       }
 
                       onClick={() =>
@@ -397,12 +431,20 @@ export function Tasks() {
                         summary.outOfTolerance
                       }
 
-                      inTolerance={
-                        summary.inTolerance
+                      backlog={
+                        summary.backlog
+                      }
+
+                      today={
+                        summary.today
                       }
 
                       upcoming={
                         summary.upcoming
+                      }
+
+                      unknownTolerance={
+                        summary.unknownTolerance
                       }
 
                       onClick={() =>

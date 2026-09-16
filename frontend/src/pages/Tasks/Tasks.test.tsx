@@ -41,6 +41,11 @@ vi.mock(
 interface DeviceTaskCardMockProps {
   device: string
   total: number
+  outOfTolerance: number
+  backlog: number
+  today: number
+  upcoming: number
+  unknownTolerance: number
   onClick: () => void
 }
 
@@ -51,57 +56,26 @@ vi.mock(
     DeviceTaskCard: ({
       device,
       total,
+      outOfTolerance,
+      backlog,
+      today,
+      upcoming,
+      unknownTolerance,
       onClick,
     }: DeviceTaskCardMockProps) => (
       <button
         type="button"
         data-testid="device-card"
+        data-out-of-tolerance={outOfTolerance}
+        data-backlog={backlog}
+        data-today={today}
+        data-upcoming={upcoming}
+        data-unknown-tolerance={unknownTolerance}
         onClick={onClick}
       >
         {device} ({total})
       </button>
     ),
-  })
-)
-
-
-interface TaskDeviceModalMockProps {
-  device: string | null
-  tasks: Task[]
-  onClose: () => void
-}
-
-
-vi.mock(
-  "../../components/TaskDeviceModal",
-  () => ({
-    TaskDeviceModal: ({
-      device,
-      tasks,
-      onClose,
-    }: TaskDeviceModalMockProps) => {
-      if (!device) {
-        return null
-      }
-
-      return (
-        <div
-          role="dialog"
-          aria-label={`${device} tasks`}
-        >
-          <span>
-            {tasks.length} tasks in modal
-          </span>
-
-          <button
-            type="button"
-            onClick={onClose}
-          >
-            Close
-          </button>
-        </div>
-      )
-    },
   })
 )
 
@@ -114,13 +88,41 @@ const mockedGetUpcomingTasks =
 
 function createTask(
   device: string,
-  toleranceStatus:
-    Task["tolerance_status"],
+  planningCategory:
+    Task["planning_category"],
+  scheduledTaskId = 1,
+  plannedDate = "2026-09-15T10:00:00",
 ): Task {
   return {
+    scheduled_task_id:
+      scheduledTaskId,
+
     device,
-    tolerance_status:
-      toleranceStatus,
+
+    task_code:
+      String(scheduledTaskId)
+        .padStart(6, "0"),
+
+    description:
+      `${planningCategory ?? "unknown"} task`,
+
+    planned_date:
+      plannedDate,
+
+    planning_category:
+      planningCategory,
+
+    status:
+      "Pending",
+
+    status_id:
+      199,
+
+    frequency:
+      "Weekly",
+
+    remarks:
+      null,
   } as Task
 }
 
@@ -180,7 +182,7 @@ describe(
 
             createTask(
               "A400M",
-              "in_tolerance",
+              "backlog",
             ),
 
             createTask(
@@ -201,7 +203,23 @@ describe(
                 "A400M (2)",
             }
           )
-        ).toBeInTheDocument()
+        ).toHaveAttribute(
+          "data-out-of-tolerance",
+          "1"
+        )
+
+        expect(
+          screen.getByRole(
+            "button",
+            {
+              name:
+                "A400M (2)",
+            }
+          )
+        ).toHaveAttribute(
+          "data-backlog",
+          "1"
+        )
 
         expect(
           screen.getByRole(
@@ -233,16 +251,21 @@ describe(
             createTask(
               "A400M",
               "out_of_tolerance",
+              11,
+              "2026-09-14T10:00:00",
             ),
 
             createTask(
               "A400M",
-              "upcoming",
+              "backlog",
+              12,
+              "2026-09-15T10:00:00",
             ),
 
             createTask(
               "ARMS",
-              "in_tolerance",
+              "unknown_tolerance",
+              13,
             ),
           ])
 
@@ -265,16 +288,110 @@ describe(
             "dialog",
             {
               name:
-                "A400M tasks",
+                "Tasks for A400M",
             }
           )
         ).toBeInTheDocument()
 
         expect(
           screen.getByText(
-            "2 tasks in modal"
+            "2 tasks"
           )
         ).toBeInTheDocument()
+
+        expect(
+          screen.getByRole(
+            "button",
+            {
+              name:
+                /Out of tolerance/i,
+            }
+          )
+        ).toBeInTheDocument()
+
+        expect(
+          screen.getByRole(
+            "button",
+            {
+              name:
+                /Backlog/i,
+            }
+          )
+        ).toBeInTheDocument()
+
+        await user.click(
+          screen.getByRole(
+            "button",
+            {
+              name:
+                /Backlog/i,
+            }
+          )
+        )
+
+        expect(
+          screen.getByText(
+            "backlog task"
+          )
+        ).toBeInTheDocument()
+
+        expect(
+          screen.queryByText(
+            "out_of_tolerance task"
+          )
+        ).not.toBeInTheDocument()
+      }
+    )
+
+
+    it(
+      "orders modal tasks by planned date",
+      async () => {
+        const user =
+          userEvent.setup()
+
+        mockedGetUpcomingTasks
+          .mockResolvedValue([
+            createTask(
+              "A400M",
+              "upcoming",
+              22,
+              "2026-09-17T10:00:00",
+            ),
+
+            createTask(
+              "A400M",
+              "today",
+              21,
+              "2026-09-15T10:00:00",
+            ),
+          ])
+
+        render(
+          <Tasks />
+        )
+
+        await user.click(
+          await screen.findByRole(
+            "button",
+            {
+              name:
+                "A400M (2)",
+            }
+          )
+        )
+
+        expect(
+          screen.getAllByText(
+            /^Task #/
+          ).map(
+            (element) =>
+              element.textContent
+          )
+        ).toEqual([
+          "Task #21",
+          "Task #22",
+        ])
       }
     )
 

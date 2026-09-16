@@ -251,7 +251,7 @@
 
   grid-template-columns:
     repeat(
-      4,
+      3,
       minmax(
         0,
         1fr
@@ -355,27 +355,43 @@
 }
 
 
-/* Pending */
+/* Out of tolerance */
 
-.task-device-modal__filter--pending {
+.task-device-modal__filter--out-of-tolerance {
   color:
-    #a51890;
+    var(--airbus-danger);
 }
 
 
-/* In process */
+/* Backlog */
 
-.task-device-modal__filter--progress {
+.task-device-modal__filter--backlog {
+  color:
+    #d97706;
+}
+
+
+/* Today */
+
+.task-device-modal__filter--today {
+  color:
+    #6b3fa0;
+}
+
+
+/* Upcoming */
+
+.task-device-modal__filter--upcoming {
   color:
     var(--airbus-blue-500);
 }
 
 
-/* Not done */
+/* Unknown tolerance */
 
-.task-device-modal__filter--not-done {
+.task-device-modal__filter--unknown-tolerance {
   color:
-    var(--airbus-danger);
+    var(--airbus-text-muted);
 }
 
 
@@ -397,28 +413,155 @@
 }
 
 
-.task-device-modal__filter--pending.task-device-modal__filter--active {
-  background:
-    rgba(
-      165,
-      24,
-      144,
-      0.08
-    );
-}
-
-
-.task-device-modal__filter--progress.task-device-modal__filter--active {
-  background:
-    var(--airbus-blue-100);
-}
-
-
-.task-device-modal__filter--not-done.task-device-modal__filter--active {
+.task-device-modal__filter--out-of-tolerance.task-device-modal__filter--active {
   background:
     color-mix(
       in srgb,
       var(--airbus-danger) 8%,
       white
     );
+}
+
+
+.task-device-modal__filter--backlog.task-device-modal__filter--active {
+  background:
+    rgba(
+      217,
+      119,
+      6,
+      0.08
+    );
+}
+
+
+.task-device-modal__filter--today.task-device-modal__filter--active {
+  background:
+    rgba(
+      107,
+      63,
+      160,
+      0.08
+    );
+}
+
+
+.task-device-modal__filter--upcoming.task-device-modal__filter--active {
+  background:
+    var(--airbus-blue-100);
+}
+
+
+.task-device-modal__filter--unknown-tolerance.task-device-modal__filter--active {
+  background:
+    rgba(
+      91,
+      104,
+      120,
+      0.08
+    );
+}
+
+
+/* ================================
+   TASK PLANNING BADGES
+================================ */
+
+.tasks-list__badges {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  align-items: center;
+
+  justify-content: flex-end;
+
+  gap:
+    var(--airbus-space-2);
+}
+
+
+.tasks-list__planning {
+  display: inline-flex;
+
+  align-items: center;
+
+  min-height: 24px;
+
+  padding:
+    3px
+    9px;
+
+  border:
+    1px solid
+    currentColor;
+
+  border-radius: 999px;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+
+.tasks-list__planning--out-of-tolerance {
+  color:
+    var(--airbus-danger);
+}
+
+
+.tasks-list__planning--backlog {
+  color:
+    #d97706;
+}
+
+
+.tasks-list__planning--today {
+  color:
+    #6b3fa0;
+}
+
+
+.tasks-list__planning--upcoming {
+  color:
+    var(--airbus-blue-500);
+}
+
+
+.tasks-list__planning--unknown-tolerance {
+  color:
+    var(--airbus-text-muted);
+}
+
+
+@media (
+  max-width: 760px
+) {
+
+  .task-device-modal__filters {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+}
+
+
+@media (
+  max-width: 430px
+) {
+
+  .task-device-modal__filters {
+    grid-template-columns: 1fr;
+  }
+
+
+  .tasks-list__badges {
+    justify-content: flex-start;
+  }
 }

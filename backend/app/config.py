@@ -28,6 +28,9 @@ class Settings(BaseSettings):
     query_cache_cleanup_interval_seconds: int = 3600
     query_cache_stale_retention_seconds: int = 86400
 
+    scheduled_tasks_sync_interval_seconds: int = 1800
+    scheduled_tasks_initial_delay_seconds: int = 15
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

@@ -6,8 +6,10 @@ interface DeviceTaskCardProps {
   total: number;
 
   outOfTolerance: number;
-  inTolerance: number;
+  backlog: number;
+  today: number;
   upcoming: number;
+  unknownTolerance: number;
 
   onClick: () => void;
 }
@@ -40,8 +42,10 @@ export function DeviceTaskCard({
   device,
   total,
   outOfTolerance,
-  inTolerance,
+  backlog,
+  today,
   upcoming,
+  unknownTolerance,
   onClick,
 }: DeviceTaskCardProps) {
   return (
@@ -85,11 +89,23 @@ export function DeviceTaskCard({
           <span className="device-task-card__dot" />
 
           <strong>
-            {inTolerance}
+            {backlog}
           </strong>
 
           <span>
-            in tolerance
+            backlog
+          </span>
+        </div>
+
+        <div className="device-task-card__stat device-task-card__stat--today">
+          <span className="device-task-card__dot" />
+
+          <strong>
+            {today}
+          </strong>
+
+          <span>
+            today
           </span>
         </div>
 
@@ -104,6 +120,18 @@ export function DeviceTaskCard({
             upcoming
           </span>
         </div>
+      </div>
+
+      <div className="device-task-card__quality">
+        <span className="device-task-card__dot" />
+
+        <strong>
+          {unknownTolerance}
+        </strong>
+
+        <span>
+          unknown tolerance
+        </span>
       </div>
     </button>
   );

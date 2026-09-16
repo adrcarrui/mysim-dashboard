@@ -15,6 +15,8 @@ from app.api.recommendations import router as recommendations_router
 from app.api.tasks import router as tasks_router
 from app.api.task_frequencies import router as task_frequencies_router
 from app.api.maintenance_tasks import router as maintenance_tasks_router
+from app.api.scheduled_tasks import router as scheduled_tasks_router
+from app.services.scheduled_tasks_sync_worker import run_scheduled_tasks_synchronization
 from app.config import settings
 from app.database import close_database_connection
 from app.repositories.mysim_query_cache_repository import (
@@ -86,6 +88,10 @@ async def lifespan(app: FastAPI):
         run_reference_data_synchronization()
     )
 
+    scheduled_tasks_task = asyncio.create_task(
+        run_scheduled_tasks_synchronization()
+    )
+
     query_cache_cleanup_task = asyncio.create_task(
         run_query_cache_cleanup()
     )
@@ -94,6 +100,7 @@ async def lifespan(app: FastAPI):
 
     synchronization_task.cancel()
     reference_data_task.cancel()
+    scheduled_tasks_task.cancel()
     query_cache_cleanup_task.cancel()
 
     with suppress(asyncio.CancelledError):
@@ -101,6 +108,9 @@ async def lifespan(app: FastAPI):
 
     with suppress(asyncio.CancelledError):
         await reference_data_task
+
+    with suppress(asyncio.CancelledError):
+        await scheduled_tasks_task
 
     with suppress(asyncio.CancelledError):
         await query_cache_cleanup_task
@@ -167,6 +177,11 @@ app.include_router(
 
 app.include_router(
     maintenance_tasks_router,
+    prefix="/api",
+)
+
+app.include_router(
+    scheduled_tasks_router,
     prefix="/api",
 )
 

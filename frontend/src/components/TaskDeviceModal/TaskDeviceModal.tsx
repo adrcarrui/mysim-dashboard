@@ -23,9 +23,11 @@ interface TaskDeviceModalProps {
 
 type TaskFilter =
   | "all"
-  | "pending"
-  | "progress"
-  | "not-done"
+  | "out_of_tolerance"
+  | "backlog"
+  | "today"
+  | "upcoming"
+  | "unknown_tolerance"
 
 
 function matchesFilter(
@@ -38,26 +40,29 @@ function matchesFilter(
     return true
   }
 
-  if (
-    filter === "pending"
-  ) {
-    return (
-      task.status_id === 199
-    )
-  }
-
-  if (
-    filter === "progress"
-  ) {
-    return (
-      task.status_id === 200
-    )
-  }
-
   return (
-    task.status_id === 2542
+    task.planning_category === filter
   )
 }
+
+
+const FILTERS: Array<{
+  value: TaskFilter
+  label: string
+}> = [
+  { value: "all", label: "All" },
+  {
+    value: "out_of_tolerance",
+    label: "Out of tolerance",
+  },
+  { value: "backlog", label: "Backlog" },
+  { value: "today", label: "Today" },
+  { value: "upcoming", label: "Upcoming" },
+  {
+    value: "unknown_tolerance",
+    label: "Unknown tolerance",
+  },
+]
 
 
 export function TaskDeviceModal({
@@ -80,22 +85,39 @@ export function TaskDeviceModal({
         all:
           tasks.length,
 
-        pending:
+        out_of_tolerance:
           tasks.filter(
             (task) =>
-              task.status_id === 199
+              task.planning_category ===
+              "out_of_tolerance"
           ).length,
 
-        progress:
+        backlog:
           tasks.filter(
             (task) =>
-              task.status_id === 200
+              task.planning_category ===
+              "backlog"
           ).length,
 
-        notDone:
+        today:
           tasks.filter(
             (task) =>
-              task.status_id === 2542
+              task.planning_category ===
+              "today"
+          ).length,
+
+        upcoming:
+          tasks.filter(
+            (task) =>
+              task.planning_category ===
+              "upcoming"
+          ).length,
+
+        unknown_tolerance:
+          tasks.filter(
+            (task) =>
+              task.planning_category ===
+              "unknown_tolerance"
           ).length,
       }),
       [tasks]
@@ -172,112 +194,39 @@ export function TaskDeviceModal({
 
           <div className="task-device-modal__filters">
 
-            <button
-              type="button"
-              className={`
-                task-device-modal__filter
-                task-device-modal__filter--all
-                ${
-                  activeFilter === "all"
-                    ? "task-device-modal__filter--active"
-                    : ""
-                }
-              `}
-              onClick={() =>
-                setActiveFilter(
-                  "all"
-                )
-              }
-            >
-              <span>
-                All
-              </span>
-
-              <strong>
-                {counts.all}
-              </strong>
-            </button>
-
-
-            <button
-              type="button"
-              className={`
-                task-device-modal__filter
-                task-device-modal__filter--pending
-                ${
-                  activeFilter === "pending"
-                    ? "task-device-modal__filter--active"
-                    : ""
-                }
-              `}
-              onClick={() =>
-                setActiveFilter(
-                  "pending"
-                )
-              }
-            >
-              <span>
-                Pending
-              </span>
-
-              <strong>
-                {counts.pending}
-              </strong>
-            </button>
-
-
-            <button
-              type="button"
-              className={`
-                task-device-modal__filter
-                task-device-modal__filter--progress
-                ${
-                  activeFilter === "progress"
-                    ? "task-device-modal__filter--active"
-                    : ""
-                }
-              `}
-              onClick={() =>
-                setActiveFilter(
-                  "progress"
-                )
-              }
-            >
-              <span>
-                In process
-              </span>
-
-              <strong>
-                {counts.progress}
-              </strong>
-            </button>
-
-
-            <button
-              type="button"
-              className={`
-                task-device-modal__filter
-                task-device-modal__filter--not-done
-                ${
-                  activeFilter === "not-done"
-                    ? "task-device-modal__filter--active"
-                    : ""
-                }
-              `}
-              onClick={() =>
-                setActiveFilter(
-                  "not-done"
-                )
-              }
-            >
-              <span>
-                Not done
-              </span>
-
-              <strong>
-                {counts.notDone}
-              </strong>
-            </button>
+            {FILTERS.map(
+              (filter) => (
+                <button
+                  key={filter.value}
+                  type="button"
+                  className={`
+                    task-device-modal__filter
+                    task-device-modal__filter--${filter.value.replaceAll(
+                      "_",
+                      "-"
+                    )}
+                    ${
+                      activeFilter === filter.value
+                        ? "task-device-modal__filter--active"
+                        : ""
+                    }
+                  `}
+                  onClick={() =>
+                    setActiveFilter(
+                      filter.value
+                    )
+                  }
+                  aria-pressed={
+                    activeFilter === filter.value
+                  }
+                >
+                  <span>{filter.label}</span>
+                  <strong>
+                    {counts[filter.value]}
+                  </strong>
+                </button>
+              )
+            )}
 
           </div>
 

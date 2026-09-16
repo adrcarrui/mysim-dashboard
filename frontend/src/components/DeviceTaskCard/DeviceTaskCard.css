@@ -4,7 +4,7 @@
   width: 100%;
   max-width: 220px;
 
-  height: 135px;
+  height: 185px;
 
   padding:
     var(--airbus-space-4);
@@ -167,7 +167,7 @@
   margin-top: 2px;
 
   margin-bottom:
-    var(--airbus-space-4);
+    var(--airbus-space-3);
 
   font-size: 11px;
 
@@ -185,7 +185,7 @@
 
   flex-direction: column;
 
-  gap: 7px;
+  gap: 6px;
 }
 
 
@@ -244,6 +244,18 @@
 
 /* Normal */
 
+.device-task-card__stat--today {
+  color: #6b3fa0;
+}
+
+.device-task-card__stat--today
+.device-task-card__dot {
+  background: #6b3fa0;
+}
+
+
+/* Normal */
+
 .device-task-card__stat--normal {
   color:
     var(--airbus-blue-500);
@@ -258,4 +270,43 @@
 .tasks-device-grid--ffs
 .device-task-card {
   max-width: none;
+}
+
+
+/* Data quality */
+
+.device-task-card__quality {
+  display: grid;
+
+  grid-template-columns:
+    8px
+    24px
+    1fr;
+
+  align-items: center;
+
+  gap: 6px;
+
+  margin-top: 8px;
+
+  padding-top: 7px;
+
+  color:
+    var(--airbus-text-muted);
+
+  border-top:
+    1px solid
+    var(--airbus-border);
+
+  font-size: 11px;
+}
+
+.device-task-card__quality strong {
+  font-weight: 700;
+}
+
+.device-task-card__quality
+.device-task-card__dot {
+  background:
+    var(--airbus-text-muted);
 }

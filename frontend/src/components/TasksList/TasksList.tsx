@@ -33,6 +33,45 @@ function getStatusClass(
 }
 
 
+function getPlanningLabel(
+  category: Task["planning_category"]
+): string {
+  switch (category) {
+    case "out_of_tolerance":
+      return "Out of tolerance"
+
+    case "backlog":
+      return "Backlog"
+
+    case "today":
+      return "Today"
+
+    case "upcoming":
+      return "Upcoming"
+
+    case "unknown_tolerance":
+      return "Unknown tolerance"
+
+    default:
+      return "Unknown tolerance"
+  }
+}
+
+
+function getPlanningClass(
+  category: Task["planning_category"]
+): string {
+  if (!category) {
+    return "unknown-tolerance"
+  }
+
+  return category.replaceAll(
+    "_",
+    "-"
+  )
+}
+
+
 function getShortDescription(
   description: string | null
 ): string {
@@ -168,16 +207,34 @@ export function TasksList({
               </div>
 
 
-              <span
-                className={`
-                  tasks-list__status
-                  ${getStatusClass(
-                    task.status_id
+              <div className="tasks-list__badges">
+
+                <span
+                  className={`
+                    tasks-list__planning
+                    tasks-list__planning--${getPlanningClass(
+                      task.planning_category
+                    )}
+                  `}
+                >
+                  {getPlanningLabel(
+                    task.planning_category
                   )}
-                `}
-              >
-                {task.status}
-              </span>
+                </span>
+
+
+                <span
+                  className={`
+                    tasks-list__status
+                    ${getStatusClass(
+                      task.status_id
+                    )}
+                  `}
+                >
+                  {task.status}
+                </span>
+
+              </div>
 
             </div>
 

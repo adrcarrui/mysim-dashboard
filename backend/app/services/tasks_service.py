@@ -6,8 +6,8 @@ from app.schemas.task import Task
 from app.services.maintenance_tasks_service import (
     maintenance_tasks_service,
 )
-from app.services.mysim_query_service import (
-    cached_mysim_client as mysim_client,
+from app.repositories.scheduled_tasks_repository import (
+    scheduled_tasks_repository,
 )
 from app.services.task_frequencies_service import (
     task_frequencies_service,
@@ -68,32 +68,6 @@ DEVICE_MAP = {
     "ARMS": "ARMS",
     "LE": "LE",
 }
-
-
-def extract_rows(
-    response: dict,
-) -> list[dict]:
-
-    data = response.get(
-        "data"
-    )
-
-    if isinstance(
-        data,
-        dict,
-    ):
-
-        rows = data.get(
-            "data"
-        )
-
-        if isinstance(
-            rows,
-            list,
-        ):
-            return rows
-
-    return []
 
 
 def parse_mysim_datetime(
@@ -213,44 +187,28 @@ async def get_upcoming_tasks(
     now = datetime.now()
     today = now.date()
 
-    # No lower date bound: old pending occurrences must remain visible.
-    # Fetch enough future dates to include windows opening during the horizon.
+    # Fecha límite del horizonte solicitado.
     horizon_end = datetime.combine(
         today + timedelta(days=days + 1),
         datetime.min.time(),
     )
 
-    start_date = today - timedelta(weeks=5)
-    end_date = horizon_end.date() + timedelta(days=35)
-
-    query = (
-        "t.entity='MaintenanceSchedule' "
-        "AND t.idCol=34 "
-        "AND t.deleted=0 "
-        "AND t.enabled=1 "
-        f"AND t.plannedDate>='{start_date.isoformat()}' "
-        f"AND t.plannedDate<'{end_date.isoformat()}'"
+    # Recuperar desde PostgreSQL suficiente margen futuro para
+    # incluir las ventanas de tolerancia que entren en el horizonte.
+    local_end = datetime.combine(
+        horizon_end.date() + timedelta(days=35),
+        datetime.min.time(),
     )
 
-    logger.info(
-        "SCHEDULED TASK QUERY: %s",
-        query,
-    )
-
-    response = (
-        await mysim_client.get(
-            entity="scheduledTasks",
-            extra_query=query,
+    rows = await (
+        scheduled_tasks_repository
+        .get_open_until(
+            end_date=local_end,
         )
     )
 
-    if response.get("status") != 200:
-        raise RuntimeError("Could not retrieve scheduledTasks from mySim")
-
-    rows = extract_rows(response)
-
     logger.info(
-        "SCHEDULED TASKS RECEIVED: %s",
+        "SCHEDULED TASKS FROM POSTGRESQL: %s",
         len(rows),
     )
 
@@ -626,8 +584,7 @@ async def get_upcoming_tasks(
                 99,
             ),
 
-            task.tolerance_end
-            or task.planned_date,
+            task.planned_date,
 
             task.device,
 

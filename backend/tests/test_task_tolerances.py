@@ -55,53 +55,189 @@ def test_daily_hours_and_missing_time():
         manual_version='L',frequency='Daily',has_planned_time=False) == (None,None)
 
 
-def test_service_uses_bounded_query_and_respects_horizon(monkeypatch):
+def test_service_reads_local_tasks_and_respects_horizon(
+    monkeypatch,
+):
     import app.services.tasks_service as service
+
     class FrozenDatetime(datetime):
         @classmethod
         def now(cls):
-            return cls(2026,9,15,12)
-    monkeypatch.setattr(service,'datetime',FrozenDatetime)
-    rows=[]
-    for index,day,status in [
-        (2,'2026-09-14',200),
-        (3,'2026-09-15',199),(4,'2026-09-18',199),
-        (5,'2026-09-30',199),(6,'2025-01-01',201),
-        (7,'2026-09-19',2542),
+            return cls(
+                2026,
+                9,
+                15,
+                12,
+            )
+
+    monkeypatch.setattr(
+        service,
+        "datetime",
+        FrozenDatetime,
+    )
+
+    rows = []
+
+    for index, day, status in [
+        (2, "2026-09-14", 200),
+        (3, "2026-09-15", 199),
+        (4, "2026-09-18", 199),
+        (5, "2026-09-30", 199),
+        (6, "2025-01-01", 201),
+        (7, "2026-09-19", 2542),
     ]:
-        rows.append(dict(id=index,task=100,scheduleTaskCod=f'{index}-2026-CN235-001',
-                         plannedDate=day,status=status))
-    async def fetch(**kwargs):
-        assert "plannedDate>='2026-08-11'" in kwargs["extra_query"]
-        assert "t.status" not in kwargs["extra_query"]
-        return {'status':200,'data':{'data':rows}}
+        rows.append(
+            {
+                "id": index,
+                "task": 100,
+                "scheduleTaskCod": (
+                    f"{index}-2026-CN235-001"
+                ),
+                "plannedDate": day,
+                "status": status,
+            }
+        )
+
+    requested_end_dates = []
+
+    async def get_open_until(
+        *,
+        end_date,
+    ):
+        requested_end_dates.append(
+            end_date
+        )
+
+        return rows
+
     async def details(ids):
-        return {100:dict(device=1,preventiveManualVersion='L',frequency=3,task='Check')}
+        assert ids == {100}
+
+        return {
+            100: {
+                "device": 1,
+                "preventiveManualVersion": "L",
+                "frequency": 3,
+                "task": "Check",
+            }
+        }
+
     async def frequencies(ids):
-        return {3:dict(name='Weekly',num_of_days=7)}
-    monkeypatch.setattr(service.mysim_client,'get',fetch)
-    monkeypatch.setattr(service.maintenance_tasks_service,'get_many',details)
-    monkeypatch.setattr(service.task_frequencies_service,'get_many',frequencies)
-    tasks=asyncio.run(service.get_upcoming_tasks(days=3))
-    categories={t.scheduled_task_id:t.planning_category for t in tasks}
+        assert ids == {3}
+
+        return {
+            3: {
+                "name": "Weekly",
+                "num_of_days": 7,
+            }
+        }
+
+    monkeypatch.setattr(
+        service
+        .scheduled_tasks_repository,
+        "get_open_until",
+        get_open_until,
+    )
+
+    monkeypatch.setattr(
+        service
+        .maintenance_tasks_service,
+        "get_many",
+        details,
+    )
+
+    monkeypatch.setattr(
+        service
+        .task_frequencies_service,
+        "get_many",
+        frequencies,
+    )
+
+    tasks = asyncio.run(
+        service.get_upcoming_tasks(
+            days=3,
+        )
+    )
+
+    categories = {
+        task.scheduled_task_id: (
+            task.planning_category
+        )
+        for task in tasks
+    }
+
     assert categories == {
-    2: "backlog",
-    3: "today",
-    4: "upcoming",
-    7: "upcoming",
-}
-    # Task 7 is outside the planned horizon, but its window opens on its last day.
-    tasks=asyncio.run(service.get_upcoming_tasks(days=1))
+        2: "backlog",
+        3: "today",
+        4: "upcoming",
+        7: "upcoming",
+    }
+
+    # La tarea 7 queda fuera por planned_date,
+    # pero entra porque su tolerancia comienza
+    # dentro del horizonte de tres días.
+    assert [
+        task.scheduled_task_id
+        for task in tasks
+    ] == [
+        2,
+        3,
+        4,
+        7,
+    ]
+
+    tasks = asyncio.run(
+        service.get_upcoming_tasks(
+            days=1,
+        )
+    )
+
     assert {
-    task.scheduled_task_id
-    for task in tasks
-} == {2, 3}
+        task.scheduled_task_id
+        for task in tasks
+    } == {
+        2,
+        3,
+    }
+
+    assert requested_end_dates == [
+        datetime(
+            2026,
+            10,
+            24,
+        ),
+        datetime(
+            2026,
+            10,
+            22,
+        ),
+    ]
 
 
-def test_service_rejects_failed_response(monkeypatch):
+def test_service_propagates_repository_error(
+    monkeypatch,
+):
     import app.services.tasks_service as service
-    async def fetch(**kwargs):
-        return {'status':500,'data':{'data':[]}}
-    monkeypatch.setattr(service.mysim_client,'get',fetch)
-    with pytest.raises(RuntimeError):
-        asyncio.run(service.get_upcoming_tasks())
+
+    async def get_open_until(
+        *,
+        end_date,
+    ):
+        raise RuntimeError(
+            "PostgreSQL unavailable"
+        )
+
+    monkeypatch.setattr(
+        service
+        .scheduled_tasks_repository,
+        "get_open_until",
+        get_open_until,
+    )
+
+    with pytest.raises(
+        RuntimeError,
+        match="PostgreSQL unavailable",
+    ):
+        asyncio.run(
+            service.get_upcoming_tasks()
+        )
