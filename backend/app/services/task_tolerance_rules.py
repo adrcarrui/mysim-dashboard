@@ -27,6 +27,36 @@ def normalize_frequency(value: str | None) -> str:
     return re.sub(r"[\s_-]+", "", (value or "").lower())
 
 
+def get_unknown_tolerance_reason(
+    *, device_id, manual_version, frequency, has_planned_time=True
+) -> str | None:
+    """Explain why no documented tolerance window can be calculated."""
+    if not normalize_frequency(frequency):
+        return "missing_frequency"
+
+    expected_issue = VALIDATED_ISSUES.get(device_id)
+    if expected_issue is None:
+        return "unmapped_device"
+
+    if not manual_version:
+        return "missing_manual_version"
+
+    if normalize_manual_issue(manual_version) != expected_issue:
+        return "missing_tolerance_rule"
+
+    key = normalize_frequency(frequency)
+    if key == "daily" and not has_planned_time:
+        return "missing_planned_time"
+
+    if key == "28days":
+        return None if device_id == 21 else "missing_tolerance_rule"
+
+    if key not in COMMON_TOLERANCES:
+        return "unsupported_frequency"
+
+    return None
+
+
 def get_documented_tolerance(*, device_id, manual_version, frequency):
     expected = VALIDATED_ISSUES.get(device_id)
     if expected is None or normalize_manual_issue(manual_version) != expected:

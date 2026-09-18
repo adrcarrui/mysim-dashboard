@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import pytest
 from app.services.task_tolerance_rules import (
     get_documented_window, get_documented_tolerance, get_planning_category,
+    get_unknown_tolerance_reason,
 )
 
 
@@ -28,6 +29,27 @@ def test_unvalidated_rules_remain_unknown(device,issue,frequency):
 def test_ts03_28_days():
     assert get_documented_tolerance(device_id=21,manual_version='E',
                                     frequency='28 days') == timedelta(days=2)
+
+
+@pytest.mark.parametrize('device,issue,frequency,has_time,expected', [
+    (None, 'L', 'Weekly', True, 'unmapped_device'),
+    (1, None, 'Weekly', True, 'missing_manual_version'),
+    (1, 'L', None, True, 'missing_frequency'),
+    (1, 'L', 'Special', True, 'unsupported_frequency'),
+    (1, 'L', 'Daily', False, 'missing_planned_time'),
+    (1, 'H', 'Monthly', True, 'missing_tolerance_rule'),
+    (1, 'L', '28 days', True, 'missing_tolerance_rule'),
+    (21, 'E', '28 days', True, None),
+])
+def test_unknown_tolerance_reason(
+    device, issue, frequency, has_time, expected,
+):
+    assert get_unknown_tolerance_reason(
+        device_id=device,
+        manual_version=issue,
+        frequency=frequency,
+        has_planned_time=has_time,
+    ) == expected
 
 
 @pytest.mark.parametrize('now,expected', [

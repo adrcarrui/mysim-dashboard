@@ -17,6 +17,7 @@ from app.services.task_frequencies_service import (
 from app.services.task_tolerance_rules import (
     get_documented_window,
     get_planning_category,
+    get_unknown_tolerance_reason,
 )
 
 logger = logging.getLogger(__name__)
@@ -439,16 +440,29 @@ async def get_upcoming_tasks(
                         )
                     )
 
+        device_id = (
+            details.get("device")
+            if isinstance(details, dict)
+            else None
+        )
+        manual_version = (
+            details.get("preventiveManualVersion")
+            if isinstance(details, dict)
+            else None
+        )
+        has_planned_time = (
+            len(str(row.get("plannedDate", "")).strip()) > 10
+        )
+
         (
             tolerance_start,
             tolerance_end,
         ) = get_documented_window(
             planned_date=planned_date,
-            device_id=details.get("device") if isinstance(details, dict) else None,
-            manual_version=(details.get("preventiveManualVersion")
-                            if isinstance(details, dict) else None),
+            device_id=device_id,
+            manual_version=manual_version,
             frequency=frequency,
-            has_planned_time=len(str(row.get("plannedDate", "")).strip()) > 10,
+            has_planned_time=has_planned_time,
         )
 
         tolerance_status = (
@@ -464,11 +478,20 @@ async def get_upcoming_tasks(
             tolerance_end=tolerance_end, frequency=frequency,
         )
 
+        unknown_tolerance_reason = None
+        if planning_category == "unknown_tolerance":
+            unknown_tolerance_reason = get_unknown_tolerance_reason(
+                device_id=device_id,
+                manual_version=manual_version,
+                frequency=frequency,
+                has_planned_time=has_planned_time,
+            )
+
         task = Task(
             planning_category=planning_category,
-            device_id=details.get("device") if isinstance(details, dict) else None,
-            preventive_manual_version=(details.get("preventiveManualVersion")
-                                       if isinstance(details, dict) else None),
+            unknown_tolerance_reason=unknown_tolerance_reason,
+            device_id=device_id,
+            preventive_manual_version=manual_version,
             scheduled_task_id=(
                 scheduled_task_id
             ),

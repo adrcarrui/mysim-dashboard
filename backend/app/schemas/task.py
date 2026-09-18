@@ -15,6 +15,7 @@ class Task(BaseModel):
     device_id: int | None = None
     preventive_manual_version: str | None = None
     planning_category: str | None = None
+    unknown_tolerance_reason: str | None = None
 
     description: str | None = None
 

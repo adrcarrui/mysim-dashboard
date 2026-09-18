@@ -7,7 +7,7 @@ export interface AirbusFooterProps {
 
 export function AirbusFooter({
   leftText = "Maintenance Department Dashboard · " + __APP_VERSION__,
-  rightText = "© 2026 Airbus Operations GmbH. All rights reserved.",
+  rightText = "",
 }: AirbusFooterProps) {
   return (
     <footer className="airbus-footer">
