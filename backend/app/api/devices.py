@@ -1,7 +1,7 @@
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Query
-
+from fastapi import APIRouter, HTTPException, Query, Depends
+from app.api.auth_guard import require_mysim_admin
 from app.services.devices_service import (
     devices_service,
 )
@@ -13,7 +13,7 @@ router = APIRouter(
 )
 
 
-@router.post("/sync")
+@router.post("/sync", dependencies=[Depends(require_mysim_admin)])
 async def synchronize_devices() -> dict[str, Any]:
     try:
         synchronized = (
@@ -48,7 +48,7 @@ async def get_devices(
     }
 
 
-@router.get("/raw")
+@router.get("/raw", dependencies=[Depends(require_mysim_admin)])
 async def get_raw_devices_response() -> dict[str, Any]:
     response = (
         await devices_service

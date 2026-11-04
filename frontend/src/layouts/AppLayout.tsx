@@ -35,7 +35,25 @@ export function AppLayout() {
       title="Maintenance & Support Dashboard"
 
       headerActions={
-        <AirbusClock />
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.75rem",
+          }}
+        >
+          <AirbusClock />
+
+          <form
+            method="post"
+            action="http://127.0.0.1:8000/auth/logout"
+            style={{ margin: 0 }}
+          >
+            <button type="submit">
+              Cerrar sesión
+            </button>
+          </form>
+        </div>
       }
 
       sidebarCollapsed={
@@ -72,11 +90,11 @@ export function AppLayout() {
               strokeWidth={1.8}
             />
           ),
-            active:
-              location.pathname === "/jobs",
+          active:
+            location.pathname === "/jobs",
 
-            onClick: () =>
-              navigate("/jobs"),
+          onClick: () =>
+            navigate("/jobs"),
         },
 
         {
@@ -91,7 +109,7 @@ export function AppLayout() {
             location.pathname === "/drs",
           onClick: () =>
             navigate("/drs"),
-          
+
         },
 
         {
@@ -121,7 +139,7 @@ export function AppLayout() {
           onClick: () =>
             navigate("/tasks"),
         },
-         {
+        {
           label: "Availability",
           icon: (
             <CalendarRange

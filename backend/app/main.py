@@ -2,7 +2,7 @@ import asyncio
 import logging
 from contextlib import asynccontextmanager, suppress
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.actions import router as actions_router
@@ -27,6 +27,9 @@ from app.services.devices_sync_service import run_devices_synchronization
 from app.services.reference_data_sync_service import (
     run_reference_data_synchronization,
 )
+from starlette.middleware.sessions import SessionMiddleware
+from app.api.auth import router as auth_router
+from app.api.auth_guard import require_mysim_session
 from app.version import APP_VERSION
 
 
@@ -123,6 +126,15 @@ app = FastAPI(
     version=APP_VERSION,
     lifespan=lifespan,
 )
+if settings.oidc_state_secret is not None:
+    app.add_middleware(
+        SessionMiddleware,
+        secret_key=settings.oidc_state_secret.get_secret_value(),
+        session_cookie="mysim_oidc_flow",
+        max_age=600,
+        same_site="lax",
+        https_only=False,  # Desarrollo local con HTTP; True con HTTPS.
+    )
 
 
 app.add_middleware(
@@ -130,6 +142,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        "http://127.0.0.1:8081",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -138,52 +151,65 @@ app.add_middleware(
 
 
 app.include_router(health_router)
-app.include_router(jobs_router)
+app.include_router(jobs_router,
+                   dependencies=[Depends(require_mysim_session)],)
 
 app.include_router(
     drs_router,
     prefix="/api",
+    dependencies=[Depends(require_mysim_session)],
 )
 
 app.include_router(
     actions_router,
     prefix="/api",
+    dependencies=[Depends(require_mysim_session)],
 )
 
 app.include_router(
     tasks_router,
     prefix="/api",
+    dependencies=[Depends(require_mysim_session)],
 )
 
 app.include_router(
     availability_router,
     prefix="/api",
+    dependencies=[Depends(require_mysim_session)],
 )
 
 app.include_router(
     recommendations_router,
     prefix="/api",
+    dependencies=[Depends(require_mysim_session)],
 )
 
 app.include_router(
     devices_router,
     prefix="/api",
+    dependencies=[Depends(require_mysim_session)],
 )
+    
 
 app.include_router(
     task_frequencies_router,
     prefix="/api",
+    dependencies=[Depends(require_mysim_session)],
 )
 
 app.include_router(
     maintenance_tasks_router,
     prefix="/api",
+    dependencies=[Depends(require_mysim_session)],
 )
 
 app.include_router(
     scheduled_tasks_router,
     prefix="/api",
+    dependencies=[Depends(require_mysim_session)],
 )
+
+app.include_router(auth_router)
 
 @app.get("/")
 async def root():

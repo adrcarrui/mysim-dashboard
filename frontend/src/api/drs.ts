@@ -1,3 +1,4 @@
+import { apiFetch } from "./client";
 import type { Dr } from "../types/dr"
 
 const API_BASE_URL = "http://localhost:8000"
@@ -11,7 +12,7 @@ export async function getOpenDrs(
     url += `?device_id=${deviceId}`
   }
 
-  const response = await fetch(url)
+  const response = await apiFetch(url)
 
   if (!response.ok) {
     throw new Error("Error loading open DRs")

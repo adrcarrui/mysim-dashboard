@@ -2,9 +2,17 @@ from pydantic_settings import (
     BaseSettings,
     SettingsConfigDict,
 )
-
+from pydantic import SecretStr
 
 class Settings(BaseSettings):
+    amh_nfc_client_token: SecretStr | None = None
+    oidc_issuer: str | None = None
+    oidc_client_id: str | None = None
+    oidc_client_secret: SecretStr | None = None
+    oidc_redirect_uri: str | None = None
+    oidc_state_secret: SecretStr | None = None
+    amh_api_url: str | None = None
+    frontend_url: str | None = None
     mysim_base_url: str
     mysim_auth_token: str
 

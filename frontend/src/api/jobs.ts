@@ -1,3 +1,4 @@
+import { apiFetch } from "./client";
 import type {
   Job,
 } from "../types/job"
@@ -11,7 +12,7 @@ export async function getOpenJobs():
 Promise<Job[]> {
 
   const response =
-    await fetch(
+    await apiFetch(
       `${API_BASE_URL}/api/jobs/open`
     )
 
@@ -32,7 +33,7 @@ export async function getExpiringJobs(
 ): Promise<Job[]> {
 
   const response =
-    await fetch(
+    await apiFetch(
       `${API_BASE_URL}/api/jobs/expiring?days=${days}`
     )
 
@@ -52,7 +53,7 @@ export async function getOverdueJobs():
 Promise<Job[]> {
 
   const response =
-    await fetch(
+    await apiFetch(
       `${API_BASE_URL}/api/jobs/overdue`
     )
 

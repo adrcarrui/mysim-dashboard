@@ -1,5 +1,5 @@
 // frontend/src/api/tasks.ts
-
+import { apiFetch } from "./client";
 import type { Task } from "../types/task";
 
 const API_BASE_URL = "http://localhost:8000/api";
@@ -8,7 +8,7 @@ const API_BASE_URL = "http://localhost:8000/api";
 export async function getUpcomingTasks(
   days = 7
 ): Promise<Task[]> {
-  const response = await fetch(
+  const response = await apiFetch(
     `${API_BASE_URL}/tasks/upcoming?days=${days}`
   );
 

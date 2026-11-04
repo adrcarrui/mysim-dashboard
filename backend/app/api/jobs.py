@@ -1,8 +1,5 @@
-from fastapi import (
-    APIRouter,
-    Query,
-)
-
+from fastapi import APIRouter, Query, Depends
+from app.api.auth_guard import require_mysim_admin
 from app.schemas.job import Job
 
 from app.services.jobs_service import (

@@ -1,3 +1,4 @@
+import { apiFetch } from "./client";
 import type { Action } from "../types/action"
 
 const API_BASE_URL = "http://localhost:8000"
@@ -26,7 +27,7 @@ export async function getOpenActions(
     ? `${API_BASE_URL}/api/actions/open?${queryString}`
     : `${API_BASE_URL}/api/actions/open`
 
-  const response = await fetch(url)
+  const response = await apiFetch(url)
 
   if (!response.ok) {
     throw new Error(

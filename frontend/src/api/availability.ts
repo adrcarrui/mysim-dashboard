@@ -1,3 +1,4 @@
+import { apiFetch } from "./client";
 import type {
   DeviceAvailability,
 } from "../types/availability";
@@ -36,7 +37,7 @@ export async function getAvailability(
     params.set("force_refresh", "true");
   }
 
-  const response = await fetch(
+  const response = await apiFetch(
     `${API_BASE_URL}/availability?${params.toString()}`,
   );
 

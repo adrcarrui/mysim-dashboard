@@ -1,3 +1,4 @@
+import { apiFetch } from "./client";
 import type { Dr } from "../types/dr";
 
 const API_BASE_URL =
@@ -20,7 +21,7 @@ export async function getOpenDrs(
     `${API_BASE_URL}/api/drs/open` +
     (query ? `?${query}` : "");
 
-  const response = await fetch(url);
+  const response = await apiFetch(url);
 
   if (!response.ok) {
     throw new Error(

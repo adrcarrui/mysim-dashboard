@@ -1,11 +1,7 @@
 from datetime import date
 
-from fastapi import (
-    APIRouter,
-    HTTPException,
-    Query,
-)
-
+from fastapi import APIRouter, HTTPException, Query, Depends
+from app.api.auth_guard import require_mysim_admin
 from app.repositories.scheduled_tasks_repository import (
     scheduled_tasks_repository,
 )
@@ -20,7 +16,7 @@ router = APIRouter(
 )
 
 
-@router.post("/sync")
+@router.post("/sync", dependencies=[Depends(require_mysim_admin)])
 async def synchronize_scheduled_tasks(
     period_start: date = Query(
         description="Fecha inicial incluida",
@@ -59,7 +55,7 @@ async def synchronize_scheduled_tasks(
         ) from exc
 
 
-@router.post("/sync/month")
+@router.post("/sync/month", dependencies=[Depends(require_mysim_admin)])
 async def synchronize_scheduled_tasks_month(
     year: int = Query(
         ge=2000,

@@ -1,3 +1,4 @@
+import { apiFetch } from "./client";
 import type {
   RecommendationsResponse,
 } from "../types/recommendation";
@@ -22,7 +23,7 @@ export async function getRecommendations(
 
 
   const response =
-    await fetch(
+    await apiFetch(
       `${API_BASE_URL}/recommendations?${params.toString()}`,
     );
 

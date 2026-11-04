@@ -1,5 +1,5 @@
-from fastapi import APIRouter, HTTPException
-
+from fastapi import APIRouter, HTTPException, Depends
+from app.api.auth_guard import require_mysim_admin
 from app.services.task_frequencies_service import (
     task_frequencies_service,
 )
@@ -11,7 +11,7 @@ router = APIRouter(
 )
 
 
-@router.post("/sync")
+@router.post("/sync", dependencies=[Depends(require_mysim_admin)])
 async def synchronize_task_frequencies():
     try:
         synchronized = await (
