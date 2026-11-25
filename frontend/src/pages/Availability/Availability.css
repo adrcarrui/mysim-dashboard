@@ -2,1473 +2,732 @@
   width: 100%;
 }
 
-
 /* ================================
    HEADER
 ================================ */
-
 .availability-page__header {
   display: flex;
-
   align-items: flex-start;
   justify-content: space-between;
-
-  gap:
-    var(--airbus-space-5);
-
-  margin-bottom:
-    var(--airbus-space-6);
+  gap: var(--airbus-space-5);
+  margin-bottom: var(--airbus-space-6);
 }
-
 
 .availability-page__title {
   margin: 0;
-
+  text-align: start;
   font-size: 26px;
   font-weight: 600;
-
-  color:
-    var(--airbus-primary);
+  color: var(--airbus-primary);
 }
-
 
 /* ================================
    DATE FILTERS
 ================================ */
-
 .availability-page__filters {
   display: flex;
-
   align-items: flex-end;
-
-  gap:
-    var(--airbus-space-3);
+  gap: var(--airbus-space-3);
 }
-
 
 .availability-page__filters label {
   display: flex;
-
   flex-direction: column;
-
-  gap:
-    var(--airbus-space-1);
-
+  gap: var(--airbus-space-1);
   font-size: 11px;
   font-weight: 600;
-
-  color:
-    var(--airbus-text-muted);
+  color: var(--airbus-text-muted);
 }
-
 
 .availability-page__filters input {
   min-width: 170px;
-
   height: 38px;
-
-  padding:
-    0
-    var(--airbus-space-3);
-
+  padding: 0 var(--airbus-space-3);
   font: inherit;
-
-  color:
-    var(--airbus-primary);
-
-  background:
-    var(--airbus-surface);
-
-  border:
-    1px solid
-    var(--airbus-border);
-
-  border-radius:
-    var(--airbus-radius-sm);
-
+  color: var(--airbus-primary);
+  background: var(--airbus-surface);
+  border: 1px solid var(--airbus-border);
+  border-radius: var(--airbus-radius-sm);
   box-sizing: border-box;
 }
 
-
 .availability-page__filters input:focus {
   outline: none;
-
-  border-color:
-    var(--airbus-blue-300);
-
-  box-shadow:
-    0 0 0 2px
-    rgba(
-      0,
-      133,
-      173,
-      0.12
-    );
+  border-color: var(--airbus-blue-300);
+  box-shadow: 0 0 0 2px rgba(0, 133, 173, 0.12);
 }
-
 
 /* ================================
    CONTENT
 ================================ */
-
 .availability-page__content {
   display: flex;
-
   flex-direction: column;
 }
-
 
 /* ================================
    DEVICE SECTIONS
 ================================ */
-
 .availability-device-section {
-  margin-bottom:
-    var(--airbus-space-7);
+  margin-bottom: var(--airbus-space-7);
 }
-
 
 .availability-device-section__header {
   display: flex;
-
   align-items: baseline;
-
-  gap:
-    var(--airbus-space-3);
-
-  margin-bottom:
-    var(--airbus-space-4);
-
-  padding-bottom:
-    var(--airbus-space-2);
-
-  border-bottom:
-    2px solid
-    var(--airbus-primary);
+  gap: var(--airbus-space-3);
+  margin-bottom: var(--airbus-space-4);
+  padding-bottom: var(--airbus-space-2);
+  border-bottom: 2px solid var(--airbus-primary);
 }
-
 
 .availability-device-section__header h2 {
   margin: 0;
-
   font-size: 18px;
   font-weight: 600;
-
-  color:
-    var(--airbus-primary);
+  color: var(--airbus-primary);
 }
-
 
 .availability-device-section__header span {
   font-size: 11px;
-
-  color:
-    var(--airbus-text-muted);
+  color: var(--airbus-text-muted);
 }
-
 
 /* ================================
    DEVICE GRID
 ================================ */
-
 .availability-grid,
 .availability-grid--ffs {
   display: grid;
-
-  grid-template-columns:
-    repeat(
-      5,
-      minmax(
-        0,
-        1fr
-      )
-    );
-
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   align-items: start;
-
   justify-content: start;
-
-  gap:
-    var(--airbus-space-4);
+  gap: var(--airbus-space-4);
 }
-
 
 /* ================================
    CARD
 ================================ */
-
 .availability-card {
   position: relative;
-
   width: 100%;
-
   min-width: 0;
-
-  padding:
-    var(--airbus-space-4);
-
+  padding: var(--airbus-space-4);
   overflow: hidden;
-
   color: inherit;
-
-  background:
-    var(--airbus-surface);
-
-  border:
-    1px solid
-    var(--airbus-border);
-
-  border-radius:
-    var(--airbus-radius-md);
-
-  box-shadow:
-    var(--airbus-shadow-sm);
-
+  background: var(--airbus-surface);
+  border: 1px solid var(--airbus-border);
+  border-radius: var(--airbus-radius-md);
+  box-shadow: var(--airbus-shadow-sm);
   box-sizing: border-box;
 }
 
-
 .availability-card--with-image::before {
   content: "";
-
   position: absolute;
-
   top: -15px;
   right: 60px;
-
   width: 100px;
   height: 82px;
-
-  background-image:
-    var(--device-image);
-
-  background-repeat:
-    no-repeat;
-
-  background-position:
-    center;
-
-  background-size:
-    contain;
-
+  background-image: var(--device-image);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
   opacity: 0.14;
-
   pointer-events: none;
-
   z-index: 0;
 }
 
-
 .availability-card > * {
   position: relative;
-
   z-index: 1;
 }
-
 
 /* ================================
    CARD HEADER
 ================================ */
-
 .availability-card__header {
   display: flex;
-
   align-items: flex-start;
   justify-content: space-between;
-
-  gap:
-    var(--airbus-space-4);
-
-  padding-bottom:
-    var(--airbus-space-3);
-
-  border-bottom:
-    1px solid
-    var(--airbus-border);
-
-  color:
-    var(--airbus-blue-500);
+  gap: var(--airbus-space-4);
+  padding-bottom: var(--airbus-space-3);
+  border-bottom: 1px solid var(--airbus-border);
+  color: var(--airbus-blue-500);
 }
-
 
 .availability-card__header h2 {
   margin: 0;
-
   font-size: 18px;
-
   line-height: 1.2;
-
-  color:
-    var(--airbus-primary);
+  color: var(--airbus-primary);
 }
-
 
 /* ================================
    TASK ROW
 ================================ */
-
 .availability-card__tasks-row {
   display: flex;
-
   justify-content: flex-end;
-
-  margin-top:
-    var(--airbus-space-2);
-
-  margin-bottom:
-    var(--airbus-space-2);
+  margin-top: var(--airbus-space-2);
+  margin-bottom: var(--airbus-space-2);
 }
-
 
 /* ================================
    TASK BUTTON
 ================================ */
-
 .availability-card__tasks-button {
   display: flex;
-
   align-items: center;
   justify-content: center;
-
-  gap:
-    5px;
-
+  gap: 5px;
   height: 27px;
-
-  padding:
-    0
-    8px;
-
+  padding: 0 8px;
   font: inherit;
-
   font-size: 10px;
   font-weight: 700;
-
-  color:
-    var(--airbus-blue-700);
-
-  background:
-    rgba(
-      0,
-      133,
-      173,
-      0.06
-    );
-
-  border:
-    1px solid
-    rgba(
-      0,
-      133,
-      173,
-      0.28
-    );
-
-  border-radius:
-    var(--airbus-radius-sm);
-
+  color: var(--airbus-blue-700);
+  background: rgba(0, 133, 173, 0.06);
+  border: 1px solid rgba(0, 133, 173, 0.28);
+  border-radius: var(--airbus-radius-sm);
   cursor: pointer;
-
   transition:
-    background
-      140ms ease,
-    border-color
-      140ms ease;
+    background 140ms ease,
+    border-color 140ms ease;
 }
-
 
 .availability-card__tasks-button:hover {
-  background:
-    rgba(
-      0,
-      133,
-      173,
-      0.12
-    );
-
-  border-color:
-    var(--airbus-blue-300);
+  background: rgba(0, 133, 173, 0.12);
+  border-color: var(--airbus-blue-300);
 }
-
 
 .availability-card__tasks-button strong {
   display: flex;
-
   align-items: center;
   justify-content: center;
-
   min-width: 17px;
   height: 17px;
-
-  padding:
-    0
-    4px;
-
+  padding: 0 4px;
   font-size: 9px;
-
-  color:
-    #ffffff;
-
-  background:
-    var(--airbus-blue-500);
-
-  border-radius:
-    999px;
+  color: #ffffff;
+  background: var(--airbus-blue-500);
+  border-radius: 999px;
 }
-
 
 /* ================================
    SUMMARY
 ================================ */
-
 .availability-card__summary {
   display: grid;
-
-  grid-template-columns:
-    repeat(
-      2,
-      minmax(
-        0,
-        1fr
-      )
-    );
-
-  gap:
-    var(--airbus-space-3);
-
-  margin:
-    var(--airbus-space-4)
-    0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--airbus-space-3);
+  margin: var(--airbus-space-4) 0;
 }
-
 
 .availability-card__summary-item {
   display: flex;
-
   flex-direction: column;
-
-  gap:
-    var(--airbus-space-1);
-
-  padding:
-    var(--airbus-space-2)
-    var(--airbus-space-3);
-
-  background:
-    var(--airbus-surface-muted);
-
-  border-radius:
-    var(--airbus-radius-sm);
+  gap: var(--airbus-space-1);
+  padding: var(--airbus-space-2) var(--airbus-space-3);
+  background: var(--airbus-surface-muted);
+  border-radius: var(--airbus-radius-sm);
 }
-
 
 .availability-card__summary-item span {
   font-size: 11px;
-
-  color:
-    var(--airbus-text-muted);
+  color: var(--airbus-text-muted);
 }
-
 
 .availability-card__summary-item strong {
   font-size: 16px;
-
-  color:
-    var(--airbus-primary);
+  color: var(--airbus-primary);
 }
-
 
 .availability-card__summary-item--available {
-  background:
-    rgba(
-      132,
-      189,
-      0,
-      0.09
-    );
+  background: rgba(132, 189, 0, 0.09);
 }
-
 
 .availability-card__summary-item--available strong {
-  color:
-    #557a00;
+  color: #557a00;
 }
-
 
 /* ================================
    FREE WINDOWS
 ================================ */
-
 .availability-card__windows {
   display: flex;
-
   flex-direction: column;
-
-  gap:
-    var(--airbus-space-2);
+  gap: var(--airbus-space-2);
 }
-
 
 .availability-card__windows h3 {
-  margin:
-    0
-    0
-    var(--airbus-space-1);
-
+  margin: 0 0 var(--airbus-space-1);
   font-size: 12px;
   font-weight: 700;
-
   text-transform: uppercase;
-
   letter-spacing: 0.04em;
-
-  color:
-    var(--airbus-text-muted);
+  color: var(--airbus-text-muted);
 }
-
 
 .availability-day {
   display: flex;
-
   flex-direction: column;
-
-  gap:
-    var(--airbus-space-2);
+  gap: var(--airbus-space-2);
 }
 
-
-.availability-day
-+ .availability-day {
-  margin-top:
-    var(--airbus-space-3);
+.availability-day + .availability-day {
+  margin-top: var(--airbus-space-3);
 }
-
 
 .availability-day__title {
-  padding:
-    var(--airbus-space-1)
-    0
-    var(--airbus-space-2);
-
+  padding: var(--airbus-space-1) 0 var(--airbus-space-2);
   font-size: 12px;
   font-weight: 700;
-
-  color:
-    var(--airbus-blue-700);
-
+  color: var(--airbus-blue-700);
   text-transform: capitalize;
-
-  border-bottom:
-    1px solid
-    var(--airbus-border);
+  border-bottom: 1px solid var(--airbus-border);
 }
-
 
 /* ================================
    FREE WINDOW
 ================================ */
-
 .availability-window {
   display: grid;
-
   grid-template-columns:
     20px
     1fr
     20px;
-
   align-items: center;
-
-  gap:
-    var(--airbus-space-2);
-
-  padding:
-    var(--airbus-space-2)
-    var(--airbus-space-3);
-
-  color:
-    #557a00;
-
-  background:
-    rgba(
-      132,
-      189,
-      0,
-      0.08
-    );
-
-  border:
-    1px solid
-    rgba(
-      132,
-      189,
-      0,
-      0.28
-    );
-
-  border-radius:
-    var(--airbus-radius-sm);
+  gap: var(--airbus-space-2);
+  padding: var(--airbus-space-2) var(--airbus-space-3);
+  color: #557a00;
+  background: rgba(132, 189, 0, 0.08);
+  border: 1px solid rgba(132, 189, 0, 0.28);
+  border-radius: var(--airbus-radius-sm);
 }
-
 
 .availability-window > svg {
   grid-column: 1;
-
   justify-self: start;
 }
 
-
 .availability-window > div {
   grid-column: 2;
-
   display: flex;
-
   flex-direction: column;
-
   align-items: center;
   justify-content: center;
-
   min-width: 0;
-
   text-align: center;
 }
-
 
 .availability-window strong {
   font-size: 13px;
-
-  color:
-    var(--airbus-primary);
+  color: var(--airbus-primary);
 }
-
 
 .availability-window span {
-  margin-top:
-    var(--airbus-space-1);
-
+  margin-top: var(--airbus-space-1);
   font-size: 11px;
-
-  color:
-    var(--airbus-text-muted);
+  color: var(--airbus-text-muted);
 }
-
 
 .availability-card__no-slots {
-  padding:
-    var(--airbus-space-3);
-
+  padding: var(--airbus-space-3);
   text-align: center;
-
   font-size: 12px;
-
-  color:
-    var(--airbus-text-muted);
-
-  background:
-    var(--airbus-surface-muted);
-
-  border-radius:
-    var(--airbus-radius-sm);
+  color: var(--airbus-text-muted);
+  background: var(--airbus-surface-muted);
+  border-radius: var(--airbus-radius-sm);
 }
-
 
 /* ================================
    MODAL OVERLAY
 ================================ */
-
 .availability-modal-overlay {
   position: fixed;
-
   inset: 0;
-
   z-index: 9999;
-
   display: flex;
-
   align-items: center;
   justify-content: center;
-
   width: 100vw;
   height: 100dvh;
-
-  padding:
-    32px;
-
+  padding: 32px;
   overflow-y: auto;
-
-  background:
-    rgba(
-      0,
-      32,
-      91,
-      0.28
-    );
-
-  backdrop-filter:
-    blur(2px);
-
+  background: rgba(0, 32, 91, 0.28);
+  backdrop-filter: blur(2px);
   box-sizing: border-box;
 }
-
 
 /* ================================
    MODAL
 ================================ */
-
 .availability-modal {
   position: relative;
-
-  width:
-    min(
-      760px,
-      100%
-    );
-
-  max-height:
-    calc(
-      100dvh
-      - 64px
-    );
-
+  width: min(760px, 100%);
+  max-height: calc(100dvh - 64px);
   display: flex;
-
   flex-direction: column;
-
   margin: auto;
-
   overflow: hidden;
-
-  background:
-    var(--airbus-surface);
-
-  border:
-    1px solid
-    var(--airbus-border);
-
-  border-radius:
-    var(--airbus-radius-md);
-
-  box-shadow:
-    0
-    18px
-    48px
-    rgba(
-      0,
-      32,
-      91,
-      0.22
-    );
-
+  background: var(--airbus-surface);
+  border: 1px solid var(--airbus-border);
+  border-radius: var(--airbus-radius-md);
+  box-shadow: 0 18px 48px rgba(0, 32, 91, 0.22);
   box-sizing: border-box;
 }
-
 
 /* ================================
    MODAL HEADER
 ================================ */
-
 .availability-modal__header {
-  flex:
-    0
-    0
-    auto;
-
+  flex: 0 0 auto;
   display: flex;
-
   align-items: flex-start;
   justify-content: space-between;
-
-  gap:
-    var(--airbus-space-4);
-
-  padding:
-    var(--airbus-space-5);
-
-  background:
-    var(--airbus-surface);
-
-  border-bottom:
-    2px solid
-    var(--airbus-primary);
+  gap: var(--airbus-space-4);
+  padding: var(--airbus-space-5);
+  background: var(--airbus-surface);
+  border-bottom: 2px solid var(--airbus-primary);
 }
-
 
 .availability-modal__eyebrow {
   display: block;
-
-  margin-bottom:
-    var(--airbus-space-1);
-
+  margin-bottom: var(--airbus-space-1);
   font-size: 10px;
   font-weight: 700;
-
-  letter-spacing:
-    0.06em;
-
-  text-transform:
-    uppercase;
-
-  color:
-    var(--airbus-blue-500);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--airbus-blue-500);
 }
-
 
 .availability-modal__header h2 {
   margin: 0;
-
   font-size: 22px;
-
-  color:
-    var(--airbus-primary);
+  color: var(--airbus-primary);
 }
-
 
 .availability-modal__header p {
-  margin:
-    var(--airbus-space-1)
-    0
-    0;
-
+  margin: var(--airbus-space-1) 0 0;
   font-size: 11px;
-
-  color:
-    var(--airbus-text-muted);
+  color: var(--airbus-text-muted);
 }
 
-
 .availability-modal__close {
-  flex:
-    0
-    0
-    auto;
-
+  flex: 0 0 auto;
   display: flex;
-
   align-items: center;
   justify-content: center;
-
   width: 32px;
   height: 32px;
-
   padding: 0;
-
-  color:
-    var(--airbus-text-muted);
-
-  background:
-    transparent;
-
-  border:
-    1px solid
-    transparent;
-
-  border-radius:
-    var(--airbus-radius-sm);
-
+  color: var(--airbus-text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--airbus-radius-sm);
   cursor: pointer;
 }
 
-
 .availability-modal__close:hover {
-  color:
-    var(--airbus-primary);
-
-  background:
-    var(--airbus-surface-muted);
-
-  border-color:
-    var(--airbus-border);
+  color: var(--airbus-primary);
+  background: var(--airbus-surface-muted);
+  border-color: var(--airbus-border);
 }
-
 
 /* ================================
    MODAL BODY
 ================================ */
-
 .availability-modal__body {
-  flex:
-    1
-    1
-    auto;
-
+  flex: 1 1 auto;
   min-height: 0;
-
   display: flex;
-
   flex-direction: column;
-
-  gap:
-    var(--airbus-space-3);
-
-  padding:
-    var(--airbus-space-5);
-
+  gap: var(--airbus-space-3);
+  padding: var(--airbus-space-5);
   overflow-y: auto;
-
-  overscroll-behavior:
-    contain;
+  overscroll-behavior: contain;
 }
-
 
 .availability-modal__empty {
-  padding:
-    var(--airbus-space-6);
-
+  padding: var(--airbus-space-6);
   text-align: center;
-
   font-size: 12px;
-
-  color:
-    var(--airbus-text-muted);
-
-  background:
-    var(--airbus-surface-muted);
-
-  border-radius:
-    var(--airbus-radius-sm);
+  color: var(--airbus-text-muted);
+  background: var(--airbus-surface-muted);
+  border-radius: var(--airbus-radius-sm);
 }
-
 
 /* ================================
    TASK
 ================================ */
-
 .availability-task {
-  flex:
-    0
-    0
-    auto;
-
-  padding:
-    var(--airbus-space-4);
-
-  background:
-    var(--airbus-surface);
-
-  border:
-    1px solid
-    var(--airbus-border);
-
-  border-radius:
-    var(--airbus-radius-md);
-
-  box-shadow:
-    var(--airbus-shadow-sm);
+  flex: 0 0 auto;
+  padding: var(--airbus-space-4);
+  background: var(--airbus-surface);
+  border: 1px solid var(--airbus-border);
+  border-radius: var(--airbus-radius-md);
+  box-shadow: var(--airbus-shadow-sm);
 }
-
 
 .availability-task__header {
   display: flex;
-
   align-items: flex-start;
   justify-content: space-between;
-
-  gap:
-    var(--airbus-space-3);
+  gap: var(--airbus-space-3);
 }
-
 
 .availability-task__heading {
   min-width: 0;
 }
 
-
 .availability-task__code {
   display: block;
-
-  margin-bottom:
-    var(--airbus-space-1);
-
+  margin-bottom: var(--airbus-space-1);
   font-size: 10px;
   font-weight: 700;
-
-  letter-spacing:
-    0.04em;
-
-  text-transform:
-    uppercase;
-
-  color:
-    var(--airbus-blue-500);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--airbus-blue-500);
 }
-
 
 .availability-task__heading h3 {
   margin: 0;
-
   font-size: 14px;
   font-weight: 600;
-
   line-height: 1.35;
-
-  color:
-    var(--airbus-primary);
+  color: var(--airbus-primary);
 }
-
 
 .availability-task__status {
   flex-shrink: 0;
-
-  padding:
-    4px
-    7px;
-
+  padding: 4px 7px;
   font-size: 9px;
   font-weight: 700;
-
-  color:
-    #557a00;
-
-  background:
-    rgba(
-      132,
-      189,
-      0,
-      0.10
-    );
-
-  border:
-    1px solid
-    rgba(
-      132,
-      189,
-      0,
-      0.22
-    );
-
-  border-radius:
-    999px;
+  color: #557a00;
+  background: rgba(132, 189, 0, 0.1);
+  border: 1px solid rgba(132, 189, 0, 0.22);
+  border-radius: 999px;
 }
-
 
 .availability-task__status--overdue {
-  color:
-    var(--airbus-danger);
-
-  background:
-    rgba(
-      228,
-      0,
-      43,
-      0.06
-    );
-
-  border-color:
-    rgba(
-      228,
-      0,
-      43,
-      0.16
-    );
+  color: var(--airbus-danger);
+  background: rgba(228, 0, 43, 0.06);
+  border-color: rgba(228, 0, 43, 0.16);
 }
-
 
 /* ================================
    PLANNED
 ================================ */
-
 .availability-task__planned {
   display: flex;
-
   align-items: center;
   justify-content: space-between;
-
-  gap:
-    var(--airbus-space-3);
-
-  margin-top:
-    var(--airbus-space-3);
-
-  padding:
-    var(--airbus-space-2)
-    0;
-
+  gap: var(--airbus-space-3);
+  margin-top: var(--airbus-space-3);
+  padding: var(--airbus-space-2) 0;
   font-size: 11px;
-
-  color:
-    var(--airbus-text-muted);
-
-  border-top:
-    1px solid
-    var(--airbus-border);
+  color: var(--airbus-text-muted);
+  border-top: 1px solid var(--airbus-border);
 }
-
 
 .availability-task__planned strong {
-  color:
-    var(--airbus-primary);
+  color: var(--airbus-primary);
 }
-
 
 /* ================================
    BEST WINDOW
 ================================ */
-
 .availability-task__best-window {
-  margin-top:
-    var(--airbus-space-2);
-
-  padding:
-    var(--airbus-space-3);
-
-  background:
-    rgba(
-      132,
-      189,
-      0,
-      0.08
-    );
-
-  border:
-    1px solid
-    rgba(
-      132,
-      189,
-      0,
-      0.28
-    );
-
-  border-radius:
-    var(--airbus-radius-sm);
+  margin-top: var(--airbus-space-2);
+  padding: var(--airbus-space-3);
+  background: rgba(132, 189, 0, 0.08);
+  border: 1px solid rgba(132, 189, 0, 0.28);
+  border-radius: var(--airbus-radius-sm);
 }
-
 
 .availability-task__best-window-title {
   display: flex;
-
   align-items: center;
-
-  gap:
-    var(--airbus-space-1);
-
-  margin-bottom:
-    var(--airbus-space-1);
-
+  gap: var(--airbus-space-1);
+  margin-bottom: var(--airbus-space-1);
   font-size: 10px;
   font-weight: 700;
-
-  text-transform:
-    uppercase;
-
-  color:
-    #557a00;
+  text-transform: uppercase;
+  color: #557a00;
 }
-
 
 .availability-task__best-window > strong {
   display: block;
-
   font-size: 13px;
-
-  color:
-    var(--airbus-primary);
+  color: var(--airbus-primary);
 }
-
 
 .availability-task__best-window-meta {
   display: flex;
-
   justify-content: space-between;
-
-  gap:
-    var(--airbus-space-3);
-
-  margin-top:
-    var(--airbus-space-1);
-
+  gap: var(--airbus-space-3);
+  margin-top: var(--airbus-space-1);
   font-size: 10px;
-
-  color:
-    var(--airbus-text-muted);
+  color: var(--airbus-text-muted);
 }
-
 
 /* ================================
    TASK META
 ================================ */
-
 .availability-task__meta {
   display: flex;
-
   flex-wrap: wrap;
-
-  gap:
-    var(--airbus-space-3);
-
-  margin-top:
-    var(--airbus-space-3);
-
+  gap: var(--airbus-space-3);
+  margin-top: var(--airbus-space-3);
   font-size: 10px;
-
-  color:
-    var(--airbus-text-muted);
+  color: var(--airbus-text-muted);
 }
-
 
 .availability-task__meta strong {
-  color:
-    var(--airbus-primary);
+  color: var(--airbus-primary);
 }
-
 
 /* ================================
    ALTERNATIVES
 ================================ */
-
 .availability-task__alternatives {
-  margin-top:
-    var(--airbus-space-4);
-
-  padding-top:
-    var(--airbus-space-3);
-
-  border-top:
-    1px solid
-    var(--airbus-border);
+  margin-top: var(--airbus-space-4);
+  padding-top: var(--airbus-space-3);
+  border-top: 1px solid var(--airbus-border);
 }
-
 
 .availability-task__alternatives h4 {
-  margin:
-    0
-    0
-    var(--airbus-space-2);
-
+  margin: 0 0 var(--airbus-space-2);
   font-size: 10px;
   font-weight: 700;
-
-  text-transform:
-    uppercase;
-
-  letter-spacing:
-    0.04em;
-
-  color:
-    var(--airbus-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--airbus-text-muted);
 }
-
 
 .availability-task__alternative {
   display: flex;
-
   align-items: flex-start;
-
-  gap:
-    var(--airbus-space-2);
-
-  padding:
-    var(--airbus-space-2);
-
-  color:
-    var(--airbus-blue-500);
-
-  background:
-    var(--airbus-surface-muted);
-
-  border-radius:
-    var(--airbus-radius-sm);
+  gap: var(--airbus-space-2);
+  padding: var(--airbus-space-2);
+  color: var(--airbus-blue-500);
+  background: var(--airbus-surface-muted);
+  border-radius: var(--airbus-radius-sm);
 }
 
-
-.availability-task__alternative
-+ .availability-task__alternative {
-  margin-top:
-    var(--airbus-space-2);
+.availability-task__alternative + .availability-task__alternative {
+  margin-top: var(--airbus-space-2);
 }
-
 
 .availability-task__alternative div {
   display: flex;
-
   flex-direction: column;
-
-  gap:
-    2px;
+  gap: 2px;
 }
-
 
 .availability-task__alternative strong {
   font-size: 11px;
-
-  color:
-    var(--airbus-primary);
+  color: var(--airbus-primary);
 }
-
 
 .availability-task__alternative span {
   font-size: 9px;
-
-  color:
-    var(--airbus-text-muted);
+  color: var(--airbus-text-muted);
 }
-
 
 /* ================================
    LOADING / ERROR / EMPTY
 ================================ */
-
 .availability-page__state {
-  padding:
-    var(--airbus-space-6);
-
-  color:
-    var(--airbus-text-muted);
-
-  background:
-    var(--airbus-surface);
-
-  border:
-    1px solid
-    var(--airbus-border);
-
-  border-radius:
-    var(--airbus-radius-md);
-
-  text-align:
-    center;
+  padding: var(--airbus-space-6);
+  color: var(--airbus-text-muted);
+  background: var(--airbus-surface);
+  border: 1px solid var(--airbus-border);
+  border-radius: var(--airbus-radius-md);
+  text-align: center;
 }
-
 
 .availability-page__state--error {
-  color:
-    var(--airbus-danger);
+  color: var(--airbus-danger);
 }
-
 
 /* ================================
    RESPONSIVE
 ================================ */
-
-@media (
-  max-width: 1200px
-) {
+@media (max-width: 1200px) {
   .availability-grid,
   .availability-grid--ffs {
-    grid-template-columns:
-      repeat(
-        3,
-        minmax(
-          0,
-          1fr
-        )
-      );
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-
-@media (
-  max-width: 800px
-) {
+@media (max-width: 800px) {
   .availability-page__header {
-    flex-direction:
-      column;
+    flex-direction: column;
   }
-
 
   .availability-page__filters {
     width: 100%;
   }
-
 
   .availability-page__filters label {
     flex: 1;
   }
 
-
   .availability-page__filters input {
     width: 100%;
-
     min-width: 0;
   }
 
-
   .availability-grid,
   .availability-grid--ffs {
-    grid-template-columns:
-      repeat(
-        2,
-        minmax(
-          0,
-          1fr
-        )
-      );
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
 
   .availability-modal-overlay {
-    padding:
-      var(--airbus-space-4);
+    padding: var(--airbus-space-4);
   }
 
-
   .availability-modal {
-    max-height:
-      calc(
-        100dvh
-        - 32px
-      );
+    max-height: calc(100dvh - 32px);
   }
 }
 
-
-@media (
-  max-width: 520px
-) {
+@media (max-width: 520px) {
   .availability-page__filters {
-    flex-direction:
-      column;
-
-    align-items:
-      stretch;
+    flex-direction: column;
+    align-items: stretch;
   }
-
 
   .availability-grid,
   .availability-grid--ffs {
-    grid-template-columns:
-      1fr;
+    grid-template-columns: 1fr;
   }
-
 
   .availability-modal-overlay {
-    padding:
-      var(--airbus-space-3);
+    padding: var(--airbus-space-3);
   }
-
 
   .availability-modal {
-    max-height:
-      calc(
-        100dvh
-        - 24px
-      );
+    max-height: calc(100dvh - 24px);
   }
-
 
   .availability-modal__header,
   .availability-modal__body {
-    padding:
-      var(--airbus-space-4);
+    padding: var(--airbus-space-4);
   }
-
 
   .availability-task__header {
-    flex-direction:
-      column;
+    flex-direction: column;
   }
-
 
   .availability-task__planned {
-    align-items:
-      flex-start;
-
-    flex-direction:
-      column;
-
-    gap:
-      var(--airbus-space-1);
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--airbus-space-1);
   }
 }
-
 
 /* Availability cache status and refresh */
 .availability-page__cache-info {

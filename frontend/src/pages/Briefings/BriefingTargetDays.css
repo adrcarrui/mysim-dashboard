@@ -1,0 +1,103 @@
+.briefings-view-switch { display: flex; gap: 6px; margin-bottom: 14px; }
+.briefings-page .briefings-view-switch button[aria-pressed="true"] { color: #fff; background: var(--airbus-primary, #00205b); border-color: var(--airbus-primary, #00205b); }
+.briefing-target-days { min-width: 0; text-align: left; }
+.briefing-target-days__filters { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 12px; }
+.briefing-target-days__filters label { display: grid; gap: 5px; font-size: 12px; color: var(--airbus-primary, #00205b); }
+.briefing-target-days__filters label:nth-child(3) { flex: 1; min-width: 180px; }
+.briefing-target-days__filters input, .briefing-target-days__filters select { box-sizing: border-box; min-height: 34px; min-width: 150px; width: 100%; padding: 6px 8px; border: 1px solid var(--airbus-border, #d8e0e5); border-radius: 4px; font: inherit; background: var(--airbus-surface, #fff); color: inherit; }
+.briefing-target-days__hint { margin: 8px 0; color: var(--airbus-text-secondary, #5f7482); font-size: 11px; line-height: 1.5; }
+.briefing-target-days__error { font-size: 12px; color: var(--airbus-danger, #e4002b); }
+.briefing-target-days__undated { display: flex; align-items: center; gap: 7px; margin: 10px 0; color: var(--airbus-text-secondary, #5f7482); font-size: 12px; }
+.briefing-target-days__undated input { margin: 0; width: 14px; height: 14px; accent-color: var(--airbus-primary, #00205b); }
+.briefing-target-days__calendar-wrap { overflow-x: auto; margin-top: 16px; padding-bottom: 4px; }
+.briefing-target-days .fc { min-width: 910px; color: var(--airbus-text-body, #243746); font-size: 12px; --fc-border-color: #d8e0e5; --fc-button-bg-color: #00205b; --fc-button-border-color: #00205b; --fc-button-hover-bg-color: #003a78; --fc-button-hover-border-color: #003a78; --fc-button-active-bg-color: #005587; --fc-button-active-border-color: #005587; --fc-today-bg-color: #fffbe6; --fc-event-text-color: #243746; }
+.briefing-target-days .fc .fc-toolbar-title { margin: 0; color: var(--airbus-primary, #00205b); font-size: 21px; font-weight: 600; }
+.briefing-target-days .fc .fc-header-toolbar { gap: 12px; flex-wrap: wrap; }
+.briefings-page .briefing-target-days .fc .fc-button { padding: 6px 10px; color: #fff; background: var(--fc-button-bg-color); border: 1px solid var(--fc-button-border-color); font: inherit; font-size: 12px; }
+.briefings-page .briefing-target-days .fc .fc-button:hover { background: var(--fc-button-hover-bg-color); }
+.briefings-page .briefing-target-days .fc .fc-button-active { background: var(--fc-button-active-bg-color); }
+.briefing-target-days .fc .fc-col-header-cell-cushion { padding: 10px 4px; color: #005587; font-weight: 600; text-decoration: none; }
+.briefing-target-days .fc .fc-daygrid-day-frame { min-height: 420px; }
+.briefing-target-days .fc .fc-daygrid-event-harness { margin-bottom: 5px; }
+.briefing-target-days .fc .fc-daygrid-day-events { margin-top: 4px; }
+.briefing-target-days .fc .fc-daygrid-more-link { margin: 5px 4px; color: var(--airbus-primary, #00205b); font-weight: 600; }
+.briefing-target-days .fc .fc-popover { z-index: 8; max-width: 330px; border-radius: 5px; background: var(--airbus-surface, #fff); }
+.briefing-target-days .fc .fc-popover-body { max-height: 450px; overflow-y: auto; }
+.briefing-target-days .fc .fc-event, .briefings-page .briefing-target-days .briefing-target-days__undated-event { --work-colour: #005587; --work-tint: #edf5fa; padding: 0; border: 1px solid var(--work-colour); border-left-width: 3px; border-radius: 3px; background: var(--work-tint); color: #243746; text-decoration: none; cursor: pointer; white-space: normal; }
+.briefing-target-days .fc .fc-event.briefing-target-days__event--dr, .briefings-page .briefing-target-days .briefing-target-days__undated-event.briefing-target-days__event--dr { --work-colour: #b42338; --work-tint: #fff1f3; }
+.briefing-target-days .fc .fc-event.briefing-target-days__event--action, .briefings-page .briefing-target-days .briefing-target-days__undated-event.briefing-target-days__event--action { --work-colour: #8656a0; --work-tint: #f5f0fa; }
+.briefing-target-days .fc .fc-event.briefing-target-days__event--task, .briefings-page .briefing-target-days .briefing-target-days__undated-event.briefing-target-days__event--task { --work-colour: #367d59; --work-tint: #eef7f1; }
+.briefing-target-days .fc .fc-event:focus-visible, .briefing-target-days__undated-event:focus-visible { outline: 2px solid var(--airbus-primary, #00205b); outline-offset: 2px; }
+.briefing-target-days .fc .fc-event:hover { filter: brightness(.97); }
+.briefing-target-days .fc .fc-event-main { color: inherit; }
+.briefing-target-days__event-content { padding: 5px; overflow: hidden; text-align: left; line-height: 1.35; }
+.briefing-target-days button.briefing-target-days__card-open {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  gap: 5px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  font: inherit;
+}
+.briefing-target-days button.briefing-target-days__card-open:focus-visible {
+  outline: 2px solid var(--airbus-primary, #00205b);
+  outline-offset: 1px;
+}
+.briefing-target-days__type { min-width: 0; flex: 1; color: var(--work-colour, #005587); font-size: 10px; }
+.briefing-target-days__type b, .briefing-target-days__type small { display: block; }
+.briefing-target-days__type small { color: #5f7482; font-size: 10px; overflow-wrap: anywhere; }
+.briefing-target-days__reference { min-width: 0; max-width: 65%; font-size: 11px; overflow-wrap: anywhere; }
+.briefing-target-days__badges { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
+.briefing-target-days__target-status, .briefing-target-days__tolerance { display: inline-block; padding: 1px 3px; border-radius: 3px; font-size: 9px; line-height: 1.4; background: #edf0f3; color: #526472; }
+.briefing-target-days__target-status.is-past, .briefing-target-days__tolerance--upcoming { background: #fff0d8; color: #8a4d00; }
+.briefing-target-days__target-status.is-today { background: #e3effa; color: #005587; }
+.briefing-target-days__tolerance { font-weight: 600; }
+.briefing-target-days__tolerance--in_tolerance { background: #e0f2e6; color: #226442; }
+.briefing-target-days__tolerance--out_of_tolerance { background: #fde5e8; color: #a61c32; }
+.briefing-target-days__plan { margin-top: 4px; font-size: 10px; }
+.briefing-target-days__plan small { display: block; color: #5f7482; font-size: 9px; }
+.briefing-target-days__plan-status.is-scheduled { color: var(--work-colour, #005587); font-weight: 600; }
+.briefing-target-days__plan-status.is-included { color: #9b5b00; font-weight: 600; }
+.briefing-target-days__undated-section { margin-top: 18px; }
+.briefing-target-days__undated-section h3 { color: var(--airbus-primary, #00205b); font-size: 15px; }
+.briefing-target-days__undated-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; }
+.briefing-target-days .fc .fc-list-event:hover td { background: #f3f7fa; }
+.briefing-target-days .fc .fc-list-event-title .briefing-target-days__event-content { max-width: 650px; }
+.briefing-target-days .fc .fc-list-event-title { cursor: pointer; }
+@media (max-width: 950px) { .briefing-target-days .fc .fc-header-toolbar { width: calc(100vw - 70px); max-width: 100%; gap: 8px; } .briefing-target-days .fc .fc-toolbar-title { font-size: 17px; } }
+@media (max-width: 600px) { .briefing-target-days__filters label { flex: 1; min-width: 140px; } .briefing-target-days .fc .fc-header-toolbar { flex-direction: column; align-items: flex-start; } }
+.briefing-target-days .fc .fc-event.briefing-target-days__event--completed,
+.briefings-page .briefing-target-days .briefing-target-days__undated-event.briefing-target-days__event--completed {
+  --work-colour: #007a73;
+  --work-tint: #d0f3ee;
+}
+.briefing-target-days .fc .fc-list-event.briefing-target-days__event--completed td {
+  background: #d0f3ee;
+}
+.briefing-target-days__execution {
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: #d0f3ee;
+  color: #005d57;
+  font-weight: 600;
+  font-size: 9px;
+}
+
+.briefing-target-days__card-controls {
+  margin-top: 6px;
+  padding-top: 5px;
+  border-top: 1px solid var(--fc-border-color, #d8e0e5);
+}
+.briefing-target-days__card-controls .briefing-task-controls > label { padding: 0 0 4px; }
+.briefing-target-days__card-controls .briefing-task-controls > label select { width: 100%; }
+.briefing-target-days__card-controls .briefing-task-execution { font-size: 11px; gap: 4px; }
+.briefing-target-days__card-controls .briefing-task-execution__dates { gap: 4px 8px; font-size: 10px; }
+.briefing-target-days__card-controls .briefing-task-execution__actions { gap: 4px; }
+.briefing-target-days__card-controls .briefing-task-execution__actions button { padding: 3px 5px; font-size: 10px; }

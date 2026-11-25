@@ -2,7 +2,8 @@
 import { apiFetch } from "./client";
 import type { Task } from "../types/task";
 
-const API_BASE_URL = "http://localhost:8000/api";
+const API_BASE_URL =
+  `${window.location.protocol}//${window.location.hostname}:8000/api`;
 
 
 export async function getUpcomingTasks(

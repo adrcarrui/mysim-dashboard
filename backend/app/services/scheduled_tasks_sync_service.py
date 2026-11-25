@@ -283,13 +283,28 @@ class ScheduledTasksSyncService:
                     extra_query=query,
                 )
 
-                if response.get("status") != 200:
-                    raise RuntimeError(
-                        "Could not retrieve "
-                        "scheduledTasks from mySim"
+                status = response.get("status")
+
+                if status == 200:
+                    rows = self._extract_rows(response)
+
+                elif (
+                    status == 404
+                    and response.get("msg") == "No data!"
+                    and response.get("data") == []
+                ):
+                    rows = []
+
+                    logger.info(
+                        "No scheduled tasks for period: %s - %s",
+                        period_start,
+                        period_end,
                     )
 
-                rows = self._extract_rows(response)
+                else:
+                    raise RuntimeError(
+                        "Could not retrieve scheduledTasks from mySim"
+                    )
 
                 values = [
                     self._to_values(
@@ -326,7 +341,7 @@ class ScheduledTasksSyncService:
                         .mark_period_failed(
                             period_start=period_start,
                             period_end=period_end,
-                            error=str(exc)[:2000],
+                            error_message=str(exc)[:2000],
                         )
                     )
                 except Exception:

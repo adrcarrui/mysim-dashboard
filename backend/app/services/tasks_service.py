@@ -14,6 +14,7 @@ from app.services.task_frequencies_service import (
 )
 
 
+from app.services.task_duration_rules import get_task_duration
 from app.services.task_tolerance_rules import (
     get_documented_window,
     get_planning_category,
@@ -487,7 +488,20 @@ async def get_upcoming_tasks(
                 has_planned_time=has_planned_time,
             )
 
+        device = normalize_device(device_code)
+        details = details if isinstance(details, dict) else {}
+        duration, duration_reference = get_task_duration(
+            device_id=device_id,
+            device=device,
+            manual_version=manual_version,
+            task_id=details.get("taskId"),
+            task_code=task_code,
+            estimated_time=details.get("estimatedTime"),
+        )
+
         task = Task(
+            estimated_duration_minutes=duration,
+            duration_reference=duration_reference,
             planning_category=planning_category,
             unknown_tolerance_reason=unknown_tolerance_reason,
             device_id=device_id,
@@ -504,9 +518,7 @@ async def get_upcoming_tasks(
                 schedule_code
             ),
 
-            device=normalize_device(
-                device_code
-            ),
+            device=device,
 
             task_code=(
                 task_code

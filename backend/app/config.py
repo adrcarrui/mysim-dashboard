@@ -2,7 +2,7 @@ from pydantic_settings import (
     BaseSettings,
     SettingsConfigDict,
 )
-from pydantic import SecretStr
+from pydantic import SecretStr, Field
 
 class Settings(BaseSettings):
     amh_nfc_client_token: SecretStr | None = None
@@ -38,6 +38,16 @@ class Settings(BaseSettings):
 
     scheduled_tasks_sync_interval_seconds: int = 1800
     scheduled_tasks_initial_delay_seconds: int = 15
+
+    dashboard_cache_refresh_interval_seconds: int = Field(
+        default=14400,
+        ge=60,
+    )
+
+    dashboard_cache_initial_delay_seconds: int = Field(
+        default=30,
+        ge=0,
+    )
 
     model_config = SettingsConfigDict(
         env_file=".env",

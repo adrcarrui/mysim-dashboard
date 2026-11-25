@@ -18,6 +18,8 @@ class Task(BaseModel):
     unknown_tolerance_reason: str | None = None
 
     description: str | None = None
+    estimated_duration_minutes: int | None = None
+    duration_reference: str | None = None
 
     frequency_id: int | None = None
     frequency: str | None = None

@@ -3,6 +3,8 @@ import logging
 from time import monotonic
 
 from app.config import settings
+from app.database import AsyncSessionLocal
+from app.services.maintenance_kpi_backlog import capture_backlog
 from app.services.scheduled_tasks_sync_service import (
     scheduled_tasks_sync_service,
 )
@@ -27,6 +29,12 @@ async def run_scheduled_tasks_synchronization() -> None:
                 scheduled_tasks_sync_service
                 .synchronize_around_today()
             )
+
+            try:
+                async with AsyncSessionLocal() as db:
+                    await capture_backlog(db)
+            except Exception:
+                logger.exception("Maintenance backlog snapshot failed")
 
             logger.info(
                 "Scheduled tasks synchronized "

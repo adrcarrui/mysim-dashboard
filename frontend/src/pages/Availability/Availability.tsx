@@ -48,6 +48,8 @@ import c295Ea03Image from "../../assets/devices/c295.png";
 import cn235Image from "../../assets/devices/cn235.png";
 
 import "./Availability.css";
+import { DeviceMaintenanceSections } from "./DeviceMaintenanceSections";
+import { FilteredMaintenanceList, type MaintenanceFilter } from "./FilteredMaintenanceList";
 
 
 const FFS_DEVICE_ORDER = [
@@ -634,6 +636,11 @@ function RecommendationTask({
 }
 
 
+const recommendationFilters: MaintenanceFilter<TaskRecommendation>[] = [
+  { id: "with_window", label: "With suggested window", tone: "info", matches: task => task.bestWindow !== null },
+  { id: "without_window", label: "Without suggested window", tone: "warning", matches: task => task.bestWindow === null },
+];
+
 interface TaskModalProps {
   device:
     DeviceAvailability;
@@ -716,7 +723,7 @@ function TaskModal({
         role="dialog"
         aria-modal="true"
         aria-label={
-          `Recommended maintenance for ${device.deviceName}`
+          `Maintenance for ${device.deviceName}`
         }
       >
         <header
@@ -726,7 +733,7 @@ function TaskModal({
             <span
               className="availability-modal__eyebrow"
             >
-              Recommended maintenance
+              Device maintenance
             </span>
 
 
@@ -765,31 +772,22 @@ function TaskModal({
         </header>
 
 
-        <div
-          className="availability-modal__body"
+        <DeviceMaintenanceSections
+          device={device}
+          taskDeviceName={recommendations?.taskDeviceName}
         >
-          {tasks.length === 0 ? (
-            <div
-              className="availability-modal__empty"
-            >
-              No maintenance
-              recommendations for this
-              period.
-            </div>
-          ) : (
-            tasks.map(
-              (task) => (
-                <RecommendationTask
-                  key={
-                    task
-                      .scheduledTaskId
-                  }
-                  task={task}
-                />
-              ),
-            )
-          )}
-        </div>
+          <FilteredMaintenanceList
+            rows={tasks}
+            filters={recommendationFilters}
+            renderList={visibleTasks => visibleTasks.length === 0 ? (
+              <div className="availability-modal__empty">
+                No maintenance recommendations for this period.
+              </div>
+            ) : (
+              visibleTasks.map(task => <RecommendationTask key={task.scheduledTaskId} task={task} />)
+            )}
+          />
+        </DeviceMaintenanceSections>
       </section>
     </div>,
     document.body,
@@ -881,13 +879,16 @@ function AvailabilityCard({
         <button
           type="button"
           className="availability-card__tasks-button"
-          aria-label={`Tasks (${taskCount})`}
+          aria-haspopup="dialog"
+          aria-label={
+            `Maintenance for ${getDisplayDeviceName(device.deviceName)} (${taskCount} recommended ${taskCount === 1 ? "task" : "tasks"})`
+          }
           onClick={
             onOpenTasks
           }
         >
           <span>
-            Tasks
+            Maintenance
           </span>
         </button>
       </div>

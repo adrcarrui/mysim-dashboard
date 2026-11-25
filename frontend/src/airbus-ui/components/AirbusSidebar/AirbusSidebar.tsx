@@ -18,7 +18,6 @@ export interface AirbusSidebarProps {
 }
 
 export function AirbusSidebar({
-  title = "Navigation",
   items,
   collapsed = false,
   onToggle,

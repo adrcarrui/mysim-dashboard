@@ -1,22 +1,54 @@
 import { apiFetch } from "./client";
-import type { Dr } from "../types/dr"
+import type { Dr } from "../types/dr";
 
-const API_BASE_URL = "http://localhost:8000"
+const API_BASE_URL =
+  `${window.location.protocol}//${window.location.hostname}:8000`;
 
 export async function getOpenDrs(
-  deviceId?: number
+  deviceId?: number,
 ): Promise<Dr[]> {
-  let url = `${API_BASE_URL}/api/drs/open`
+  const params = new URLSearchParams();
 
   if (deviceId !== undefined) {
-    url += `?device_id=${deviceId}`
+    params.set("device_id", String(deviceId));
   }
 
-  const response = await apiFetch(url)
+  const query = params.toString();
+
+  const url =
+    `${API_BASE_URL}/api/drs/open` +
+    (query ? `?${query}` : "");
+
+  const response = await apiFetch(url, {
+    credentials: "include",
+    cache: "no-store",
+  });
 
   if (!response.ok) {
-    throw new Error("Error loading open DRs")
+    let detail = response.statusText;
+
+    try {
+      const error = await response.json();
+
+      if (typeof error.detail === "string") {
+        detail = error.detail;
+      }
+    } catch {
+      // La respuesta de error puede no ser JSON.
+    }
+
+    throw new Error(
+      `Error cargando DRs: HTTP ${response.status}. ${detail}`,
+    );
   }
 
-  return response.json()
+  const data = await response.json();
+
+  if (!Array.isArray(data)) {
+    throw new Error(
+      "La respuesta de DRs no contiene una lista",
+    );
+  }
+
+  return data as Dr[];
 }

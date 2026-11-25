@@ -1,11 +1,26 @@
 import base64
-import re
+from html.parser import HTMLParser
 from typing import Any
 from urllib.parse import urlsplit
 
 import httpx
 
 from app.config import settings
+
+
+class _CsrfTokenParser(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.token: str | None = None
+
+    def handle_starttag(self, tag, attrs):
+        if tag.lower() != "input":
+            return
+
+        attributes = dict(attrs)
+
+        if attributes.get("name") == "_csrf_token":
+            self.token = attributes.get("value")
 
 
 class MySimClient:
@@ -19,7 +34,17 @@ class MySimClient:
 
         parsed = urlsplit(self.base_url)
 
+        site_path = (
+            parsed.path
+            .split("/api/", 1)[0]
+            .rstrip("/")
+        )
+
         self.site_base_url = (
+            f"{parsed.scheme}://{parsed.netloc}{site_path}"
+        )
+
+        self.site_origin = (
             f"{parsed.scheme}://{parsed.netloc}"
         )
 
@@ -40,10 +65,8 @@ class MySimClient:
 
     @staticmethod
     def encode_extra_query(query: str) -> str:
-        raw = query.encode("utf-8")
-
         return base64.b64encode(
-            raw
+            query.encode("utf-8")
         ).decode("ascii")
 
     async def get(
@@ -52,8 +75,7 @@ class MySimClient:
         extra_query: str | None = None,
     ) -> dict[str, Any]:
         """
-        API pública de mySim.
-        Usada por Jobs, Tasks, Actions, DRs, etc.
+        Consulta la API pública de mySim mediante el token.
         """
 
         params = {
@@ -62,15 +84,8 @@ class MySimClient:
 
         if extra_query:
             params["extraQuery"] = (
-                self.encode_extra_query(
-                    extra_query
-                )
+                self.encode_extra_query(extra_query)
             )
-
-        headers = {
-            "X-AUTH-TOKEN": self.token,
-            "Accept": "application/json",
-        }
 
         async with httpx.AsyncClient(
             timeout=self.timeout,
@@ -79,53 +94,32 @@ class MySimClient:
             response = await client.post(
                 f"{self.base_url}/get",
                 params=params,
-                headers=headers,
+                headers={
+                    "X-AUTH-TOKEN": self.token,
+                    "Accept": "application/json",
+                },
             )
 
-        print(
-            "========== mySim DEBUG =========="
-        )
-        print(
-            "Request URL:",
-            response.request.url,
-        )
-        print(
-            "Status:",
-            response.status_code,
-        )
+        print("========== mySim DEBUG ==========")
+        print("Request URL:", response.request.url)
+        print("Status:", response.status_code)
         print(
             "Location:",
-            response.headers.get(
-                "location"
-            ),
+            response.headers.get("location"),
         )
         print(
             "Content-Type:",
-            response.headers.get(
-                "content-type"
-            ),
+            response.headers.get("content-type"),
         )
-        print(
-            "Token configured:",
-            bool(self.token),
-        )
-        print(
-            "Response body:",
-            response.text[:500],
-        )
-        print(
-            "================================="
-        )
+        print("Token configured:", bool(self.token))
+        print("=================================")
 
         content_type = response.headers.get(
             "content-type",
             "",
         )
 
-        if (
-            "application/json"
-            not in content_type
-        ):
+        if "application/json" not in content_type.lower():
             raise RuntimeError(
                 "mySim returned unexpected response "
                 f"(HTTP {response.status_code}, "
@@ -134,19 +128,20 @@ class MySimClient:
 
         data = response.json()
 
-        if data.get("status") not in (
-            200,
-            404,
-        ):
+        if not isinstance(data, dict):
             raise RuntimeError(
-                f"mySim API error: {data}"
+                "mySim API returned an invalid JSON structure"
+            )
+
+        if data.get("status") not in (200, 404):
+            raise RuntimeError(
+                f"mySim API error: status={data.get('status')}, "
+                f"msg={data.get('msg')}"
             )
 
         return data
 
-    async def _get_csrf_token(
-        self,
-    ) -> str:
+    async def _get_csrf_token(self) -> str:
         response = await self.session_client.get(
             "/login",
             params={
@@ -154,79 +149,39 @@ class MySimClient:
             },
             headers={
                 "Accept": (
-                    "text/html,"
-                    "application/xhtml+xml,"
-                    "application/xml;q=0.9,"
-                    "*/*;q=0.8"
+                    "text/html,application/xhtml+xml,"
+                    "application/xml;q=0.9,*/*;q=0.8"
                 ),
             },
         )
 
         response.raise_for_status()
 
-        html = response.text
+        parser = _CsrfTokenParser()
+        parser.feed(response.text)
 
-        patterns = [
-            (
-                r'name=["\']_csrf_token["\']'
-                r'[^>]*'
-                r'value=["\']([^"\']+)["\']'
-            ),
-            (
-                r'value=["\']([^"\']+)["\']'
-                r'[^>]*'
-                r'name=["\']_csrf_token["\']'
-            ),
-        ]
-
-        for pattern in patterns:
-            match = re.search(
-                pattern,
-                html,
-                flags=re.IGNORECASE,
-            )
-
-            if match:
-                print(
-                    "CSRF found:",
-                    True,
-                )
-
-                print(
-                    "Session cookies after login page:",
-                    self.session_client.cookies,
-                )
-
-                return match.group(1)
-
-        raise RuntimeError(
-            "Could not find mySim CSRF token "
-            "in login page"
-        )
-
-    async def login(
-        self,
-    ) -> None:
-        if (
-            not self.username
-            or not self.password
-        ):
+        if not parser.token:
             raise RuntimeError(
-                "MYSIM_USERNAME and "
-                "MYSIM_PASSWORD are not configured"
+                "Could not find mySim CSRF token "
+                "in login page"
             )
 
-        csrf_token = (
-            await self._get_csrf_token()
-        )
+        print("CSRF found: True")
 
-        print(
-            "Cookies before login_check:",
-            self.session_client.cookies,
-        )
+        return parser.token
 
+    async def login(self) -> None:
+        if not self.username or not self.password:
+            raise RuntimeError(
+                "MYSIM_USERNAME and MYSIM_PASSWORD "
+                "are not configured"
+            )
+
+        csrf_token = await self._get_csrf_token()
+
+        # El formulario actual de mySim envía POST a /login.
         response = await self.session_client.post(
-            "/login_check",
+            "/login",
             data={
                 "target_path": "",
                 "_csrf_token": csrf_token,
@@ -235,25 +190,17 @@ class MySimClient:
             },
             headers={
                 "Accept": (
-                    "text/html,"
-                    "application/xhtml+xml,"
-                    "application/xml;q=0.9,"
-                    "image/avif,"
-                    "image/webp,"
-                    "image/apng,"
-                    "*/*;q=0.8"
+                    "text/html,application/xhtml+xml,"
+                    "application/xml;q=0.9,*/*;q=0.8"
                 ),
-                "Content-Type": (
-                    "application/x-www-form-urlencoded"
-                ),
-                "Origin": self.site_base_url,
+                "Origin": self.site_origin,
                 "Referer": (
-                    f"{self.site_base_url}"
-                    "/login?partial=1"
+                    f"{self.site_base_url}/login?partial=1"
                 ),
                 "Cache-Control": "no-cache",
                 "Pragma": "no-cache",
             },
+            follow_redirects=False,
         )
 
         location = response.headers.get(
@@ -261,74 +208,42 @@ class MySimClient:
             "",
         )
 
-        print(
-            "====== mySim LOGIN DEBUG ======"
-        )
-        print(
-            "Status:",
-            response.status_code,
-        )
-        print(
-            "Location:",
-            location,
-        )
-        print(
-            "Cookies after login_check:",
-            self.session_client.cookies,
-        )
-        print(
-            "Username configured:",
-            bool(self.username),
-        )
-        print(
-            "Password configured:",
-            bool(self.password),
-        )
-        print(
-            "Password length:",
-            len(self.password or ""),
-        )
-        print(
-            "==============================="
+        location_path = (
+            urlsplit(location)
+            .path
+            .rstrip("/")
+            .lower()
         )
 
-        if response.status_code not in (
-            301,
-            302,
-            303,
-        ):
+        print("====== mySim LOGIN DEBUG ======")
+        print("Request URL:", response.request.url)
+        print("Method:", response.request.method)
+        print("Status:", response.status_code)
+        print("Location:", location)
+        print("===============================")
+
+        if response.status_code not in (302, 303):
             raise RuntimeError(
-                "mySim login failed: "
-                f"HTTP {response.status_code}"
-            )
-
-        normalized_location = (
-            location.lower()
-        )
-
-        if (
-            normalized_location.endswith(
-                "/login"
-            )
-            or "/login?" in normalized_location
-        ):
-            raise RuntimeError(
-                "mySim login failed: "
-                f"redirected to {location}"
+                "mySim login returned an unexpected response "
+                f"(HTTP {response.status_code})"
             )
 
         if (
-            "/index"
-            not in normalized_location
+            not location
+            or location_path.endswith(
+                ("/login", "/login_check")
+            )
         ):
             raise RuntimeError(
-                "mySim login returned "
-                "unexpected redirect: "
-                f"{location}"
+                "mySim did not confirm the login; "
+                "check the web credentials and login form"
             )
 
+        # La siguiente consulta verificará que la sesión
+        # permite acceder a los datos.
         print(
-            "mySim login successful"
+            "mySim login submitted; "
+            "verifying session with the next request"
         )
 
     @staticmethod
@@ -347,9 +262,18 @@ class MySimClient:
         location = response.headers.get(
             "location",
             "",
-        ).lower()
+        )
 
-        return "/login" in location
+        path = (
+            urlsplit(location)
+            .path
+            .rstrip("/")
+            .lower()
+        )
+
+        return path.endswith(
+            ("/login", "/login_check")
+        )
 
     async def get_datatable(
         self,
@@ -358,29 +282,18 @@ class MySimClient:
         params: dict[str, Any],
     ) -> dict[str, Any]:
         """
-        Consulta endpoints:
-
-        /content-datatable/<entity>
-
-        Si la sesión web no existe o ha caducado,
-        hace login automáticamente y repite.
+        Consulta DataTables utilizando la sesión web de mySim.
         """
 
-        url = (
-            f"/content-datatable/{entity}"
-        )
+        url = f"/content-datatable/{entity}"
 
         headers = {
             "Accept": (
                 "application/json, "
                 "text/javascript, */*; q=0.01"
             ),
-            "X-Requested-With": (
-                "XMLHttpRequest"
-            ),
-            "Referer": (
-                f"{self.site_base_url}/index"
-            ),
+            "X-Requested-With": "XMLHttpRequest",
+            "Referer": f"{self.site_base_url}/index",
             "Cache-Control": "no-cache",
             "Pragma": "no-cache",
         }
@@ -391,58 +304,42 @@ class MySimClient:
             headers=headers,
         )
 
-        if self._requires_login(
-            response
-        ):
+        login_attempted = False
+
+        if self._requires_login(response):
             print(
                 "mySim session missing/expired. "
                 "Logging in..."
             )
 
             await self.login()
+            login_attempted = True
 
-            response = (
-                await self.session_client.get(
-                    url,
-                    params=params,
-                    headers=headers,
-                )
+            response = await self.session_client.get(
+                url,
+                params=params,
+                headers=headers,
             )
 
-        if self._requires_login(
-            response
-        ):
-            raise RuntimeError(
-                "mySim authentication failed "
-                "after login"
-            )
-
-        print(
-            "=== mySim DATATABLE DEBUG ==="
-        )
-        print(
-            "Request URL:",
-            response.request.url,
-        )
-        print(
-            "Status:",
-            response.status_code,
-        )
+        print("=== mySim DATATABLE DEBUG ===")
+        print("Request URL:", response.request.url)
+        print("Method:", response.request.method)
+        print("Status:", response.status_code)
         print(
             "Location:",
-            response.headers.get(
-                "location"
-            ),
+            response.headers.get("location"),
         )
         print(
             "Content-Type:",
-            response.headers.get(
-                "content-type"
-            ),
+            response.headers.get("content-type"),
         )
-        print(
-            "============================="
-        )
+        print("Login attempted:", login_attempted)
+        print("=============================")
+
+        if self._requires_login(response):
+            raise RuntimeError(
+                "mySim authentication failed after login"
+            )
 
         response.raise_for_status()
 
@@ -451,18 +348,22 @@ class MySimClient:
             "",
         )
 
-        if (
-            "application/json"
-            not in content_type
-        ):
+        if "application/json" not in content_type.lower():
             raise RuntimeError(
-                "mySim datatable returned "
-                "unexpected response "
+                "mySim datatable returned unexpected response "
                 f"(HTTP {response.status_code}, "
                 f"{content_type})"
             )
 
-        return response.json()
+        data = response.json()
+
+        if not isinstance(data, dict):
+            raise RuntimeError(
+                "mySim datatable returned "
+                "an invalid JSON structure"
+            )
+
+        return data
 
 
 mysim_client = MySimClient()

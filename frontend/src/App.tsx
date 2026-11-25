@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
 import {
@@ -8,6 +8,7 @@ import {
   Routes,
 } from "react-router-dom";
 
+import { setDataCacheSession } from "./api/dataCache";
 import { NfcLogin } from "./components/NfcLogin";
 import { AppLayout } from "./layouts/AppLayout";
 
@@ -16,6 +17,9 @@ import { Jobs } from "./pages/Jobs/Jobs";
 import { DRs } from "./pages/DRs/DRs";
 import { Actions } from "./pages/Actions/Actions";
 import { Tasks } from "./pages/Tasks/Tasks";
+import { Team } from "./pages/Team/Team";
+import { Briefings } from "./pages/Briefings/Briefings";
+import { MaintenanceKpis } from "./pages/MaintenanceKpis/MaintenanceKpis";
 
 type AuthStatus =
   | "checking"
@@ -23,16 +27,24 @@ type AuthStatus =
   | "unauthenticated"
   | "unavailable";
 
-function AuthGate({ children }: { children: ReactNode }) {
+function AuthGate({
+  children,
+}: {
+  children: (canViewKpis: boolean) => ReactNode;
+}) {
   const [status, setStatus] = useState<AuthStatus>("checking");
   const [attempt, setAttempt] = useState(0);
+  const [session, setSession] = useState<{
+    identity: string;
+    canViewKpis: boolean;
+  } | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
 
     async function checkSession() {
       setStatus((current) =>
-        current === "unavailable" ? "checking" : current
+        current === "unavailable" ? "checking" : current,
       );
 
       try {
@@ -45,15 +57,43 @@ function AuthGate({ children }: { children: ReactNode }) {
           },
         );
 
+        if (controller.signal.aborted) return;
+
         if (response.ok) {
+          const user = await response.json();
+
+          if (controller.signal.aborted) return;
+
+          if (
+            typeof user?.user_id !== "string" ||
+            !user.user_id ||
+            !["viewer", "editor", "admin"].includes(user.role)
+          ) {
+            throw new Error("Invalid session");
+          }
+
+          const identity = `${user.user_id}:${user.role}`;
+
+          setDataCacheSession(identity);
+          setSession({
+            identity,
+            canViewKpis: user.role === "editor" || user.role === "admin",
+          });
           setStatus("authenticated");
-        } else if (response.status === 401) {
-          setStatus("unauthenticated");
         } else {
-          setStatus("unavailable");
+          setDataCacheSession(null);
+          setSession(null);
+
+          setStatus(
+            response.status === 401
+              ? "unauthenticated"
+              : "unavailable",
+          );
         }
       } catch {
         if (!controller.signal.aborted) {
+          setDataCacheSession(null);
+          setSession(null);
           setStatus("unavailable");
         }
       }
@@ -112,17 +152,20 @@ function AuthGate({ children }: { children: ReactNode }) {
   }, []);
 
   if (status === "checking") {
-    return <main>Comprobando sesión…</main>;
+    return <main>Checking session…</main>;
   }
 
   if (status === "unauthenticated") {
     return (
       <main>
         <h1>mySim Dashboard</h1>
+
         <NfcLogin requestSessionCheck={setAttempt} />
-        <p>También puedes iniciar sesión con contraseña.</p>
+
+        <p>You can also sign in with your password.</p>
+
         <a href="http://127.0.0.1:8000/auth/login">
-          Iniciar sesión con contraseña
+          Sign in with your password
         </a>
       </main>
     );
@@ -131,62 +174,83 @@ function AuthGate({ children }: { children: ReactNode }) {
   if (status === "unavailable") {
     return (
       <main>
-        <h1>No se pudo comprobar la sesión</h1>
+        <h1>Could not verify your session</h1>
+
         <button
           type="button"
           onClick={() => setAttempt((value) => value + 1)}
         >
-          Reintentar
+          Retry
         </button>
       </main>
     );
   }
 
-  return <>{children}</>;
+  return (
+    <Fragment key={session?.identity}>
+      {children(session?.canViewKpis ?? false)}
+    </Fragment>
+  );
 }
 
 export default function App() {
   return (
     <BrowserRouter>
       <AuthGate>
-        <Routes>
-          <Route element={<AppLayout />}>
-            <Route
-              index
-              element={
-                <Navigate
-                  to="/availability"
-                  replace
-                />
-              }
-            />
+        {canViewKpis => (
+          <Routes>
+            <Route element={<AppLayout canViewKpis={canViewKpis} />}>
+              <Route
+                index
+                element={
+                  <Navigate
+                    to="/availability"
+                    replace
+                  />
+                }
+              />
 
-            <Route
-              path="availability"
-              element={<Availability />}
-            />
+              <Route
+                path="availability"
+                element={<Availability />}
+              />
 
-            <Route
-              path="jobs"
-              element={<Jobs />}
-            />
+              <Route
+                path="jobs"
+                element={<Jobs />}
+              />
 
-            <Route
-              path="drs"
-              element={<DRs />}
-            />
+              <Route
+                path="drs"
+                element={<DRs />}
+              />
 
-            <Route
-              path="actions"
-              element={<Actions />}
-            />
+              <Route
+                path="actions"
+                element={<Actions />}
+              />
 
-            <Route
-              path="tasks"
-              element={<Tasks />}
-            />
-          </Route>
-        </Routes>
+              <Route
+                path="tasks"
+                element={<Tasks />}
+              />
+
+              <Route
+                path="team"
+                element={<Team />}
+              />
+
+              <Route
+                path="briefings"
+                element={<Briefings />}
+              />
+              <Route
+                path="maintenance-kpis"
+                element={canViewKpis ? <MaintenanceKpis /> : <Navigate to="/availability" replace />}
+              />
+            </Route>
+          </Routes>
+        )}
       </AuthGate>
     </BrowserRouter>
   );

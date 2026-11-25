@@ -1,0 +1,104 @@
+.briefings-calendar-section { margin-bottom: 24px; }
+.briefings-calendar-select { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.briefings-calendar-select label { display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--airbus-primary, #00205b); }
+.briefings-calendar-select select, .briefing-calendar__toolbar input[type="date"] { box-sizing: border-box; padding: 6px 8px; border: 1px solid var(--airbus-border, #d8e0e5); border-radius: 4px; color: inherit; background: var(--airbus-surface, #fff); font: inherit; max-width: 100%; }
+.briefing-calendar { min-width: 0; }
+.briefing-calendar__toolbar { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+.briefing-calendar__toolbar label { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--airbus-text-secondary, #5f7482); }
+.briefing-calendar__toolbar > span { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; }
+.briefing-calendar__toolbar > button { margin-left: auto; }
+.briefing-calendar__full-day input { width: 14px; height: 14px; margin: 0; accent-color: var(--airbus-primary, #00205b); }
+.briefing-calendar__hint { margin: 10px 0; color: var(--airbus-text-secondary, #5f7482); font-size: 12px; line-height: 1.4; }
+.briefing-calendar__viewport { overflow: auto; max-height: 580px; border: 1px solid var(--airbus-border, #d8e0e5); border-radius: 4px; background: var(--airbus-surface, #fff); }
+.briefing-calendar__table { display: grid; min-width: 100%; width: max-content; }
+.briefing-calendar__corner, .briefing-calendar__person { position: sticky; top: 0; z-index: 3; min-height: 40px; box-sizing: border-box; padding: 10px 12px; border-right: 1px solid #edf0f3; border-bottom: 1px solid var(--airbus-border, #d8e0e5); background: var(--airbus-surface, #fff); color: var(--airbus-primary, #00205b); font-size: 12px; }
+.briefing-calendar__person { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.briefing-calendar__person > span { display: flex; color: #005587; }
+.briefing-calendar__corner { left: 0; z-index: 5; }
+.briefing-calendar__hours { position: sticky; left: 0; z-index: 2; background: var(--airbus-surface, #fff); border-right: 1px solid #edf0f3; }
+.briefing-calendar__hours time { position: absolute; left: 12px; padding-top: 4px; color: var(--airbus-text-muted, #7f919c); font-size: 11px; }
+.briefing-calendar__column { position: relative; min-width: 0; border-right: 1px solid #edf0f3; background: repeating-linear-gradient(to bottom, transparent 0, transparent 89px, #edf0f3 89px, #edf0f3 90px); }
+.briefing-calendar__block {
+  position: absolute;
+  display: flex;
+  align-items: flex-start;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid #d8e0e5;
+  border-left: 3px solid #005587;
+  border-radius: 3px;
+  background: #f8fafc;
+  color: var(--airbus-text-body, #243746);
+}
+.briefing-calendar__block.briefing-calendar__event--dr { border-left-color: #b42338; }
+.briefing-calendar__block.briefing-calendar__event--action { border-left-color: #8656a0; }
+.briefing-calendar__block.briefing-calendar__event--task { border-left-color: #367d59; }
+.briefing-calendar__block.briefing-calendar__event--manual { border-left-color: #6b7785; }
+.briefings-page .briefing-calendar__block > button.briefing-calendar__open-event {
+  display: block;
+  flex: 1;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  padding: 4px 5px;
+  border: 0;
+  text-align: left;
+  align-content: start;
+  font-size: 11px;
+  line-height: 1.2;
+  color: inherit;
+  background: transparent;
+}
+.briefings-page .briefing-calendar__block--short > button.briefing-calendar__open-event { padding: 0 5px; font-size: 9px; }
+.briefing-calendar__block:hover, .briefing-calendar__block:focus-within { background: #eaf1f6; }
+.briefing-calendar__block strong, .briefing-calendar__block small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.briefing-calendar__block small { font-size: 10px; color: var(--airbus-text-secondary, #5f7482); }
+.briefing-task-execution.is-compact { padding: 3px 3px 0 0; }
+.briefing-task-execution.is-compact .briefing-task-execution__actions { flex-wrap: nowrap; gap: 2px; }
+.briefings-page .briefing-task-execution.is-compact button { padding: 3px; min-width: 20px; min-height: 20px; }
+.briefing-task-execution.is-compact .briefing-task-execution__error { max-width: 42px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.briefing-calendar__empty { padding: 24px; background: var(--airbus-surface, #fff); border: 1px solid var(--airbus-border, #d8e0e5); border-radius: 4px; color: var(--airbus-text-secondary, #5f7482); font-size: 13px; }
+.briefing-calendar__pending { margin-top: 14px; }
+.briefing-calendar__pending h3 { margin: 0 0 8px; color: var(--airbus-primary, #00205b); font-size: 13px; }
+.briefing-calendar__pending h3 span { color: var(--airbus-text-muted, #7f919c); }
+.briefing-calendar__pending-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 6px; }
+.briefing-calendar__pending-grid span, .briefing-calendar__pending-grid small { font-size: 11px; color: var(--airbus-text-secondary, #5f7482); }
+@media (max-width: 600px) { .briefings-calendar-select label { display: grid; width: 100%; } .briefing-calendar__toolbar > button { margin-left: 0; } .briefing-calendar__viewport { max-height: 480px; } }
+
+.briefing-calendar__pending-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border: 1px solid var(--airbus-border, #d8e0e5);
+  border-radius: 4px;
+  background: var(--airbus-surface, #fff);
+}
+.briefings-page .briefing-calendar__pending-card > button.briefing-calendar__pending-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.briefing-calendar__pending-card .briefing-task-execution { padding: 8px 10px; border-top: 1px solid var(--airbus-border, #d8e0e5); }
+.briefing-task-execution { display: grid; gap: 6px; color: var(--airbus-text-body, #243746); font-size: 12px; }
+.briefing-task-execution__summary, .briefing-task-execution__actions { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; }
+.briefing-task-execution__summary [role="status"] { font-weight: 600; }
+.briefing-task-execution__summary [aria-label] { font-variant-numeric: tabular-nums; }
+.briefing-task-execution__actions button { display: inline-flex; align-items: center; gap: 5px; }
+.briefing-task-execution__dates { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 4px 0 0; }
+.briefing-task-execution__dates dt { font-weight: 600; }
+.briefing-task-execution__dates dd { margin: 2px 0 0; }
+.briefing-task-execution__error { margin: 0; color: #b42338; }
+.briefing-task-controls > label { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; padding: 6px 10px; font-size: 12px; }
+.briefing-task-controls > label select { max-width: 100%; min-width: 0; padding: 4px; color: inherit; font: inherit; }
+.briefing-calendar__block.is-completed,
+.briefing-calendar__pending-card.is-completed { border-color: #007a73; background: #d0f3ee; }
+.briefing-task-execution__performers fieldset { display: grid; gap: 5px; min-width: 0; margin: 0 0 4px; border: 1px solid #92a9ba; }
+.briefing-task-execution__performers label { display: flex; gap: 6px; align-items: baseline; overflow-wrap: anywhere; }
+.briefing-task-execution__performers button { margin: 3px 4px 0 0; }

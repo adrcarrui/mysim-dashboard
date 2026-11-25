@@ -7,21 +7,24 @@ import {
 } from "react-router-dom";
 
 import {
+  Users,
   LayoutDashboard,
   BriefcaseBusiness,
   FileWarning,
   ListChecks,
   CalendarClock,
-  CalendarRange,
+  ClipboardList,
+  ChartNoAxesColumn,
+  LogOut,
 } from "lucide-react";
 
 import {
   AirbusLayout,
   AirbusClock,
 } from "../airbus-ui";
+import { setDataCacheSession } from "../api/dataCache";
 
-
-export function AppLayout() {
+export function AppLayout({ canViewKpis = false }: { canViewKpis?: boolean }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -45,12 +48,13 @@ export function AppLayout() {
           <AirbusClock />
 
           <form
+            onSubmit={() => setDataCacheSession(null)}
             method="post"
             action="http://127.0.0.1:8000/auth/logout"
             style={{ margin: 0 }}
           >
             <button type="submit">
-              Cerrar sesión
+              <LogOut size={20} strokeWidth={1.8} aria-hidden="true" />
             </button>
           </form>
         </div>
@@ -77,11 +81,21 @@ export function AppLayout() {
           ),
           active:
             location.pathname === "/" ||
-            location.pathname === "/dashboard",
+            location.pathname === "/availability",
           onClick: () =>
-            navigate("/dashboard"),
+            navigate("/availability"),
         },
-
+        {
+          label: "Briefings",
+          icon: (
+            <ClipboardList
+              size={20}
+              strokeWidth={1.8}
+            />
+          ),
+          active: location.pathname === "/briefings",
+          onClick: () => navigate("/briefings"),
+        },
         {
           label: "Jobs",
           icon: (
@@ -140,19 +154,23 @@ export function AppLayout() {
             navigate("/tasks"),
         },
         {
-          label: "Availability",
+          label: "Team",
           icon: (
-            <CalendarRange
+            <Users
               size={20}
               strokeWidth={1.8}
             />
           ),
-          active:
-            location.pathname === "/" ||
-            location.pathname === "/availability",
-          onClick: () =>
-            navigate("/availability"),
+          active: location.pathname === "/team",
+          onClick: () => navigate("/team"),
         },
+
+        ...(canViewKpis ? [{
+          label: "KPIs",
+          icon: <ChartNoAxesColumn size={20} strokeWidth={1.8} />,
+          active: location.pathname === "/maintenance-kpis",
+          onClick: () => navigate("/maintenance-kpis"),
+        }] : []),
       ]}
     >
       <Outlet />

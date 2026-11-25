@@ -31,7 +31,11 @@ from starlette.middleware.sessions import SessionMiddleware
 from app.api.auth import router as auth_router
 from app.api.auth_guard import require_mysim_session
 from app.version import APP_VERSION
-
+from app.api.team import router as team_router
+from app.services.dashboard_cache_worker import (
+    run_dashboard_cache_refresh,
+)
+from app.api.briefings import router as briefings_router
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -99,12 +103,17 @@ async def lifespan(app: FastAPI):
         run_query_cache_cleanup()
     )
 
+    dashboard_cache_task = asyncio.create_task(
+        run_dashboard_cache_refresh()
+    )
+
     yield
 
     synchronization_task.cancel()
     reference_data_task.cancel()
     scheduled_tasks_task.cancel()
     query_cache_cleanup_task.cancel()
+    dashboard_cache_task.cancel()
 
     with suppress(asyncio.CancelledError):
         await synchronization_task
@@ -117,6 +126,9 @@ async def lifespan(app: FastAPI):
 
     with suppress(asyncio.CancelledError):
         await query_cache_cleanup_task
+
+    with suppress(asyncio.CancelledError):
+        await dashboard_cache_task
 
     await close_database_connection()
 
@@ -210,6 +222,8 @@ app.include_router(
 )
 
 app.include_router(auth_router)
+app.include_router(team_router)
+app.include_router(briefings_router)
 
 @app.get("/")
 async def root():

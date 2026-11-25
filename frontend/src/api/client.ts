@@ -1,3 +1,5 @@
+import { setDataCacheSession } from "./dataCache";
+
 export async function apiFetch(
   input: RequestInfo | URL,
   init?: RequestInit,
@@ -8,6 +10,8 @@ export async function apiFetch(
   });
 
   if (response.status === 401) {
+    setDataCacheSession(null);
+
     window.dispatchEvent(
       new Event("mysim:session-invalid"),
     );

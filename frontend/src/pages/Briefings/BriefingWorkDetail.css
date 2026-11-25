@@ -1,0 +1,32 @@
+.briefing-work-detail { box-sizing: border-box; width: min(1100px, calc(100vw - 32px)); max-width: none; max-height: calc(100dvh - 32px); margin: auto; padding: 0; border: 1px solid var(--airbus-border, #d8e0e5); border-radius: 8px; background: var(--airbus-surface, #fff); color: var(--airbus-text-body, #243746); text-align: left; box-shadow: 0 14px 50px rgb(0 32 91 / 20%); overflow: hidden; }
+.briefing-work-detail[open] { display: flex; flex-direction: column; }
+.briefing-work-detail::backdrop { background: rgb(0 20 50 / 38%); }
+.briefing-work-detail__header { display: flex; justify-content: space-between; gap: 20px; flex-shrink: 0; padding: 18px 20px; border-bottom: 1px solid var(--airbus-border, #d8e0e5); }
+.briefing-work-detail__header > div { min-width: 0; }
+.briefing-work-detail__header span { color: var(--airbus-text-secondary, #5f7482); font-size: 12px; }
+.briefing-work-detail__header h2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin: 6px 0 0; color: var(--airbus-primary, #00205b); font-size: 18px; line-height: 1.4; overflow-wrap: anywhere; }
+.briefing-work-detail__header button { display: grid; place-items: center; align-self: flex-start; }
+.briefing-work-detail__body { flex: 1; min-height: 0; overflow-y: auto; padding: 16px 20px; text-align: left; }
+.briefing-work-detail__body section { width: 100%; min-width: 0; text-align: left; }
+.briefing-work-detail__body section > :not(h3) { box-sizing: border-box; padding-inline-start: 20px; }
+.briefing-work-detail__body section + section { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--airbus-border, #d8e0e5); }
+.briefing-work-detail h3 { margin: 0 0 14px; font-size: 17px; font-weight: 700; line-height: 1.4; color: var(--airbus-primary, #00205b); }
+.briefing-work-detail__fields { display: grid; width: 100%; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: 8px 24px; margin: 0; text-align: left; }
+.briefing-work-detail__fields > div { min-width: 0; line-height: 1.6; }
+.briefing-work-detail__fields dt, .briefing-work-detail__text h4 { margin: 0 0 4px; font-size: 13px; font-weight: 600; color: var(--airbus-primary, #00205b); }
+.briefing-work-detail__fields dt, .briefing-work-detail__fields dd { display: inline; margin: 0; font-size: 13px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.briefing-work-detail__fields dt::after { content: ": "; }
+.briefing-work-detail__text { margin-top: 10px; line-height: 1.6; }
+.briefing-work-detail__text:not(.briefing-work-detail__text--description) h4,
+.briefing-work-detail__text:not(.briefing-work-detail__text--description) p { display: inline; font-size: 13px; }
+.briefing-work-detail__text:not(.briefing-work-detail__text--description) h4::after { content: ": "; }
+.briefing-work-detail__text--description { margin-top: 16px; }
+.briefing-work-detail__text--description h4 { font-size: 14px; }
+.briefing-work-detail__text p { margin: 0; font-size: 13px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.briefing-work-detail__muted { margin: 16px 0 0; font-size: 11px; color: var(--airbus-text-muted, #7f919c); }
+.briefing-work-detail__error { margin-bottom: 16px; padding: 12px; border-left: 3px solid var(--airbus-warning, #fe5000); background: #fff6e9; font-size: 13px; }
+.briefing-work-detail__error p { margin: 0 0 10px; }
+.briefing-work-detail__footer { display: flex; justify-content: flex-end; flex-shrink: 0; gap: 10px; padding: 12px 20px; border-top: 1px solid var(--airbus-border, #d8e0e5); }
+.briefing-work-detail :focus-visible { outline: 2px solid var(--airbus-primary, #00205b); outline-offset: 3px; }
+@media (max-width: 950px) { .briefing-work-detail__fields { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 18px; } }
+@media (max-width: 600px) { .briefing-work-detail { width: calc(100vw - 16px); max-height: calc(100dvh - 16px); } .briefing-work-detail__fields { grid-template-columns: minmax(0, 1fr); } .briefing-work-detail__header, .briefing-work-detail__body { padding: 14px; } .briefing-work-detail__body section > :not(h3) { padding-inline-start: 12px; } }

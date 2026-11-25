@@ -1,42 +1,20 @@
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from "react"
+import { useMemo, useState } from "react";
 
-import {
-  getOpenJobs,
-} from "../../api/jobs"
+import { getOpenJobs } from "../../api/jobs";
+import type { Job } from "../../types/job";
 
-import type {
-  Job,
-} from "../../types/job"
+import { useCachedQuery } from "../../hooks/useCachedQuery";
 
-import {
-  DeviceJobCard,
-} from "../../components/DeviceJobCard"
+import { DeviceJobCard } from "../../components/DeviceJobCard";
+import { JobDeviceModal } from "../../components/JobDeviceModal";
 
-import {
-  JobDeviceModal,
-} from "../../components/JobDeviceModal"
+import a400mImage from "../../assets/devices/a400m.png";
+import mrttImage from "../../assets/devices/mrtt.png";
+import c295Ts03Image from "../../assets/devices/c295-ts03.png";
+import c295Image from "../../assets/devices/c295.png";
+import cn235Image from "../../assets/devices/cn235.png";
 
-import a400mImage
-  from "../../assets/devices/a400m.png"
-
-import mrttImage
-  from "../../assets/devices/mrtt.png"
-
-import c295Ts03Image
-  from "../../assets/devices/c295-ts03.png"
-
-import c295Image
-  from "../../assets/devices/c295.png"
-
-import cn235Image
-  from "../../assets/devices/cn235.png"
-
-import "./Jobs.css"
-
+import "./Jobs.css";
 
 const FFS_DEVICES = [
   {
@@ -64,460 +42,258 @@ const FFS_DEVICES = [
     label: "CN235",
     image: cn235Image,
   },
-] as const
-
+] as const;
 
 const FFS_DEVICE_SET: ReadonlySet<string> = new Set(
-  FFS_DEVICES.map(
-    (device) =>
-      device.rawName
-  )
-)
+  FFS_DEVICES.map((device) => device.rawName),
+);
 
+const EMPTY_JOBS: Job[] = [];
 
 interface DeviceSummary {
-  device: string
-  total: number
-  overdue: number
-  today: number
-  upcoming: number
+  device: string;
+  total: number;
+  overdue: number;
+  today: number;
+  upcoming: number;
 }
-
 
 function buildDeviceSummary(
   device: string,
   jobs: Job[],
 ): DeviceSummary {
-  const deviceJobs =
-    jobs.filter(
-      (job) =>
-        job.device_name ===
-        device
-    )
+  const deviceJobs = jobs.filter(
+    (job) => job.device_name === device,
+  );
 
   return {
     device,
+    total: deviceJobs.length,
 
-    total:
-      deviceJobs.length,
+    overdue: deviceJobs.filter(
+      (job) =>
+        job.days_remaining !== null &&
+        job.days_remaining < 0,
+    ).length,
 
-    overdue:
-      deviceJobs.filter(
-        (job) =>
-          job.days_remaining !== null &&
-          job.days_remaining < 0
-      ).length,
+    today: deviceJobs.filter(
+      (job) => job.days_remaining === 0,
+    ).length,
 
-    today:
-      deviceJobs.filter(
-        (job) =>
-          job.days_remaining === 0
-      ).length,
-
-    upcoming:
-      deviceJobs.filter(
-        (job) =>
-          job.days_remaining !== null &&
-          job.days_remaining > 0
-      ).length,
-  }
+    upcoming: deviceJobs.filter(
+      (job) =>
+        job.days_remaining !== null &&
+        job.days_remaining > 0,
+    ).length,
+  };
 }
 
-
 export function Jobs() {
-  const [
-    jobs,
-    setJobs,
-  ] = useState<Job[]>([])
-
-  const [
+  const {
+    data: jobs = EMPTY_JOBS,
     loading,
-    setLoading,
-  ] = useState(true)
-
-  const [
+    refreshing,
     error,
-    setError,
-  ] = useState<string | null>(
-    null
-  )
+    refresh,
+  } = useCachedQuery<Job[]>(
+    "jobs:open",
+    getOpenJobs,
+  );
 
-  const [
-    selectedDevice,
-    setSelectedDevice,
-  ] = useState<string | null>(
-    null
-  )
+  const [selectedDevice, setSelectedDevice] =
+    useState<string | null>(null);
 
+  const ffsSummaries = useMemo(
+    () =>
+      FFS_DEVICES.map((device) => ({
+        ...device,
+        summary: buildDeviceSummary(
+          device.rawName,
+          jobs,
+        ),
+      })),
+    [jobs],
+  );
 
-  useEffect(() => {
-    let cancelled = false
+  const otherDevices = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          jobs
+            .map((job) => job.device_name)
+            .filter(
+              (device): device is string =>
+                device !== null &&
+                !FFS_DEVICE_SET.has(device),
+            ),
+        ),
+      ),
+    [jobs],
+  );
 
-    async function loadJobs() {
-      try {
-        setLoading(true)
-        setError(null)
-
-        const data =
-          await getOpenJobs()
-
-        if (!cancelled) {
-          setJobs(data)
-        }
-      } catch (err) {
-        console.error(
-          "Error loading jobs:",
-          err
+  const otherSummaries = useMemo(
+    () =>
+      otherDevices
+        .map((device) =>
+          buildDeviceSummary(device, jobs),
         )
+        .sort((a, b) => {
+          if (b.total !== a.total) {
+            return b.total - a.total;
+          }
 
-        if (!cancelled) {
-          setError(
-            "Unable to load open jobs."
-          )
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false)
-        }
-      }
+          return a.device.localeCompare(b.device);
+        }),
+    [otherDevices, jobs],
+  );
+
+  const selectedDeviceJobs = useMemo(() => {
+    if (!selectedDevice) {
+      return [];
     }
 
-    loadJobs()
+    return jobs.filter(
+      (job) => job.device_name === selectedDevice,
+    );
+  }, [jobs, selectedDevice]);
 
-    return () => {
-      cancelled = true
+  const selectedDeviceLabel = useMemo(() => {
+    if (!selectedDevice) {
+      return null;
     }
-  }, [])
 
+    const ffsDevice = FFS_DEVICES.find(
+      (device) => device.rawName === selectedDevice,
+    );
 
-  const ffsSummaries =
-    useMemo(
-      () =>
-        FFS_DEVICES.map(
-          (device) => ({
-            ...device,
-
-            summary:
-              buildDeviceSummary(
-                device.rawName,
-                jobs,
-              ),
-          })
-        ),
-      [jobs]
-    )
-
-
-  const otherDevices =
-    useMemo(
-      () =>
-        Array.from(
-          new Set(
-            jobs
-              .map(
-                (job) =>
-                  job.device_name
-              )
-              .filter(
-                (
-                  device
-                ): device is string =>
-                  device !== null &&
-                  !FFS_DEVICE_SET.has(
-                    device
-                  )
-              )
-          )
-        ),
-      [jobs]
-    )
-
-
-  const otherSummaries =
-    useMemo(
-      () =>
-        otherDevices
-          .map(
-            (device) =>
-              buildDeviceSummary(
-                device,
-                jobs,
-              )
-          )
-          .sort(
-            (a, b) => {
-              if (
-                b.total !==
-                a.total
-              ) {
-                return (
-                  b.total -
-                  a.total
-                )
-              }
-
-              return (
-                a.device.localeCompare(
-                  b.device
-                )
-              )
-            }
-          ),
-      [
-        otherDevices,
-        jobs,
-      ]
-    )
-
-
-  const selectedDeviceJobs =
-    useMemo(
-      () => {
-        if (!selectedDevice) {
-          return []
-        }
-
-        return jobs.filter(
-          (job) =>
-            job.device_name ===
-            selectedDevice
-        )
-      },
-      [
-        jobs,
-        selectedDevice,
-      ]
-    )
-
-
-  const selectedDeviceLabel =
-    useMemo(
-      () => {
-        if (!selectedDevice) {
-          return null
-        }
-
-        const ffsDevice =
-          FFS_DEVICES.find(
-            (device) =>
-              device.rawName ===
-              selectedDevice
-          )
-
-        return (
-          ffsDevice?.label ??
-          selectedDevice
-        )
-      },
-      [
-        selectedDevice,
-      ]
-    )
-
+    return ffsDevice?.label ?? selectedDevice;
+  }, [selectedDevice]);
 
   return (
     <main className="jobs-page">
-
       <header className="jobs-page__header">
-
         <div>
           <h1 className="jobs-page__title">
             Jobs
           </h1>
-        </div>
 
+          <button
+            type="button"
+            onClick={refresh}
+            disabled={loading || refreshing}
+          >
+            {refreshing ? "Actualizando…" : "Actualizar"}
+          </button>
+        </div>
 
         <div className="jobs-page__total">
-
-          <strong>
-            {jobs.length}
-          </strong>
-
-          <span>
-            jobs
-          </span>
-
+          <strong>{jobs.length}</strong>
+          <span>jobs</span>
         </div>
-
       </header>
 
-
       {loading && (
-        <div className="jobs-page__state">
+        <div
+          className="jobs-page__state"
+          role="status"
+        >
           Loading open jobs...
         </div>
       )}
 
+      {!loading && refreshing && (
+        <p role="status">
+          Actualizando Jobs en segundo plano…
+        </p>
+      )}
 
-      {!loading &&
-        error && (
-          <div
-            className="
-              jobs-page__state
-              jobs-page__state--error
-            "
-          >
-            {error}
-          </div>
-        )}
+      {!loading && error && (
+        <div
+          className="jobs-page__state jobs-page__state--error"
+          role="alert"
+        >
+          {error}
 
+          {jobs.length > 0 && (
+            <p>
+              Se muestran los últimos datos disponibles.
+            </p>
+          )}
+        </div>
+      )}
 
-      {!loading &&
-        !error &&
-        jobs.length === 0 && (
-          <div className="jobs-page__state">
-            No open jobs found.
-          </div>
-        )}
+      {!loading && !error && jobs.length === 0 && (
+        <div className="jobs-page__state">
+          No open jobs found.
+        </div>
+      )}
 
+      {!loading && jobs.length > 0 && (
+        <div className="jobs-page__content">
+          <section className="jobs-device-section">
+            <div className="jobs-device-section__header">
+              <h2>FFS</h2>
+              <span>Full Flight Simulators</span>
+            </div>
 
-      {!loading &&
-        !error &&
-        jobs.length > 0 && (
-          <div className="jobs-page__content">
+            <div className="jobs-device-grid jobs-device-grid--ffs">
+              {ffsSummaries.map(
+                ({ rawName, label, image }) => {
+                  const deviceJobs = jobs.filter(
+                    (job) =>
+                      job.device_name === rawName,
+                  );
 
-            <section className="jobs-device-section">
+                  return (
+                    <DeviceJobCard
+                      key={rawName}
+                      deviceName={label}
+                      jobs={deviceJobs}
+                      image={image}
+                      onClick={() =>
+                        setSelectedDevice(rawName)
+                      }
+                    />
+                  );
+                },
+              )}
+            </div>
+          </section>
 
-              <div className="jobs-device-section__header">
+          <section className="jobs-device-section">
+            <div className="jobs-device-section__header">
+              <h2>Others</h2>
+              <span>Other training devices</span>
+            </div>
 
-                <h2>
-                  FFS
-                </h2>
+            <div className="jobs-device-grid">
+              {otherSummaries.map((summary) => {
+                const deviceJobs = jobs.filter(
+                  (job) =>
+                    job.device_name === summary.device,
+                );
 
-                <span>
-                  Full Flight Simulators
-                </span>
-
-              </div>
-
-
-              <div
-                className="
-                  jobs-device-grid
-                  jobs-device-grid--ffs
-                "
-              >
-
-                {ffsSummaries.map(
-                  ({
-                    rawName,
-                    label,
-                    image,
-                  }) => {
-
-                    const deviceJobs =
-                      jobs.filter(
-                        (job) =>
-                          job.device_name ===
-                          rawName
-                      )
-
-                    return (
-                      <DeviceJobCard
-                        key={rawName}
-
-                        deviceName={
-                          label
-                        }
-
-                        jobs={
-                          deviceJobs
-                        }
-
-                        image={
-                          image
-                        }
-
-                        onClick={() =>
-                          setSelectedDevice(
-                            rawName
-                          )
-                        }
-                      />
-                    )
-                  }
-                )}
-
-              </div>
-
-            </section>
-
-
-            <section className="jobs-device-section">
-
-              <div className="jobs-device-section__header">
-
-                <h2>
-                  Others
-                </h2>
-
-                <span>
-                  Other training devices
-                </span>
-
-              </div>
-
-
-              <div className="jobs-device-grid">
-
-                {otherSummaries.map(
-                  (summary) => {
-
-                    const deviceJobs =
-                      jobs.filter(
-                        (job) =>
-                          job.device_name ===
-                          summary.device
-                      )
-
-                    return (
-                      <DeviceJobCard
-                        key={
-                          summary.device
-                        }
-
-                        deviceName={
-                          summary.device
-                        }
-
-                        jobs={
-                          deviceJobs
-                        }
-
-                        onClick={() =>
-                          setSelectedDevice(
-                            summary.device
-                          )
-                        }
-                      />
-                    )
-                  }
-                )}
-
-              </div>
-
-            </section>
-
-          </div>
-        )}
-
+                return (
+                  <DeviceJobCard
+                    key={summary.device}
+                    deviceName={summary.device}
+                    jobs={deviceJobs}
+                    onClick={() =>
+                      setSelectedDevice(summary.device)
+                    }
+                  />
+                );
+              })}
+            </div>
+          </section>
+        </div>
+      )}
 
       <JobDeviceModal
-        device={
-          selectedDeviceLabel
-        }
-
-        jobs={
-          selectedDeviceJobs
-        }
-
-        onClose={() =>
-          setSelectedDevice(
-            null
-          )
-        }
+        device={selectedDeviceLabel}
+        jobs={selectedDeviceJobs}
+        onClose={() => setSelectedDevice(null)}
       />
-
     </main>
-  )
+  );
 }
