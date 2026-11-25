@@ -33,12 +33,9 @@ function normalizeTask(record: Record<string, unknown>): CatalogTask | null {
 
 export function useBriefingTaskCatalog(revision: number) {
   const [tasks, setTasks] = useState<CatalogTask[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [result, setResult] = useState<{ revision: number; error: string } | null>(null);
   useEffect(() => {
     const abort = new AbortController();
-    setLoading(true);
-    setError("");
     async function load() {
       try {
         const response = await apiFetch(BASE + "/api/tasks/upcoming?days=31", { signal: abort.signal, cache: "no-store" });
@@ -52,14 +49,16 @@ export function useBriefingTaskCatalog(revision: number) {
           if (entry?.item.source_id) byId.set(entry.item.source_id, entry);
         }
         setTasks([...byId.values()]);
+        setResult({ revision, error: "" });
       } catch (failure) {
-        if (!abort.signal.aborted) setError(failure instanceof Error ? failure.message : "Could not load tasks");
-      } finally {
-        if (!abort.signal.aborted) setLoading(false);
+        if (!abort.signal.aborted) {
+          setResult({ revision, error: failure instanceof Error ? failure.message : "Could not load tasks" });
+        }
       }
     }
     void load();
     return () => abort.abort();
   }, [revision]);
-  return { tasks, loading, error };
+  const loading = result?.revision !== revision;
+  return { tasks, loading, error: loading ? "" : result?.error ?? "" };
 }

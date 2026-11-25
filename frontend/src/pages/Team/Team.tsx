@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { apiFetch } from "../../api/client";
 
 type DirectoryUser = {
@@ -101,79 +101,88 @@ export function Team() {
     useState<TeamHistoryResponse | null>(null);
   const [historyLoading, setHistoryLoading] = useState(true);
   const [historyError, setHistoryError] = useState("");
+  const historyRequest = useRef(0);
 
   const loadPendingATurnos = useCallback(
-    async (signal?: AbortSignal) => {
-      setPendingLoading(true);
-      setPendingError("");
-      setPendingATurnos(null);
+    (signal?: AbortSignal) =>
+      getJson<PendingATurnosResponse>(
+        "/api/team/aturnos-candidates",
+        { signal },
+      )
+        .then((data) => {
+          if (
+            data.complete !== true ||
+            !Array.isArray(data.users) ||
+            !Array.isArray(data.review_required)
+          ) {
+            throw new Error("La consulta de candidatos está incompleta");
+          }
 
-      try {
-        const data = await getJson<PendingATurnosResponse>(
-          "/api/team/aturnos-candidates",
-          { signal },
-        );
-
-        if (
-          data.complete !== true ||
-          !Array.isArray(data.users) ||
-          !Array.isArray(data.review_required)
-        ) {
-          throw new Error(
-            "La consulta de candidatos está incompleta",
-          );
-        }
-
-        if (!signal?.aborted) {
-          setPendingATurnos(data);
-        }
-      } catch (err) {
-        if (!signal?.aborted) {
-          setPendingError(
-            err instanceof Error
-              ? err.message
-              : "No se pudieron consultar los candidatos",
-          );
-        }
-      } finally {
-        if (!signal?.aborted) {
-          setPendingLoading(false);
-        }
-      }
-    },
+          if (!signal?.aborted) {
+            setPendingATurnos(data);
+          }
+        })
+        .catch((err: unknown) => {
+          if (!signal?.aborted) {
+            setPendingError(
+              err instanceof Error
+                ? err.message
+                : "No se pudieron consultar los candidatos",
+            );
+          }
+        })
+        .finally(() => {
+          if (!signal?.aborted) {
+            setPendingLoading(false);
+          }
+        }),
     [],
   );
 
   const loadHistory = useCallback(
-    async (offset = 0, signal?: AbortSignal) => {
-      setHistoryLoading(true);
-      setHistoryError("");
+    (offset: number, signal?: AbortSignal) => {
+      const requestId = ++historyRequest.current;
+      const isCurrent = () => !signal?.aborted && requestId === historyRequest.current;
 
-      try {
-        const data = await getJson<TeamHistoryResponse>(
-          `/api/team/history?limit=20&offset=${offset}`,
-          { signal },
-        );
-
-        if (!signal?.aborted) {
-          setHistory(data);
-        }
-      } catch (err) {
-        if (!signal?.aborted) {
-          setHistoryError(
-            err instanceof Error
-              ? err.message
-              : "No se pudo consultar el historial",
-          );
-        }
-      } finally {
-        if (!signal?.aborted) {
-          setHistoryLoading(false);
-        }
-      }
+      return getJson<TeamHistoryResponse>(
+        `/api/team/history?limit=20&offset=${offset}`,
+        { signal },
+      )
+        .then((data) => {
+          if (isCurrent()) {
+            setHistory(data);
+          }
+        })
+        .catch((err: unknown) => {
+          if (isCurrent()) {
+            setHistoryError(
+              err instanceof Error
+                ? err.message
+                : "No se pudo consultar el historial",
+            );
+          }
+        })
+        .finally(() => {
+          if (isCurrent()) {
+            setHistoryLoading(false);
+          }
+        });
     },
     [],
   );
+
+  function refreshHistory(offset: number) {
+    setHistoryLoading(true);
+    setHistoryError("");
+    void loadHistory(offset);
+  }
+
+  function refreshPendingATurnos() {
+    setPendingLoading(true);
+    setPendingError("");
+    setPendingATurnos(null);
+    void loadPendingATurnos();
+  }
 
   useEffect(() => {
     const controller = new AbortController();
@@ -279,7 +288,7 @@ export function Team() {
       );
 
       // Consultamos el historial después de guardar el cambio.
-      void loadHistory(0);
+      refreshHistory(0);
     } catch (err) {
       setError(
         err instanceof Error
@@ -530,7 +539,7 @@ export function Team() {
           <button
             type="button"
             disabled={pendingLoading}
-            onClick={() => void loadPendingATurnos()}
+            onClick={refreshPendingATurnos}
           >
             {pendingLoading
               ? "Consultando…"
@@ -660,9 +669,7 @@ export function Team() {
           <button
             type="button"
             disabled={historyLoading}
-            onClick={() =>
-              void loadHistory(history?.offset ?? 0)
-            }
+            onClick={() => refreshHistory(history?.offset ?? 0)}
           >
             {historyLoading
               ? "Cargando…"
@@ -753,7 +760,7 @@ export function Team() {
                 type="button"
                 disabled={history.offset === 0}
                 onClick={() =>
-                  void loadHistory(
+                  refreshHistory(
                     Math.max(
                       0,
                       history.offset - history.limit,
@@ -778,7 +785,7 @@ export function Team() {
                   history.total
                 }
                 onClick={() =>
-                  void loadHistory(
+                  refreshHistory(
                     history.offset + history.limit,
                   )
                 }

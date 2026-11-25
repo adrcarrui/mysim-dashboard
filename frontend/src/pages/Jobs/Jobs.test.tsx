@@ -163,7 +163,7 @@ describe("Jobs page", () => {
     render(<Jobs />)
 
     expect(
-      await screen.findByText("Unable to load open jobs."),
+      await screen.findByText("Backend unavailable"),
     ).toBeInTheDocument()
   })
 

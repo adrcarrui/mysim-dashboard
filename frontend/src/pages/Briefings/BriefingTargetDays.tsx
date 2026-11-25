@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import listPlugin from "@fullcalendar/list";
@@ -69,7 +69,7 @@ export function BriefingTargetDays({ briefing, members, onOpenBriefing, catalog,
   briefing: CalendarBriefing | null; members: Member[]; onOpenBriefing: (id: number) => void;
 }) {
   const [otherEntries, setEntries] = useState<Entry[]>([]);
-  const [loadingOther, setLoading] = useState(true);
+  const [completedRequest, setCompletedRequest] = useState<object | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
   const [attempt, setAttempt] = useState(0);
   const [kind, setKind] = useState("all");
@@ -79,9 +79,9 @@ export function BriefingTargetDays({ briefing, members, onOpenBriefing, catalog,
   const [showUndated, setShowUndated] = useState(false);
   const weekEnd = addDays(weekStart, 6);
   const [inspected, setInspected] = useState<Entry | null>(null);
+  const sourcesRequest = useMemo(() => ({ attempt, weekStart }), [attempt, weekStart]);
   useEffect(() => {
     const controller = new AbortController();
-    setLoading(true);
     async function load() {
       const otherSources = sources.filter(source => source.type !== "task");
       const results = await Promise.allSettled(otherSources.map(async source => {
@@ -98,12 +98,13 @@ export function BriefingTargetDays({ briefing, members, onOpenBriefing, catalog,
         else failures.push(`${otherSources[index].label}: ${String(result.reason)}`);
       });
       setEntries([...new Map(rows.map(row => [key(row.item), row])).values()]);
-      setErrors(failures); setLoading(false);
+      setErrors(failures);
+      setCompletedRequest(sourcesRequest);
     }
     void load();
     return () => controller.abort();
-  }, [attempt, weekStart]);
-  const loading = loadingOther || catalog.loading;
+  }, [sourcesRequest]);
+  const loading = completedRequest !== sourcesRequest || catalog.loading;
   const savedItems = new Map((briefing?.items ?? []).map(item => [key(item), item]));
   const taskEntries: Entry[] = catalog.tasks.map(({ item, record }) => {
     const saved = savedItems.get(key(item));

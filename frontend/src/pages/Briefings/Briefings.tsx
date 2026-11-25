@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Navigate, useSearchParams } from "react-router-dom";
 import { ClipboardList, X } from "lucide-react";
 import type { FormEvent } from "react";
@@ -194,13 +194,23 @@ function BriefingsWorkspace() {
   const [teamAttempt, setTeamAttempt] = useState(0);
   const [calendarId, setCalendarId] = useState("");
   const [workView, setWorkView] = useState<"calendar" | "target">("calendar");
-  const [calendar, setCalendar] = useState<Detail | null>(null);
-  const [calendarLoading, setCalendarLoading] = useState(false);
-  const [calendarError, setCalendarError] = useState("");
   const [calendarAttempt, setCalendarAttempt] = useState(0);
   const catalog = useBriefingTaskCatalog(calendarAttempt);
   const activeCalendarId = listing.items.some(item => String(item.id) === calendarId)
     ? calendarId : listing.items[0] ? String(listing.items[0].id) : "";
+  const calendarRequest = useMemo(
+    () => activeCalendarId ? { id: activeCalendarId, listing, attempt: calendarAttempt } : null,
+    [activeCalendarId, listing, calendarAttempt],
+  );
+  const [calendarResult, setCalendarResult] = useState<{
+    request: NonNullable<typeof calendarRequest>;
+    detail: Detail | null;
+    error: string;
+  } | null>(null);
+  const currentCalendar = calendarResult?.request === calendarRequest ? calendarResult : null;
+  const calendar = currentCalendar?.detail ?? null;
+  const calendarLoading = calendarRequest !== null && currentCalendar === null;
+  const calendarError = currentCalendar?.error ?? "";
 
   const participantOptions = [
     ...teamMembers,
@@ -249,17 +259,17 @@ function BriefingsWorkspace() {
   }, []);
 
   useEffect(() => {
+    if (!calendarRequest) return;
     const controller = new AbortController();
-    setCalendar(null);
-    setCalendarError("");
-    if (!activeCalendarId) { setCalendarLoading(false); return () => controller.abort(); }
-    setCalendarLoading(true);
-    void request<Detail>(`/api/briefings/${activeCalendarId}`, { signal: controller.signal })
-      .then(detail => { if (!controller.signal.aborted) setCalendar(detail); })
-      .catch(err => { if (!controller.signal.aborted) setCalendarError((err as Error).message); })
-      .finally(() => { if (!controller.signal.aborted) setCalendarLoading(false); });
+    void request<Detail>(`/api/briefings/${calendarRequest.id}`, { signal: controller.signal })
+      .then(detail => {
+        if (!controller.signal.aborted) setCalendarResult({ request: calendarRequest, detail, error: "" });
+      })
+      .catch(err => {
+        if (!controller.signal.aborted) setCalendarResult({ request: calendarRequest, detail: null, error: (err as Error).message });
+      });
     return () => controller.abort();
-  }, [activeCalendarId, listing, calendarAttempt]);
+  }, [calendarRequest]);
 
   useEffect(() => {
     if (!canEdit) return;
@@ -377,14 +387,15 @@ function BriefingsWorkspace() {
         ...(responsible !== undefined ? { responsible_user_id: responsible } : {}),
       }),
     });
-    setCalendar(current => {
-      if (current?.id !== briefingId) return current;
+    setCalendarResult(current => {
+      if (current?.detail?.id !== briefingId) return current;
+      const { detail } = current;
       const match = (row: CalendarWorkItem) => row.source_type === "task" && row.source_id === saved.item.source_id;
-      const previous = current.items.find(match);
+      const previous = detail.items.find(match);
       const next = (previous?.execution?.version ?? 0) > (saved.item.execution?.version ?? 0)
         ? { ...saved.item, execution: previous?.execution } : saved.item;
-      return { ...current, revision: Math.max(current.revision, saved.revision),
-        items: previous ? current.items.map(row => match(row) ? next : row) : [...current.items, next] };
+      return { ...current, detail: { ...detail, revision: Math.max(detail.revision, saved.revision),
+        items: previous ? detail.items.map(row => match(row) ? next : row) : [...detail.items, next] } };
     });
   }
 
@@ -399,14 +410,18 @@ function BriefingsWorkspace() {
   } : undefined;
 
   function updateCalendarExecution(briefingId: number, sourceId: string, execution: TaskExecution) {
-    setCalendar(current => {
-      if (current?.id !== briefingId) return current;
+    setCalendarResult(current => {
+      if (current?.detail?.id !== briefingId) return current;
+      const { detail } = current;
       return {
         ...current,
-        items: current.items.map(item =>
-          item.source_type === "task" && item.source_id === sourceId &&
-          execution.version >= (item.execution?.version ?? 0)
-            ? { ...item, execution } : item),
+        detail: {
+          ...detail,
+          items: detail.items.map(item =>
+            item.source_type === "task" && item.source_id === sourceId &&
+            execution.version >= (item.execution?.version ?? 0)
+              ? { ...item, execution } : item),
+        },
       };
     });
   }

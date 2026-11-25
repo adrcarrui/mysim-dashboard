@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { X } from "lucide-react";
 import { apiFetch } from "../../api/client";
@@ -53,21 +53,31 @@ export function BriefingWorkDetail({ item, members, onClose, onOpenBriefing, sho
   item: WorkItem; members: Member[]; onClose: () => void; onOpenBriefing?: () => void; showBriefingPlan?: boolean; sourceRecord?: Record<string, unknown>;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
-  const [record, setRecord] = useState<Record<string, unknown> | null>(sourceRecord ?? null);
-  const [loading, setLoading] = useState(!sourceRecord && item.source_type !== "manual");
-  const [error, setError] = useState("");
   const [attempt, setAttempt] = useState(0);
   const { source_type: sourceType, source_id: sourceId } = item;
+  const detailRequest = useMemo(
+    () => sourceRecord || sourceType === "manual" ? null : { sourceType, sourceId, attempt, showBriefingPlan },
+    [sourceRecord, sourceType, sourceId, attempt, showBriefingPlan],
+  );
+  const [result, setResult] = useState<{
+    request: NonNullable<typeof detailRequest>;
+    record: Record<string, unknown> | null;
+    error: string;
+  } | null>(null);
+  const currentResult = result?.request === detailRequest ? result : null;
+  const record = sourceRecord ?? currentResult?.record ?? null;
+  const loading = detailRequest !== null && currentResult === null;
+  const error = currentResult?.error ?? "";
   useEffect(() => {
     const dialog = ref.current;
     dialog?.showModal();
     return () => { if (dialog?.open) dialog.close(); };
   }, []);
   useEffect(() => {
-    if (sourceRecord) { setRecord(sourceRecord); setLoading(false); setError(""); return; }
-    if (sourceType === "manual") return;
+    if (!detailRequest) return;
+    const request = detailRequest;
+    const { sourceType, sourceId, showBriefingPlan } = request;
     const controller = new AbortController();
-    setLoading(true); setError(""); setRecord(null);
     async function load() {
       try {
         const response = await apiFetch(BASE + sourcePath(sourceType), { signal: controller.signal, cache: "no-store" });
@@ -77,20 +87,22 @@ export function BriefingWorkDetail({ item, members, onClose, onOpenBriefing, sho
         const idField = sourceType === "task" ? "scheduled_task_id" : "id";
         const found = data.find(row => row && typeof row === "object" && String(row[idField]) === sourceId);
         if (!controller.signal.aborted) {
-          if (found) setRecord(found);
-          else setError(showBriefingPlan
-            ? "This record no longer appears in the current query for open or pending work. The information saved in the briefing is shown below."
-            : "This record no longer appears in the current query for open or pending work. The selected work summary is shown below.");
+          const summary = showBriefingPlan ? "information saved in the briefing" : "selected work summary";
+          setResult({
+            request,
+            record: found ?? null,
+            error: found ? "" : `This record no longer appears in the current query for open or pending work. The ${summary} is shown below.`,
+          });
         }
       } catch (err) {
-        if (!controller.signal.aborted) setError((err as Error).message);
-      } finally {
-        if (!controller.signal.aborted) setLoading(false);
+        if (!controller.signal.aborted) {
+          setResult({ request, record: null, error: (err as Error).message });
+        }
       }
     }
     void load();
     return () => controller.abort();
-  }, [sourceType, sourceId, attempt, showBriefingPlan, sourceRecord]);
+  }, [detailRequest]);
   const owner = members.find(member => member.amh_user_id === item.responsible_user_id)?.display_name;
   const informationTitle = item.source_type === "task" ? "Task information" : "mySim information";
   const entries = Object.entries(record ?? {});

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Smartphone } from "lucide-react";
 import type { Member } from "./BriefingWork";
 import { BriefingWorkDetail } from "./BriefingWorkDetail";
@@ -74,15 +74,19 @@ export function BriefingCalendar({ briefing, onOpen, disabled = false, directory
   const [fullDay, setFullDay] = useState(false);
   const [inspectedKey, setInspectedKey] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const savedItems = briefing.items ?? [];
-  const savedTasks = new Map(savedItems.filter(item => item.source_type === "task").map(item => [item.source_id, item]));
-  const entries = (catalog?.tasks ?? []).map(entry => entry.item);
-  const targets = new Map(entries.map(item => [item.source_id, item.target_day]));
+  const catalogTasks = catalog?.tasks;
   const today = targetDay(new Date(now).toISOString());
-  const suggested = briefing.briefing_date === today
-    ? entries.filter(item => item.target_day === today && !savedTasks.has(item.source_id)) : [];
-  const items = [...savedItems.map(item => item.source_type === "task" && targets.has(item.source_id)
-    ? { ...item, target_day: targets.get(item.source_id) ?? item.target_day } : item), ...suggested];
+  const { items, savedTasks } = useMemo(() => {
+    const savedItems = briefing.items ?? [];
+    const savedTasks = new Map(savedItems.filter(item => item.source_type === "task").map(item => [item.source_id, item]));
+    const entries = (catalogTasks ?? []).map(entry => entry.item);
+    const targets = new Map(entries.map(item => [item.source_id, item.target_day]));
+    const suggested = briefing.briefing_date === today
+      ? entries.filter(item => item.target_day === today && !savedTasks.has(item.source_id)) : [];
+    const items = [...savedItems.map(item => item.source_type === "task" && targets.has(item.source_id)
+      ? { ...item, target_day: targets.get(item.source_id) ?? item.target_day } : item), ...suggested];
+    return { items, savedTasks };
+  }, [briefing.items, briefing.briefing_date, catalogTasks, today]);
   const inspectedIndex = inspectedKey === null ? -1 : items.findIndex((item, index) => taskKey(item, index) === inspectedKey);
   const inspected = items[inspectedIndex];
   const hasOpenExecution = items.some(item => item.execution?.started_at && !item.execution.completed_at);
@@ -175,7 +179,7 @@ export function BriefingCalendar({ briefing, onOpen, disabled = false, directory
       block.scrollIntoView?.({ block: "nearest", inline: "nearest" });
       setFocusKey(null);
     }
-  }, [focusKey, date, items]);
+  }, [focusKey, date, items, now]);
   const holder = directoryMembers.find(member => member.amh_user_id === briefing.mobile_holder_user_id)
     ?? known.find(member => member.amh_user_id === briefing.mobile_holder_user_id);
   const ticks = Array.from({ length: Math.ceil(minutes / 60) }, (_, index) => viewStart + index * 60 * MINUTE);

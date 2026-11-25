@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -11,7 +12,7 @@ import {
 } from "../api/dataCache";
 
 type QueryState<T> = {
-  key: string;
+  request: object;
   data: T | undefined;
   error: string | null;
   refreshing: boolean;
@@ -22,65 +23,43 @@ export function useCachedQuery<T>(
   loader: () => Promise<T>,
   ttl = 120_000,
 ) {
-  const [state, setState] = useState<QueryState<T>>(() => ({
-    key,
-    data: readDataCache<T>(key)?.data,
-    error: null,
-    refreshing: false,
-  }));
+  const request = useMemo(() => ({ key, loader, ttl }), [key, loader, ttl]);
+  const [state, setState] = useState<QueryState<T> | null>(null);
 
   const mounted = useRef(false);
   const sequence = useRef(0);
 
   const load = useCallback(
-    async (force = false) => {
+    (force = false) => {
       const requestSequence = ++sequence.current;
+      const { key, loader, ttl } = request;
       const cached = readDataCache<T>(key);
+      const isCurrent = () => mounted.current && requestSequence === sequence.current;
 
-      setState({
-        key,
-        data: cached?.data,
-        error: null,
-        refreshing: true,
-      });
+      async function fetchQuery() {
+        return fetchCachedData(key, loader, ttl, force);
+      }
 
-      try {
-        const data = await fetchCachedData(
-          key,
-          loader,
-          ttl,
-          force,
-        );
-
-        if (
-          mounted.current &&
-          requestSequence === sequence.current
-        ) {
-          setState({
-            key,
-            data,
-            error: null,
-            refreshing: false,
-          });
-        }
-      } catch (err) {
-        if (
-          mounted.current &&
-          requestSequence === sequence.current
-        ) {
-          setState({
-            key,
-            data: cached?.data,
-            error:
-              err instanceof Error
+      return fetchQuery()
+        .then((data) => {
+          if (isCurrent()) {
+            setState({ request, data, error: null, refreshing: false });
+          }
+        })
+        .catch((err: unknown) => {
+          if (isCurrent()) {
+            setState({
+              request,
+              data: cached?.data,
+              error: err instanceof Error
                 ? err.message
                 : "No se pudieron cargar los datos",
-            refreshing: false,
-          });
-        }
-      }
+              refreshing: false,
+            });
+          }
+        });
     },
-    [key, loader, ttl],
+    [request],
   );
 
   useEffect(() => {
@@ -94,10 +73,9 @@ export function useCachedQuery<T>(
   }, [load]);
 
   const current =
-    state.key === key
+    state?.request === request
       ? state
       : {
-          key,
           data: readDataCache<T>(key)?.data,
           error: null,
           refreshing: true,
@@ -111,6 +89,12 @@ export function useCachedQuery<T>(
       current.error === null,
     refreshing: current.refreshing,
     refresh: () => {
+      setState({
+        request,
+        data: readDataCache<T>(key)?.data,
+        error: null,
+        refreshing: true,
+      });
       void load(true);
     },
   };
